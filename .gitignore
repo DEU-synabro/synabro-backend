@@ -38,6 +38,3 @@ out/
 ## DB Data ##
 db/data/
 .env
-
-## application.yml file
-/src/main/resources/application.yml
