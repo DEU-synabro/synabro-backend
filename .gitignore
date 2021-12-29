@@ -40,4 +40,4 @@ db/data/
 .env
 
 ## application.yml file
-src/main/java/**/application.yml
+/src/main/resources/application.yml
