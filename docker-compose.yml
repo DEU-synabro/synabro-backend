@@ -1,0 +1,34 @@
+# Docker schema version definition
+# Check the compatibility matrix with the current schema version in the File Creation Reference.
+# https://docs.docker.com/compose/compose-file/
+version: "3.8"
+
+# Services or Containers List definition
+services:
+  # server:
+  #   container_name: "haenggu_backend"
+  #   build:
+  #     context: ./restapi
+  #     dockerfile: Dockerfile
+  #   ports: 
+  #     - 8080:8080
+  #   depends_on:
+  #     - postgres
+
+  db:
+    container_name: "synabroDB"
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
+    env_file: .env
+    networks:
+      - backend
+    restart: always
+  
+networks:
+  backend:
