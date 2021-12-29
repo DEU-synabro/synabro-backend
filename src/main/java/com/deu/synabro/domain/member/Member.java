@@ -1,9 +1,9 @@
-package com.deu.synabro.domain;
+package com.deu.synabro.domain.member;
 
+import com.deu.synabro.domain.BaseTimeEntity;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @Entity
-public class Member {
+public class Member extends BaseTimeEntity {
     @Id
     @Column(unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

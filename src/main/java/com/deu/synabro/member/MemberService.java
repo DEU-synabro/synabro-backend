@@ -1,2 +1,4 @@
-package com.deu.synabro.member;public class MemberService {
+package com.deu.synabro.member;
+
+public class MemberService {
 }
