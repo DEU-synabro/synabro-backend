@@ -10,7 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface BoardRepository extends JpaRepository<BoardEntity,Long> {
-    List<BoardEntity> findByTitleIsContaining(String title);
-    List<BoardEntity> findByWriterIsContaining(String writer);
+    List<BoardEntity> findByTitleContaining(String title);
+    List<BoardEntity> findByWriterContaining(String writer);
     List<BoardEntity> deleteByTitle(String title);
+    List<BoardEntity> findByTitleContainingOrContentContaining(String title, String content);
+    List<BoardEntity> findByWriterAndTitle(String writer, String title);
+
 }

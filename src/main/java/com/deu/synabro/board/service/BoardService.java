@@ -19,21 +19,33 @@ public class BoardService {
     public BoardEntity setBoard(BoardEntity boardEntity){
         return boardRepository.save(boardEntity);
     }
-
     public List<BoardEntity> getAllBoard(){
         return boardRepository.findAll();
     }
-
     public List<BoardEntity> findByTitle(String title){
-        return boardRepository.findByTitleIsContaining(title);
+        return boardRepository.findByTitleContaining(title);
     }
-
     public List<BoardEntity> findByWriter(String writer){
-        return boardRepository.findByWriterIsContaining(writer);
+        return boardRepository.findByWriterContaining(writer);
     }
-
+    public List<BoardEntity> findByTitleOrContent(String title, String content) {
+        return boardRepository.findByTitleContainingOrContentContaining(title,content);
+    }
     @Transactional
     public List<BoardEntity> deleteByTitle(String title){
         return boardRepository.deleteByTitle(title);
     }
+
+    public List<BoardEntity> findByWriterAndTitle(String writer, String title){
+        return boardRepository.findByWriterAndTitle(writer,title);
+    }
+    @Transactional
+    public BoardEntity UpdateBoard(BoardEntity reqBoard, BoardEntity boardEntity){
+        System.out.print(reqBoard.getContent());
+        boardEntity.setWriter(reqBoard.getWriter());
+        boardEntity.setTitle(reqBoard.getTitle());
+        boardEntity.setContent(reqBoard.getContent());
+        return boardEntity;
+    }
 }
+
