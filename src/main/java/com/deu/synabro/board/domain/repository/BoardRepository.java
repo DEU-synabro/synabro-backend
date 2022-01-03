@@ -11,9 +11,9 @@ import java.util.Optional;
 @Repository
 public interface BoardRepository extends JpaRepository<BoardEntity,Long> {
     List<BoardEntity> findByTitleContaining(String title);
-    List<BoardEntity> findByWriterContaining(String writer);
+    List<BoardEntity> findByUserid(String userid);
     List<BoardEntity> deleteByTitle(String title);
-    List<BoardEntity> findByTitleContainingOrContentContaining(String title, String content);
-    List<BoardEntity> findByWriterAndTitle(String writer, String title);
+    List<BoardEntity> findByTitleContainingOrContentsContaining(String title, String content);
+    List<BoardEntity> findByUseridAndTitle(String userid, String title);
 
 }

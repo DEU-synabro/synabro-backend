@@ -8,28 +8,29 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 public class BoardDTO {
-    private Long idx;
+    private Long id;
+    private String userid;
+    private String type;
     private String title;
-    private String content;
-    private String writer;
+    private String contents;
+    private String created_date;
+    private String updated_date;
 
     public BoardEntity toEntity(){
         BoardEntity boardEntity = BoardEntity.builder()
-                .idx(idx)
-                .writer(writer)
+                .userid(userid)
+                .type(type)
                 .title(title)
-                .content(content)
+                .contents(contents)
                 .build();
         return boardEntity;
     }
 
     @Builder
-    public BoardDTO(Long idx, String title, String content, String writer) {
-        this.idx = idx;
+    public BoardDTO(String userid, String type, String title, String contents) {
+        this.userid = userid;
+        this.type = type;
         this.title = title;
-        this.content = content;
-        this.writer = writer;
+        this.contents = contents;
     }
-
-
 }

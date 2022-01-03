@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,26 +26,27 @@ public class BoardService {
     public List<BoardEntity> findByTitle(String title){
         return boardRepository.findByTitleContaining(title);
     }
-    public List<BoardEntity> findByWriter(String writer){
-        return boardRepository.findByWriterContaining(writer);
+    public List<BoardEntity> findByUser_id(String userid){
+        return boardRepository.findByUserid(userid);
     }
-    public List<BoardEntity> findByTitleOrContent(String title, String content) {
-        return boardRepository.findByTitleContainingOrContentContaining(title,content);
+    public List<BoardEntity> findByTitleOrContents(String title, String contents) {
+        return boardRepository.findByTitleContainingOrContentsContaining(title,contents);
     }
     @Transactional
     public List<BoardEntity> deleteByTitle(String title){
         return boardRepository.deleteByTitle(title);
     }
 
-    public List<BoardEntity> findByWriterAndTitle(String writer, String title){
-        return boardRepository.findByWriterAndTitle(writer,title);
+    public List<BoardEntity> findByUser_idAndTitle(String userid, String title){
+        return boardRepository.findByUseridAndTitle(userid,title);
     }
     @Transactional
     public BoardEntity UpdateBoard(BoardEntity reqBoard, BoardEntity boardEntity){
-        System.out.print(reqBoard.getContent());
-        boardEntity.setWriter(reqBoard.getWriter());
+        boardEntity.setUserid(reqBoard.getUserid());
+        boardEntity.setType(reqBoard.getType());
         boardEntity.setTitle(reqBoard.getTitle());
-        boardEntity.setContent(reqBoard.getContent());
+        boardEntity.setContents(reqBoard.getContents());
+        boardEntity.setUpdated_date(LocalDateTime.now());
         return boardEntity;
     }
 }
