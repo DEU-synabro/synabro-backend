@@ -23,7 +23,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                 .authorizeHttpRequests()
-                    .antMatchers("/home/*", "/*/signin", "/*/signup").permitAll()
+                    .antMatchers("*" ,"/home/*", "/*/signin", "/*/signup").permitAll()
                     .anyRequest().permitAll();
     }
 }
