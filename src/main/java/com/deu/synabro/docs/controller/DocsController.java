@@ -25,24 +25,11 @@ public class DocsController {
     @Autowired
     DocsService docsService;
 
-    @PostMapping("/upload")
-    public DocsEntity saveDocs(MultipartFile file, @RequestBody DocsEntity reqEntity) throws IllegalStateException, IOException{
-        if( !file.isEmpty() ) {
-            file.transferTo(new File(file.getOriginalFilename()));
-        }
-        return docsService.saveDocs(reqEntity,file.getOriginalFilename());
-    }
-
-    @PostMapping(value="uploadFile")
-    public ResponseEntity<String> uploadFile(MultipartFile file) throws IllegalStateException, IOException {
-
-        if( !file.isEmpty() ) {
-            file.transferTo(new File(file.getOriginalFilename()));
-            System.out.println(file.getOriginalFilename());
-            System.out.println(file.getResource());
-            System.out.println(file.getName());
-            System.out.println(file.getContentType());
-        }
+    @PostMapping(value = "upload")
+    public ResponseEntity<String> saveFile(MultipartFile file) throws IllegalStateException, IOException{
+        System.out.println(file.getOriginalFilename());
+        docsService.saveFile(file);
         return new ResponseEntity<>("", HttpStatus.OK);
     }
+
 }
