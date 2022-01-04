@@ -3,8 +3,8 @@
 - [Instroduction](#Introduction)
 - [Requirements](#Requriements)
 - [Installation](#Installation)
-- [Configuration](#Configuration)
-- [Usage](#Usage)
+- [Deployment](#Deployment)
+- [Style Guide](#Style-Guide)
 - [Contributing](#Contributing)
 - [Maintainers](#Maintainers)
 
@@ -24,7 +24,8 @@ The final goal of this project is to provide an online volunteer activity platfo
     - Click *File > Settings > Plugin* or *Ctrl+Alt+S > Plugin*
     - Search **lombok** and Install
 
-## Configuration
+## Deployment
+### Configuration
 - Configurate Docker environment file.
     - Copy `.env.example` file and set the file name `.env`
     - Enter the mariaDB information
@@ -63,13 +64,15 @@ The final goal of this project is to provide an online volunteer activity platfo
             ...
         ```
 
-## Usage
 ### Run Docker container for mariaDB
 ```
 docker-compose up
 ```
 
-### Style Guide
+### Use HAL Browser
+After building the project, access `localhost:port/browser/index.html`
+
+## Style Guide
 - I referred to [Google Style Guidelines](https://github.com/JunHoPark93/google-java-styleguide)
 - Source file structure
     - A source file consists of, **in order**:
@@ -88,7 +91,7 @@ docker-compose up
         - `public void getUserByName(){}`
         - `public void toString(){}`
 - Variable Name
-    - Use Camel Case
+    - Use lowerCamelCase
     - Example
         - `private String myName`
 
