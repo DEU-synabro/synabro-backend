@@ -1,4 +1,4 @@
-package com.deu.synabro.docs.domain.entity;
+package com.deu.synabro.video.domain.entity;
 
 import lombok.*;
 
@@ -8,8 +8,8 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name="docs")
-public class DocsEntity {
+@Table(name="video")
+public class VideoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,14 +19,17 @@ public class DocsEntity {
     private String contents;
     @Column
     private String page;
+    @Column
+    private String url;
     @Column(name="file_name")
     private String file_name;
 
     @Builder
-    public DocsEntity(String work_id, String contents, String page, String file_name) {
+    public VideoEntity(String work_id, String contents, String page, String url, String file_name) {
         this.work_id = work_id;
         this.contents = contents;
         this.page = page;
+        this.url = url;
         this.file_name = file_name;
     }
 }
