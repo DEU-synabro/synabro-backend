@@ -1,4 +1,4 @@
-package com.deu.synabro.domain;
+package com.deu.synabro.member.domain;
 
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;

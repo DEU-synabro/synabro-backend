@@ -1,6 +1,6 @@
-//package com.deu.synabro.domain.member;
+//package com.deu.synabro.member.domain.member;
 //
-//import com.deu.synabro.domain.BaseTimeEntity;
+//import com.deu.synabro.member.domain.BaseTimeEntity;
 //import lombok.Builder;
 //import lombok.Data;
 //import lombok.NoArgsConstructor;
