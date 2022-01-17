@@ -1,26 +1,25 @@
-package com.deu.synabro.docs.service;
+package com.deu.synabro.video.service;
 
 import com.deu.synabro.docs.domain.entity.DocsEntity;
-import com.deu.synabro.docs.domain.repository.DocsRepository;
+import com.deu.synabro.video.domain.entity.VideoEntity;
+import com.deu.synabro.video.domain.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 
 @Service
-public class DocsService {
+public class VideoService {
 
     @Autowired
-    DocsRepository docsRepository;
+    VideoRepository videoRepository;
 
     @Value("${spring.servlet.multipart.location}")
     private String uploadPath;
@@ -34,7 +33,7 @@ public class DocsService {
         }
     }
 
-    public void saveDocs(MultipartFile file, String work_id, String contents, String page) throws IOException {
+    public void saveVideo(MultipartFile file, String work_id, String contents, String page, String url) throws IOException {
         System.out.print(uploadPath);
         try{
             if( file.isEmpty() ) {
@@ -47,14 +46,8 @@ public class DocsService {
                 System.out.println(file.getOriginalFilename());
             }
             try(InputStream inputStream = file.getInputStream()){
-                DocsEntity docsEntity = new DocsEntity(work_id,contents,page, file.getOriginalFilename());
-//                DocsEntity docsEntity= DocsEntity.builder()
-//                        .work_id(work_id)
-//                        .contents(contents)
-//                        .page(page)
-//                        .file_name(file.getOriginalFilename())
-//                        .build();
-                docsRepository.save(docsEntity);
+                VideoEntity videoEntity = new VideoEntity(work_id,contents,page,url, file.getOriginalFilename());
+                videoRepository.save(videoEntity);
                 Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
             }
         }catch (Exception e){
@@ -63,8 +56,8 @@ public class DocsService {
 
     }
 
-   public void saveFile(MultipartFile file)  {
-       System.out.print(uploadPath);
+    public void saveFile(MultipartFile file)  {
+
         try{
             if( file.isEmpty() ) {
                 System.out.println(file.getOriginalFilename());
@@ -82,4 +75,5 @@ public class DocsService {
             throw new RuntimeException("Not store the file ");
         }
     }
+
 }
