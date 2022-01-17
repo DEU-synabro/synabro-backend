@@ -1,6 +1,5 @@
 package com.deu.synabro.docs.dto;
 
-import com.deu.synabro.board.domain.entity.BoardEntity;
 import com.deu.synabro.docs.domain.entity.DocsEntity;
 import lombok.*;
 

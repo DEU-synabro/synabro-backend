@@ -1,15 +1,14 @@
 package com.deu.synabro.board.service;
 
-import com.deu.synabro.board.domain.entity.BoardEntity;
-import com.deu.synabro.board.domain.repository.BoardRepository;
-import com.deu.synabro.board.dto.BoardDTO;
+import com.deu.synabro.board.domain.BoardEntity;
+import com.deu.synabro.board.domain.BoardRepository;
+import com.deu.synabro.board.domain.BoardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BoardService {
@@ -43,7 +42,6 @@ public class BoardService {
     @Transactional
     public BoardEntity UpdateBoard(BoardEntity reqBoard, BoardEntity boardEntity){
         boardEntity.setUserid(reqBoard.getUserid());
-        boardEntity.setType(reqBoard.getType());
         boardEntity.setTitle(reqBoard.getTitle());
         boardEntity.setContents(reqBoard.getContents());
         boardEntity.setUpdated_date(LocalDateTime.now());

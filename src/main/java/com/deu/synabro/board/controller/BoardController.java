@@ -1,24 +1,12 @@
 package com.deu.synabro.board.controller;
 
-import com.deu.synabro.board.domain.entity.BoardEntity;
-import com.deu.synabro.board.domain.repository.BoardRepository;
-import com.deu.synabro.board.dto.BoardDTO;
+import com.deu.synabro.board.domain.BoardEntity;
 import com.deu.synabro.board.service.BoardService;
 import lombok.AllArgsConstructor;
-import org.apache.logging.log4j.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.Column;
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -38,6 +26,11 @@ public class BoardController {
     public List<BoardEntity> boardTitleFind(@RequestParam(name="title") String title){
         return boardService.findByTitle(title);
     }
+
+//    @GetMapping("/notice")
+//    public List<BoardEntity> boardNoticeFind() {
+//        return boardService.findByBoardType("notice");
+//    }
 
     @GetMapping("/user_idfind")  //이름으로 게시판 찾기
     public List<BoardEntity> boardUser_idFind(@RequestParam(name="user_id") String user_id){
