@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -25,24 +22,20 @@ public class DocsController {
     @Autowired
     DocsService docsService;
 
-    @PostMapping("/upload")
-    public DocsEntity saveDocs(MultipartFile file, @RequestBody DocsEntity reqEntity) throws IllegalStateException, IOException{
-        if( !file.isEmpty() ) {
-            file.transferTo(new File(file.getOriginalFilename()));
-        }
-        return docsService.saveDocs(reqEntity,file.getOriginalFilename());
+    @PostMapping(value = "upload")
+    public ResponseEntity<String> saveFile(MultipartFile file) throws IllegalStateException, IOException{
+        System.out.println(file.getOriginalFilename());
+        docsService.saveFile(file);
+        return new ResponseEntity<>("", HttpStatus.OK);
     }
 
-    @PostMapping(value="uploadFile")
-    public ResponseEntity<String> uploadFile(MultipartFile file) throws IllegalStateException, IOException {
-
-        if( !file.isEmpty() ) {
-            file.transferTo(new File(file.getOriginalFilename()));
-            System.out.println(file.getOriginalFilename());
-            System.out.println(file.getResource());
-            System.out.println(file.getName());
-            System.out.println(file.getContentType());
-        }
+    @PostMapping(value = "upload/docs")
+    public ResponseEntity<String> saveDocs(MultipartFile file, String work_id, String contents, String page) throws IllegalStateException, IOException{
+        System.out.println(file.getOriginalFilename());
+        System.out.println(work_id);
+        System.out.println(contents);
+        System.out.println(page);
+        docsService.saveDocs(file,work_id,contents,page);
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 }
