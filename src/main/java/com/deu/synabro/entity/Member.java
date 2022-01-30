@@ -1,40 +1,41 @@
-package com.deu.synabro.member.domain;
+package com.deu.synabro.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-@Data
-@NoArgsConstructor
+@Schema(description = "사용자")
+@Getter
+@RequiredArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Member {
     @Id
-    @Column(unique = true)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idx;
-
-    @Column(unique = true, length = 50)
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "member_id")
+    private UUID idx;
 
     @Column(unique = true, length = 50)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false, length = 50)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Column
+    @Column(length = 16)
     private String phone;
 
     @Column
@@ -44,13 +45,13 @@ public class Member {
     private String introduction;
 
     @Column
-    private Integer volunteer_time;
+    private Short volunteer_time;
 
     @Column
-    private Integer work_number;
+    private Short work_number;
 
     @Column
-    private Integer warning;
+    private Short warning;
 
     @Column
     private LocalDateTime last_login_time;
@@ -63,8 +64,8 @@ public class Member {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updated_date;
 
-    public Member(String userId, String email, String password, String username) {
-        this.userId = userId;
+    @Builder
+    public Member(String email, String password, String username) {
         this.email = email;
         this.password = password;
         this.username = username;
@@ -75,22 +76,5 @@ public class Member {
         this.work_number = 0;
         this.warning = 0;
         this.last_login_time = LocalDateTime.now();
-    }
-
-    @Builder
-    public Member(Long idx, String email, String password, String username, String phone, String address,
-                  String introduction, Integer volunteer_time, Integer work_number, Integer warning,
-                  LocalDateTime last_login_time, LocalDateTime created_date, LocalDateTime updated_date) {
-        this.idx = idx;
-        this.email = email;
-        this.password = password;
-        this.username = username;
-        this.phone = phone;
-        this.address = address;
-        this.introduction = introduction;
-        this.volunteer_time = volunteer_time;
-        this.work_number = work_number;
-        this.warning = warning;
-        this.last_login_time = last_login_time;
     }
 }
