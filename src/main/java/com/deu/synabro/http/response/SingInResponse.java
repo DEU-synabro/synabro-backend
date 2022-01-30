@@ -1,4 +1,4 @@
-package com.deu.synabro.member.http.response;
+package com.deu.synabro.http.response;
 
 import lombok.Data;
 import org.springframework.http.HttpEntity;

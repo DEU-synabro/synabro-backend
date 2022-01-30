@@ -1,4 +1,4 @@
-package com.deu.synabro.member.http.request;
+package com.deu.synabro.http.request;
 
 import lombok.Data;
 

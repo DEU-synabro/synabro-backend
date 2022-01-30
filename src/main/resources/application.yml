@@ -15,11 +15,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-<<<<<<< HEAD
-        show_sql: false
-=======
         show_sql: true
->>>>>>> 9a721c97d493306a613a8cbf17d9fbbd2e2bb9b2
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
