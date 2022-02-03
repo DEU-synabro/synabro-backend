@@ -23,45 +23,58 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "member_id")
+    @Schema(description = "사용자 계정 ID", nullable = false, example = "468cc9b5-bca2-494d-9f5c-f00a1af81696")
     private UUID idx;
 
     @Column(unique = true, length = 50)
+    @Schema(description = "사용자 이메일", example = "test@test.com")
     private String email;
 
     @JsonIgnore
     @Column(nullable = false, length = 50)
+    @Schema(description = "사용자 암호", example = "testPassword")
     private String password;
 
     @Column(unique = true, nullable = false)
+    @Schema(description = "사용자 이름", example = "testUsername")
     private String username;
 
     @Column(length = 16)
+    @Schema(description = "사용자 휴대폰 번호", example = "010-1234-5678")
     private String phone;
 
     @Column
+    @Schema(description = "사용자 주소", example = "00시 00구 000 123")
     private String address;
 
     @Column
+    @Schema(description = "사용자 자기소개 글", example = "test 사용자의 자기소개글입니다.")
     private String introduction;
 
     @Column
+    @Schema(description = "사용자 봉사 시간", example = "56")
     private Short volunteer_time;
 
     @Column
+    @Schema(description = "사용자 작업물 개수", example = "23")
     private Short work_number;
 
     @Column
+    @Schema(description = "사용자 경고 누적 횟수", example = "4")
     private Short warning;
 
     @Column
+    @Schema(description = "사용자 마지막 로그인 시간", example = "2022-01-030T05:17:22.024")
     private LocalDateTime last_login_time;
 
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Schema(description = "사용자 계정 생성 시간", example = "2021-11-26T06:32:14.168")
     private LocalDateTime created_date;
 
     @LastModifiedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Schema(description = "사용자 계정 정보 마지막 수정 시간", example = "2022-01-02T12:23:48.753")
     private LocalDateTime updated_date;
 
     @Builder

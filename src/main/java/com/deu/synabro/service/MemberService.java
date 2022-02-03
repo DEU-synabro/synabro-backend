@@ -24,4 +24,6 @@ public class MemberService {
         return memberRepository.findAll(pageable);
     }
 
+    public void save(Member member) { memberRepository.save(member); }
+
 }
