@@ -1,4 +1,4 @@
-package com.deu.synabro.board.domain;
+package com.deu.synabro.entity;
 
 public enum BoardType {
     notice ("공지사항");
