@@ -1,28 +1,26 @@
 package com.deu.synabro.http.response;
 
+import com.deu.synabro.controller.MemberController;
 import com.deu.synabro.entity.Member;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
 
-@Data
-@NoArgsConstructor
-@Schema(description = "사용자 전체 회원 목록 응답")
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+@Getter @Setter
 public class MemberListResponse {
-    @Schema(description = "조회 결과 개수", defaultValue = "0")
-    private int count;
+    private PagedModel<Member> members;
 
-    @Schema(description = "조회 결과")
-    private Member data;
-
-    public MemberListResponse(Member data) {
-        this.data = data;
-        if(data instanceof List) {
-            this.count = ((List<?>)data).size();
-        } else {
-            this.count = 1;
-        }
+    public MemberListResponse(Pageable pageable, Page<Member> memberPage) {
+        PagedModel.PageMetadata pageMetadata =
+                new PagedModel.PageMetadata(pageable.getPageSize(), memberPage.getNumber(), memberPage.getTotalElements());
+        members = PagedModel.of(memberPage.getContent(), pageMetadata);
+        members.add(linkTo(methodOn(MemberController.class).getMembers(pageable)).withSelfRel());
     }
 }
