@@ -1,8 +1,8 @@
-package com.deu.synabro.board.service;
+package com.deu.synabro.service;
 
-import com.deu.synabro.board.domain.BoardEntity;
-import com.deu.synabro.board.domain.BoardRepository;
-import com.deu.synabro.board.domain.BoardType;
+import com.deu.synabro.entity.Board;
+import com.deu.synabro.repository.BoardRepository;
+import com.deu.synabro.http.request.BoardRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,35 +16,42 @@ public class BoardService {
     @Autowired
     BoardRepository boardRepository;
 
-    public BoardEntity setBoard(BoardEntity boardEntity){
+    public Board setBoard(BoardRequest boardRequest){
+        Board boardEntity = boardRequest.toEntity();
         return boardRepository.save(boardEntity);
     }
-    public List<BoardEntity> getAllBoard(){
+    public List<Board> getAllBoard(){
         return boardRepository.findAll();
     }
-    public List<BoardEntity> findByTitle(String title){
+    public List<Board> findByTitle(String title){
         return boardRepository.findByTitleContaining(title);
     }
-    public List<BoardEntity> findByUser_id(String userid){
+    public List<Board> findByUser_id(String userid){
         return boardRepository.findByUserid(userid);
     }
-    public List<BoardEntity> findByTitleOrContents(String title, String contents) {
+    public List<Board> findByTitleOrContents(String title, String contents) {
         return boardRepository.findByTitleContainingOrContentsContaining(title,contents);
     }
     @Transactional
-    public List<BoardEntity> deleteByTitle(String title){
+    public List<Board> deleteByTitle(String title){
         return boardRepository.deleteByTitle(title);
     }
 
-    public List<BoardEntity> findByUser_idAndTitle(String userid, String title){
+    public List<Board> findByUser_idAndTitle(String userid, String title){
         return boardRepository.findByUseridAndTitle(userid,title);
     }
+
+    public List<Board> findByIdAndTitle(Long id, String title){
+        return boardRepository.findByIdAndTitle(id,title);
+    }
+
     @Transactional
-    public BoardEntity UpdateBoard(BoardEntity reqBoard, BoardEntity boardEntity){
+    public Board UpdateBoard(BoardRequest boardRequest, Board boardEntity){
+        Board reqBoard = boardRequest.toEntity();
         boardEntity.setUserid(reqBoard.getUserid());
         boardEntity.setTitle(reqBoard.getTitle());
         boardEntity.setContents(reqBoard.getContents());
-        boardEntity.setUpdated_date(LocalDateTime.now());
+        boardEntity.setModifiedDate(LocalDateTime.now());
         return boardEntity;
     }
 }
