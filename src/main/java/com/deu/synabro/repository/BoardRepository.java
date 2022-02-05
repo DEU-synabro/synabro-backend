@@ -1,6 +1,6 @@
 package com.deu.synabro.repository;
 
-import com.deu.synabro.entity.BoardType;
+import com.deu.synabro.entity.enums.BoardType;
 import com.deu.synabro.entity.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;

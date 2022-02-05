@@ -1,5 +1,6 @@
 package com.deu.synabro.entity;
 
+import com.deu.synabro.entity.enums.BoardType;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 

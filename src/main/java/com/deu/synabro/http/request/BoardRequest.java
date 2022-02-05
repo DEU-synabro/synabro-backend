@@ -1,7 +1,7 @@
 package com.deu.synabro.http.request;
 
 import com.deu.synabro.entity.Board;
-import com.deu.synabro.entity.BoardType;
+import com.deu.synabro.entity.enums.BoardType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
