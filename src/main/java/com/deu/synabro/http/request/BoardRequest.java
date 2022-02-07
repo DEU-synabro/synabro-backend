@@ -15,14 +15,14 @@ public class BoardRequest {
     @Schema(description = "글 내용",example = "글 내용")
     private String contents;
     @Schema(description = "게시판 종류",example = "종류")
-    private BoardType boardtype;
+    private BoardType boardType;
 
     public Board toEntity(){
         Board boardEntity = Board.builder()
                 .userid(userid)
                 .title(title)
                 .contents(contents)
-                .boardtype(boardtype)
+                .boardType(boardType)
                 .build();
         return boardEntity;
     }
