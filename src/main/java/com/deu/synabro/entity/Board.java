@@ -18,21 +18,20 @@ public class Board extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="userid")
+    @Column(name="user_id")
     private String userid;
-    @Column(name="title")
+    @Column
     private String title;
-    @Column(name="contents")
+    @Column
     private String contents;
-    @Enumerated(value=EnumType.STRING)
-    @Column(name="boardtype")
-    private BoardType boardtype;
+    @Column
+    private BoardType boardType;
 
     @Builder
-    public Board(String userid, String title, String contents, BoardType boardtype) {
+    public Board(String userid, String title, String contents, BoardType boardType) {
         this.userid = userid;
         this.title = title;
         this.contents = contents;
-        this.boardtype = boardtype;
+        this.boardType = boardType;
     }
 }
