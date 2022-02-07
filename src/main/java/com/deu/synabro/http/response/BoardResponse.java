@@ -20,7 +20,7 @@ public class BoardResponse {
     private String userid;
 
     @Schema(description = "게시판 종류", example = "종류")
-    private BoardType boardType;
+    private BoardType boardtype;
 
     @Schema(description = "게시판 제목", example = "제목")
     private String title;
@@ -39,7 +39,7 @@ public class BoardResponse {
                 .userid(userid)
                 .title(title)
                 .contents(contents)
-                .boardType(boardType)
+                .boardtype(boardtype)
                 .build();
         return boardEntity;
     }
