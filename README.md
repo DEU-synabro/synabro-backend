@@ -42,7 +42,7 @@ The final goal of this project is to provide an online volunteer activity platfo
         MARIADB_USER=testUsername
         MARIADB_PASSWORD=testPassword
         ```
-- Edit application.yml file
+- Edit application-prod.yml file
     - Correct the part below
         ```
         spring:
@@ -63,6 +63,7 @@ The final goal of this project is to provide an online volunteer activity platfo
                 password: testPassword
             ...
         ```
+  - If you want to use another profile option, you have to copy `application-prod.yml` file and change name to `application-{profile name}.yml`
 
 ### Run Docker container for mariaDB
 ```
