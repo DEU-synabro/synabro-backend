@@ -63,7 +63,8 @@ The final goal of this project is to provide an online volunteer activity platfo
                 password: testPassword
             ...
         ```
-  - If you want to use another profile option, you have to copy `application-prod.yml` file and change name to `application-{profile name}.yml`
+    - If you want to use another profile option, you have to copy `application-prod.yml` file and change name to `application-{profile name}.yml`
+      - Add `application-{profile-name}.yml` to `.gitignore` to prevent pushing sensitive data.
 
 ### Run Docker container for mariaDB
 ```
