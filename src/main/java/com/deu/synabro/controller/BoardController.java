@@ -10,7 +10,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,8 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Tag(name="Board", description = "게시판 API")
+@RequiredArgsConstructor
 @RestController
-@AllArgsConstructor
 public class BoardController {
 
     @Autowired
@@ -60,7 +61,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.findByTitle(pageable,keyword), HttpStatus.OK);
         }else if(searchOption.equals("userid")){
             return new ResponseEntity<>(boardService.findByUser_id(pageable,keyword), HttpStatus.OK);
-        }else if(searchOption=="title-content"){
+        }else if(searchOption.equals("title-content")){
             return new ResponseEntity<>(boardService.findByTitleOrContents(pageable,keyword,keyword), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -81,20 +82,20 @@ public class BoardController {
         return boardEntity;
     }
 
-    @Operation(tags = "Board", summary = "게시판 글을 삭제 합니다.",
-            responses={
-                    @ApiResponse(responseCode = "200", description = "게시판 글 삭제 성공",
-                            content = @Content(schema = @Schema(implementation = BoardResponse.class)))
-            })
-    @io.swagger.annotations.ApiResponses(
-            @io.swagger.annotations.ApiResponse(
-                    response = BoardResponse.class, message = "ok", code=200)
-    )
-    @DeleteMapping("/board/{id}/{title}") // 게시판 삭제
-    public List<Board> boardTitleDelete(@Parameter(description = "고유아이디") @PathVariable(name="id") Long id,
-                                        @Parameter(description = "제목") @PathVariable(name="title") String title){
-        return boardService.deleteByTitle(title);
-    }
+//    @Operation(tags = "Board", summary = "게시판 글을 삭제 합니다.",
+//            responses={
+//                    @ApiResponse(responseCode = "200", description = "게시판 글 삭제 성공",
+//                            content = @Content(schema = @Schema(implementation = BoardResponse.class)))
+//            })
+//    @io.swagger.annotations.ApiResponses(
+//            @io.swagger.annotations.ApiResponse(
+//                    response = BoardResponse.class, message = "ok", code=200)
+//    )
+//    @DeleteMapping("/board/{id}/{title}") // 게시판 삭제
+//    public List<Board> boardTitleDelete(@Parameter(description = "고유아이디") @PathVariable(name="id") Long id,
+//                                        @Parameter(description = "제목") @PathVariable(name="title") String title){
+//        return boardService.deleteByTitle(title);
+//    }
 
 //    @GetMapping("/board/update/{id}/{title}")
 //    public List<BoardEntity> boardUpdate(@PathVariable(name="id") Long id, @PathVariable(name="title") String title){
