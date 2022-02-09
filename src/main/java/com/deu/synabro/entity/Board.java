@@ -5,9 +5,10 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -16,20 +17,22 @@ import javax.persistence.*;
 public class Board extends BaseTime {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(name="user_id")
-    private String userid;
-    @Column
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "board_id", columnDefinition = "BINARY(16)")
+    private UUID id;
+    @Column(name="userid")
+    private String userId;
+    @Column(name="title")
     private String title;
-    @Column
+    @Column(name="contents")
     private String contents;
-    @Column
+    @Enumerated(value=EnumType.STRING)
+    @Column(name="boardtype")
     private BoardType boardType;
 
     @Builder
-    public Board(String userid, String title, String contents, BoardType boardType) {
-        this.userid = userid;
+    public Board(String userId, String title, String contents, BoardType boardType) {
+        this.userId = userId;
         this.title = title;
         this.contents = contents;
         this.boardType = boardType;

@@ -2,22 +2,26 @@ package com.deu.synabro.http.response;
 
 import com.deu.synabro.entity.Board;
 import com.deu.synabro.entity.enums.BoardType;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
 @ToString
 @Schema(description = "게시판")
 @NoArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BoardResponse {
-    @Schema(description = "고유번호", example = "1")
-    private Long id;
+    @Schema(description = "고유번호", example = "8857ba20-2cb7-407e-908c-b333cf1257c5")
+    private UUID id;
 
     @Schema(description = "아이디", example = "dnd01")
-    private String userid;
+    private String userId;
 
     @Schema(description = "게시판 종류", example = "종류")
     private BoardType boardType;
@@ -33,14 +37,4 @@ public class BoardResponse {
 
     @Schema(description = "게시판 수정 날짜")
     private LocalDateTime updated_date;
-
-    public Board toEntity(){
-        Board boardEntity = Board.builder()
-                .userid(userid)
-                .title(title)
-                .contents(contents)
-                .boardType(boardType)
-                .build();
-        return boardEntity;
-    }
 }
