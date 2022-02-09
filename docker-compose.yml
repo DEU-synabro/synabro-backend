@@ -5,7 +5,7 @@ version: "3.8"
 
 # Services or Containers List definition
 services:
-  synabro:
+  backend:
     container_name: synabro_backend
     image: springio/gs-spring-boot-docker
     build:
@@ -14,9 +14,9 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mariadb
-  mariadb:
-    container_name: synabroDB
+      - db
+  db:
+    container_name: synabro_database
     build:
       context: ./db
       dockerfile: Dockerfile
