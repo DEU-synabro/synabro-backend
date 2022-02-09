@@ -1,7 +1,7 @@
-package com.deu.synabro.video.service;
+package com.deu.synabro.service;
 
-import com.deu.synabro.video.domain.entity.VideoEntity;
-import com.deu.synabro.video.domain.repository.VideoRepository;
+import com.deu.synabro.entity.VideoEntity;
+import com.deu.synabro.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

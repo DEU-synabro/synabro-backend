@@ -1,6 +1,6 @@
-package com.deu.synabro.video.domain.repository;
+package com.deu.synabro.repository;
 
-import com.deu.synabro.video.domain.entity.VideoEntity;
+import com.deu.synabro.entity.VideoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

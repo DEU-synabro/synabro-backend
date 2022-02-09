@@ -1,4 +1,4 @@
-package com.deu.synabro.education;
+package com.deu.synabro.entity;
 
 import lombok.Builder;
 import lombok.Data;

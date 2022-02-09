@@ -1,6 +1,6 @@
-package com.deu.synabro.video.controller;
+package com.deu.synabro.controller;
 
-import com.deu.synabro.video.service.VideoService;
+import com.deu.synabro.service.VideoService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

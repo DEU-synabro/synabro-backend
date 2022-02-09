@@ -12,7 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Schema(description = "사용자")
@@ -77,14 +76,6 @@ public class Member {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Schema(description = "사용자 계정 정보 마지막 수정 시간", example = "2022-01-02T12:23:48.753")
     private LocalDateTime updated_date;
-
-    @ManyToMany
-    @JoinTable(
-            name = "member_authority",
-            joinColumns = {@JoinColumn(name = "member_id", referencedColumnName = "member_id")},
-            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")}
-    )
-    private Set<Authority> authorities;
 
     @Builder
     public Member(String email, String password, String username) {
