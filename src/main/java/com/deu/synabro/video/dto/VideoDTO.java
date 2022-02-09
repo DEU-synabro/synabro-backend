@@ -1,8 +1,6 @@
 package com.deu.synabro.video.dto;
 
-import com.deu.synabro.docs.domain.entity.DocsEntity;
 import com.deu.synabro.video.domain.entity.VideoEntity;
-import com.deu.synabro.video.service.VideoService;
 import lombok.Builder;
 
 public class VideoDTO {

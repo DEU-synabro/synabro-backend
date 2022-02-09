@@ -62,22 +62,24 @@ public class BoardController {
             BoardPageResponse boardResponse = new BoardPageResponse(boardService.findByTitle(pageable,keyword));
             return new ResponseEntity<>(boardResponse, HttpStatus.OK);
         }
-//        else if(searchOption.equals("userid")){
-//            return new ResponseEntity<>(boardService.findByUser_id(pageable,keyword), HttpStatus.OK);
-//        }else if(searchOption=="title-content"){
-//            return new ResponseEntity<>(boardService.findByTitleOrContents(pageable,keyword,keyword), HttpStatus.OK);
-//        }
+        else if(searchOption.equals("userid")){
+            BoardPageResponse boardResponse = new BoardPageResponse(boardService.findByUser_id(pageable,keyword));
+            return new ResponseEntity<>(boardResponse, HttpStatus.OK);
+        }else if(searchOption=="title-content"){
+            BoardPageResponse boardResponse = new BoardPageResponse(boardService.findByTitleOrContents(pageable,keyword,keyword));
+            return new ResponseEntity<>(boardResponse, HttpStatus.OK);
+        }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @Operation(tags = "Board", summary = "게시판 글을 생성 합니다.",
-        responses={
-            @ApiResponse(responseCode = "200", description = "게시판 글 생성 성공",
-                    content = @Content(schema = @Schema(implementation = BoardPageResponse.class)))
-    })
+            responses={
+                    @ApiResponse(responseCode = "200", description = "게시판 글 생성 성공",
+                            content = @Content(schema = @Schema(implementation = BoardResponse.class)))
+            })
     @io.swagger.annotations.ApiResponses(
             @io.swagger.annotations.ApiResponse(
-                    response = BoardPageResponse.class, message = "ok", code=200)
+                    response = BoardResponse.class, message = "ok", code=200)
     )
     @PostMapping("/board") // 게시판 생성
     public Board boardCreate(@Parameter @RequestBody BoardRequest reqBoard){
