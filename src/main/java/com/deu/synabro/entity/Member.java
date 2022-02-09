@@ -2,28 +2,22 @@ package com.deu.synabro.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Getter;
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Schema(description = "사용자")
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@RequiredArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Member {
@@ -37,8 +31,8 @@ public class Member {
     @Schema(description = "사용자 이메일", example = "test@test.com")
     private String email;
 
-//    @JsonIgnore
-    @Column(nullable = false)
+    @JsonIgnore
+    @Column(nullable = false, length = 50)
     @Schema(description = "사용자 암호", example = "testPassword")
     private String password;
 
@@ -84,16 +78,13 @@ public class Member {
     @Schema(description = "사용자 계정 정보 마지막 수정 시간", example = "2022-01-02T12:23:48.753")
     private LocalDateTime updated_date;
 
-//    @ElementCollection(fetch = FetchType.EAGER)
-//    @Builder.Default
-//    private List<String> roles = new ArrayList<>();
-//
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return this.roles.stream()
-//                .map(SimpleGrantedAuthority::new)
-//                .collect(Collectors.toList());
-//    }
+    @ManyToMany
+    @JoinTable(
+            name = "member_authority",
+            joinColumns = {@JoinColumn(name = "member_id", referencedColumnName = "member_id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")}
+    )
+    private Set<Authority> authorities;
 
     @Builder
     public Member(String email, String password, String username) {
@@ -108,25 +99,4 @@ public class Member {
         this.warning = 0;
         this.last_login_time = LocalDateTime.now();
     }
-
-
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return false;
-//    }
 }
