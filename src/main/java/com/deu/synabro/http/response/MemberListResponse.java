@@ -17,10 +17,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class MemberListResponse {
     private PagedModel<Member> members;
 
-//    public MemberListResponse(Pageable pageable, Page<Member> memberPage) {
-//        PagedModel.PageMetadata pageMetadata =
-//                new PagedModel.PageMetadata(pageable.getPageSize(), memberPage.getNumber(), memberPage.getTotalElements());
-//        members = PagedModel.of(memberPage.getContent(), pageMetadata);
-//        members.add(linkTo(methodOn(MemberController.class).getMembers(pageable)).withSelfRel());
-//    }
+    public MemberListResponse(Pageable pageable, Page<Member> memberPage) {
+        PagedModel.PageMetadata pageMetadata =
+                new PagedModel.PageMetadata(pageable.getPageSize(), memberPage.getNumber(), memberPage.getTotalElements());
+        members = PagedModel.of(memberPage.getContent(), pageMetadata);
+        members.add(linkTo(methodOn(MemberController.class).getMembers(pageable)).withSelfRel());
+    }
 }

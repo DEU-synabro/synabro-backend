@@ -35,6 +35,6 @@ public class Board extends BaseTime {
         this.userId = userId;
         this.title = title;
         this.contents = contents;
-        this.boardtype = boardtype;
+        this.boardType = boardType;
     }
 }

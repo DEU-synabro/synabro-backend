@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Member implements UserDetails {
+public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "member_id")
@@ -84,49 +84,49 @@ public class Member implements UserDetails {
     @Schema(description = "사용자 계정 정보 마지막 수정 시간", example = "2022-01-02T12:23:48.753")
     private LocalDateTime updated_date;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
-    private List<String> roles = new ArrayList<>();
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
-
-//    @Builder
-//    public Member(String email, String password, String username) {
-//        this.email = email;
-//        this.password = password;
-//        this.username = username;
-//        this.phone = "";
-//        this.address = "";
-//        this.introduction = "";
-//        this.volunteer_time = 0;
-//        this.work_number = 0;
-//        this.warning = 0;
-//        this.last_login_time = LocalDateTime.now();
+//    @ElementCollection(fetch = FetchType.EAGER)
+//    @Builder.Default
+//    private List<String> roles = new ArrayList<>();
+//
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return this.roles.stream()
+//                .map(SimpleGrantedAuthority::new)
+//                .collect(Collectors.toList());
 //    }
 
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
+    @Builder
+    public Member(String email, String password, String username) {
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.phone = "";
+        this.address = "";
+        this.introduction = "";
+        this.volunteer_time = 0;
+        this.work_number = 0;
+        this.warning = 0;
+        this.last_login_time = LocalDateTime.now();
     }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
+//    @Override
+//    public boolean isAccountNonExpired() {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean isCredentialsNonExpired() {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean isEnabled() {
+//        return false;
+//    }
 }

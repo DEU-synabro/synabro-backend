@@ -24,14 +24,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtProvider jwtProvider;
 
-    // 암호화에 필요한 PasswordEncoder 를 Bean 등록합니다.
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    // authenticationManager를 Bean 등록합니다.
-    @Bean
+//    // 암호화에 필요한 PasswordEncoder 를 Bean 등록합니다.
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+//    }
+//
+//    // authenticationManager를 Bean 등록합니다.
+//    @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
@@ -49,12 +49,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .and()
                 .authorizeHttpRequests()
                     .antMatchers("*" ,"/home/*", "/*/signin", "/*/signup").permitAll()  //누구나 접근 가능
-                    .antMatchers("/user/**").hasRole("USER")
-                    .antMatchers("/admin/**").hasRole("ADMIN")
-                    .anyRequest().permitAll()  // 나머지는 권한이 있기만 하면 접근 가능
-                    .and()
-                    .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
-                            UsernamePasswordAuthenticationFilter.class);
+                    .anyRequest().permitAll();
+//                    .antMatchers("/user/**").hasRole("USER")
+//                    .antMatchers("/admin/**").hasRole("ADMIN")
+//                    .anyRequest().permitAll()  // 나머지는 권한이 있기만 하면 접근 가능
+//                    .and()
+//                    .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
+//                            UsernamePasswordAuthenticationFilter.class);
             // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
     }
 
