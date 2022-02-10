@@ -1,4 +1,4 @@
-package com.deu.synabro.inspection;
+package com.deu.synabro.entity;
 
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Inspection {
+public class Volunteer {
     @Id
     @Column(unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,19 +45,13 @@ public class Inspection {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endedDate;
 
-    public Inspection(String title, String description) {
+    public Volunteer(String title, String description) {
         this.title = title;
         this.description = description;
-    }
-
-    public Inspection(String title, String description, LocalDateTime endedDate) {
-        this.title = title;
-        this.description = description;
-        this.endedDate = endedDate;
     }
 
     @Builder
-    public Inspection(Long idx, Long user_id, String title, String description, LocalDateTime createdDate, LocalDateTime updatedDate, LocalDateTime endedDate) {
+    public Volunteer(Long idx, Long user_id, String title, String description, LocalDateTime createdDate, LocalDateTime updatedDate, LocalDateTime endedDate) {
         this.idx = idx;
         this.user_id = user_id;
         this.title = title;

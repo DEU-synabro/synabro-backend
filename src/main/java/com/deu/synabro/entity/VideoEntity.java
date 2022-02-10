@@ -1,4 +1,4 @@
-package com.deu.synabro.video.domain.entity;
+package com.deu.synabro.entity;
 
 import lombok.*;
 

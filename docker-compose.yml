@@ -5,18 +5,18 @@ version: "3.8"
 
 # Services or Containers List definition
 services:
-  # server:
-  #   container_name: "haenggu_backend"
-  #   build:
-  #     context: ./restapi
-  #     dockerfile: Dockerfile
-  #   ports: 
-  #     - 8080:8080
-  #   depends_on:
-  #     - postgres
-
+  backend:
+    container_name: synabro_backend
+    image: springio/gs-spring-boot-docker
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
   db:
-    container_name: "synabroDB"
+    container_name: synabro_database
     build:
       context: ./db
       dockerfile: Dockerfile
@@ -25,10 +25,5 @@ services:
     volumes:
       - ./db/data:/var/lib/mysql
       - ./db/initdb.d:/docker-entrypoint-initdb.d
-    env_file: db.env
-    networks:
-      - backend
+    env_file: .env
     restart: always
-  
-networks:
-  backend:
