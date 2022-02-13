@@ -32,7 +32,7 @@ public class Member {
     private String email;
 
     @JsonIgnore
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     @Schema(description = "사용자 암호", example = "testPassword")
     private String password;
 
@@ -78,6 +78,9 @@ public class Member {
     @Schema(description = "사용자 계정 정보 마지막 수정 시간", example = "2022-01-02T12:23:48.753")
     private LocalDateTime updated_date;
 
+    @Column(name = "activated")
+    private boolean activated;
+
     @ManyToMany
     @JoinTable(
             name = "member_authority",
@@ -85,6 +88,10 @@ public class Member {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")}
     )
     private Set<Authority> authorities;
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
 
     @Builder
     public Member(String email, String password, String username) {

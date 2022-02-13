@@ -79,7 +79,7 @@ public class MemberController {
                                                    schema = @Schema(implementation = GeneralResponse.class),
                                                    examples = @ExampleObject(value = SET_MEMBER_BAD_REQUEST)))
                })
-    @PostMapping(value = "")
+    @PostMapping(value = "/signup")
     public ResponseEntity<GeneralResponse> setMember(@RequestBody SignUpRequest signUpRequest) {
         if (signUpRequest.getEmail() == null || signUpRequest.getPassword() == null || signUpRequest.getUsername() == null) {
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.BAD_REQUEST, "잘못된 접근입니다. email, password, username을 확인해주세요."), HttpStatus.BAD_REQUEST);
