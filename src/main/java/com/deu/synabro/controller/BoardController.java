@@ -26,6 +26,7 @@ import java.util.UUID;
 @Tag(name="Board", description = "게시판 API")
 @RestController
 @AllArgsConstructor
+@RequestMapping("/api/board")
 public class BoardController {
 
     @Autowired

@@ -43,16 +43,12 @@ public class DocsController {
     )
     @PostMapping(value = "/docs")
     public ResponseEntity<DocsResponse> saveDocs(@RequestPart MultipartFile file,
-                                                 @RequestPart(name = "work_id") String workId,
-                                                 @RequestPart String contents,
-                                                 @RequestPart String page) throws IllegalStateException, IOException{
+                                                 @RequestPart(name = "work_id") String workId) throws IllegalStateException, IOException{
         DocsResponse docsResponse = DocsResponse.builder()
                                                 .wordId(workId)
-                                                .contents(contents)
-                                                .page(page)
                                                 .fileName(file.getOriginalFilename())
                                                 .build();
-        docsService.saveDocs(file,workId,contents,page);
+//        docsService.saveDocs(file,volunteerResponse);
         return new ResponseEntity<>(docsResponse, HttpStatus.OK);
     }
 

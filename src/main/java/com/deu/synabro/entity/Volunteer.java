@@ -1,5 +1,6 @@
 package com.deu.synabro.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,19 +12,23 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @Entity
+@Table(name="volunteer")
 @EntityListeners(AuditingEntityListener.class)
-public class Volunteer {
+public class Volunteer extends BaseTime{
     @Id
-    @Column(unique = true)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idx;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "volunteer_id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
-    @Column
-    private Long user_id;
+    @Column(name="user_id")
+    private String userId;
 
     @Column
     private String title;
@@ -31,33 +36,16 @@ public class Volunteer {
     @Column
     private String description;
 
-    @CreatedDate
-    @Column(name = "created_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    @Column(name = "updated_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedDate;
-
     @Column(name = "ended_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endedDate;
 
-    public Volunteer(String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
     @Builder
-    public Volunteer(Long idx, Long user_id, String title, String description, LocalDateTime createdDate, LocalDateTime updatedDate, LocalDateTime endedDate) {
-        this.idx = idx;
-        this.user_id = user_id;
+    public Volunteer(String userId, String title, String description, LocalDateTime endedDate) {
+        this.userId = userId;
         this.title = title;
         this.description = description;
-        this.createdDate = createdDate;
-        this.updatedDate = updatedDate;
         this.endedDate = endedDate;
     }
 }

@@ -5,7 +5,7 @@ spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://synabro_database:3306/{database_name}
-    username: {username}
+    username: {name}
     password: {password}
   jpa:
     hibernate:
