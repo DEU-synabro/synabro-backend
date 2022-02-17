@@ -20,7 +20,7 @@ public class Board extends BaseTime {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "board_id", columnDefinition = "BINARY(16)")
     private UUID id;
-    @Column(name="userid")
+    @Column(name="user_id")
     private String userId;
     @Column(name="title")
     private String title;
