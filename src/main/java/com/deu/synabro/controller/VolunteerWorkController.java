@@ -3,7 +3,6 @@ package com.deu.synabro.controller;
 import com.deu.synabro.entity.Volunteer;
 import com.deu.synabro.http.request.VolunteerRequest;
 import com.deu.synabro.http.response.BoardResponse;
-import com.deu.synabro.http.response.DocsResponse;
 import com.deu.synabro.http.response.VolunteerResponse;
 import com.deu.synabro.service.DocsService;
 import com.deu.synabro.service.VideoService;
