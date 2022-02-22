@@ -4,9 +4,9 @@ spring:
       on-profile: prod
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://synabro_database:3306/td
-    username: user
-    password: userpassword
+    url: jdbc:mariadb://synabro_database:3306/{database_name}
+    username: {name}
+    password: {password}
   jpa:
     hibernate:
       ddl-auto: update
