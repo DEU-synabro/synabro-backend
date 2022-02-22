@@ -1,6 +1,7 @@
 package com.deu.synabro.service;
 
-import com.deu.synabro.entity.VideoEntity;
+import com.deu.synabro.entity.Video;
+import com.deu.synabro.entity.Volunteer;
 import com.deu.synabro.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +33,11 @@ public class VideoService {
         }
     }
 
-    public void saveVideo(MultipartFile file, String work_id, String contents, String page, String url) throws IOException {
+    public void saveUrl(String workId, String Url){
+
+    }
+
+    public void saveVideo(MultipartFile file, Volunteer volunteer) throws IOException {
         System.out.print(uploadPath);
         try{
             if( file.isEmpty() ) {
@@ -45,8 +50,8 @@ public class VideoService {
                 System.out.println(file.getOriginalFilename());
             }
             try(InputStream inputStream = file.getInputStream()){
-                VideoEntity videoEntity = new VideoEntity(work_id,contents,page,url, file.getOriginalFilename());
-                videoRepository.save(videoEntity);
+                Video video = new Video(volunteer,file.getOriginalFilename());
+                videoRepository.save(video);
                 Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
             }
         }catch (Exception e){

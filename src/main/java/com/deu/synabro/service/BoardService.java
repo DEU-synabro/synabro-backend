@@ -50,7 +50,7 @@ public class BoardService {
         boardEntity.setUserId(reqBoard.getUserId());
         boardEntity.setTitle(reqBoard.getTitle());
         boardEntity.setContents(reqBoard.getContents());
-        boardEntity.setModifiedDate(LocalDateTime.now());
+        boardEntity.setUpdatedDate(LocalDateTime.now());
         return boardEntity;
     }
 }

@@ -1,6 +1,9 @@
 package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Docs;
+import com.deu.synabro.entity.Volunteer;
+import com.deu.synabro.http.request.DocsRequest;
+import com.deu.synabro.http.response.VolunteerResponse;
 import com.deu.synabro.repository.DocsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +35,7 @@ public class DocsService {
         }
     }
 
-    public void saveDocs(MultipartFile file, String work_id, String contents, String page) throws IOException {
+    public void saveDocs(MultipartFile file, Volunteer volunteer) throws IOException {
         System.out.print(uploadPath);
         try{
             if( file.isEmpty() ) {
@@ -45,14 +48,9 @@ public class DocsService {
                 System.out.println(file.getOriginalFilename());
             }
             try(InputStream inputStream = file.getInputStream()){
-                Docs docsEntity = new Docs(work_id,contents,page, file.getOriginalFilename());
-//                DocsEntity docsEntity= DocsEntity.builder()
-//                        .work_id(work_id)
-//                        .contents(contents)
-//                        .page(page)
-//                        .file_name(file.getOriginalFilename())
-//                        .build();
-                docsRepository.save(docsEntity);
+
+                Docs docs = new Docs(volunteer,file.getOriginalFilename());
+                docsRepository.save(docs);
                 Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
             }
         }catch (Exception e){
