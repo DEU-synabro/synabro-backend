@@ -2,31 +2,23 @@ package com.deu.synabro.controller;
 
 import com.deu.synabro.entity.Volunteer;
 import com.deu.synabro.http.request.VolunteerRequest;
-import com.deu.synabro.http.response.BoardResponse;
 import com.deu.synabro.http.response.VolunteerResponse;
 import com.deu.synabro.service.DocsService;
 import com.deu.synabro.service.VideoService;
 import com.deu.synabro.service.VolunteerService;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javafx.application.Application;
 import lombok.AllArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.EntityManager;
 import java.io.IOException;
 
 @Tag(name="VolunteerWork", description = "문서 API")
