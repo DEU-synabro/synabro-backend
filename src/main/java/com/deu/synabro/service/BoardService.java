@@ -36,18 +36,17 @@ public class BoardService {
         return boardRepository.findByTitleContainingOrContentsContaining(pageable,title,contents);
     }
     @Transactional
-    public List<Board> deleteByTitle(UUID id, String title){
-        return boardRepository.deleteByIdAndTitle(id, title);
+    public List<Board> deleteById(UUID id){
+        return boardRepository.deleteById(id);
     }
 
-    public List<Board> findByIdAndTitle(UUID id, String title){
-        return boardRepository.findByIdAndTitle(id,title);
+    public List<Board> findById(UUID id){
+        return boardRepository.findById(id);
     }
 
     @Transactional
     public Board UpdateBoard(BoardRequest boardRequest, Board boardEntity){
         Board reqBoard = boardRequest.toEntity();
-        boardEntity.setUserId(reqBoard.getUserId());
         boardEntity.setTitle(reqBoard.getTitle());
         boardEntity.setContents(reqBoard.getContents());
         boardEntity.setUpdatedDate(LocalDateTime.now());

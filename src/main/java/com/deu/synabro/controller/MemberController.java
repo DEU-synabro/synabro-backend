@@ -84,8 +84,7 @@ public class MemberController {
         if (signUpRequest.getEmail() == null || signUpRequest.getPassword() == null || signUpRequest.getUsername() == null) {
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.BAD_REQUEST, "잘못된 접근입니다. email, password, username을 확인해주세요."), HttpStatus.BAD_REQUEST);
         }
-        Member member = new Member(signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getUsername());
-        memberService.save(member);
+        memberService.signup(signUpRequest);
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "사용자 등록에 성공하였습니다."), HttpStatus.OK);
     }
 
