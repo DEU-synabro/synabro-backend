@@ -2,13 +2,18 @@ package com.deu.synabro.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /*
@@ -32,9 +37,11 @@ public class WebConfig {
     public Docket api() {
         return new Docket(DocumentationType.OAS_30)
                 .useDefaultResponseMessages(false)
+                .securityContexts(Stream.of(securityContext()).collect(Collectors.toList()))
+                .securitySchemes(Stream.of(apiKey()).collect(Collectors.toList()))
                 .select()
                     .apis(RequestHandlerSelectors.basePackage("com.deu.synabro"))
-                    .paths(PathSelectors.any())
+                    .paths(PathSelectors.ant("/api/**"))
                 .build()
                 .apiInfo(apiInfo());
     }
@@ -53,5 +60,27 @@ public class WebConfig {
                 .description("Synabro API docs")
                 .version("1.0")
                 .build();
+    }
+
+    private ApiKey apiKey() {
+        return new ApiKey("JWT", "Authorization", "header");
+    }
+
+    private SecurityContext securityContext() {
+        return SecurityContext.builder()
+                .securityReferences(defaultAuth())
+                .operationSelector(
+                        oc -> oc.requestMappingPattern().matches("((?!boards|sign).)*")
+                )
+                .build();
+    }
+
+    private List<SecurityReference> defaultAuth() {
+        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
+        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
+        authorizationScopes[0] = authorizationScope;
+        List<SecurityReference> jwt = new ArrayList<>();
+        jwt.add(new SecurityReference("JWT", authorizationScopes));
+        return jwt;
     }
 }

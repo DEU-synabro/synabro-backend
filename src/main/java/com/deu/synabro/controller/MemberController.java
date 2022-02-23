@@ -37,7 +37,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @author Jiyoon Bak
  * @version 1.0
  */
-@Tag(name = "member", description = "사용자 관리 API")
+@Tag(name = "Member", description = "사용자 관리 API")
 @RequestMapping("/api/members")
 @RestController
 public class MemberController {
@@ -46,7 +46,7 @@ public class MemberController {
     @Autowired
     public MemberController(MemberService memberService) { this.memberService = memberService; }
 
-    @Operation(summary = "사용자 전체 정보 조회", description = "사용자 전체 정보를 반환합니다.", tags = "member",
+    @Operation(summary = "사용자 전체 정보 조회", description = "사용자 전체 정보를 반환합니다.", tags = "Member",
                responses = {
                        @ApiResponse(responseCode = "200", description = "전체 사용자 정보 조회 성공",
                                content = {@Content(schema = @Schema(implementation = MemberListResponse.class))}),
@@ -68,7 +68,7 @@ public class MemberController {
         return new ResponseEntity<>(memberListResponse, HttpStatus.OK);
     }
 
-    @Operation(summary = "사용자 등록", description = "사용자가 회원가입시 사용자를 등록합니다.", tags = "member",
+    @Operation(summary = "사용자 등록", description = "사용자가 회원가입시 사용자를 등록합니다.", tags = "Member",
                responses = {
                    @ApiResponse(responseCode = "200", description = "사용자 등록 성공",
                                 content = @Content(mediaType = "application/json",

@@ -4,6 +4,8 @@ import com.deu.synabro.auth.JwtFilter;
 import com.deu.synabro.auth.TokenProvider;
 import com.deu.synabro.http.request.SignInRequest;
 import com.deu.synabro.http.response.TokenResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Member", description = "사용자 관리 API")
 public class AuthController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -29,7 +32,8 @@ public class AuthController {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
-    @PostMapping("/auth")
+    @Operation(summary = "로그인", description = "사용자가 로그인시 토큰을 발급합니다.", tags = "Member")
+    @PostMapping("/members/signin")
     public ResponseEntity<TokenResponse> authorize(@Valid @RequestBody SignInRequest signInRequest) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword());
