@@ -1,14 +1,13 @@
 package com.deu.synabro.entity;
 
-import com.deu.synabro.http.request.DocsRequest;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-@Setter
+@Getter @Setter
 @Entity
 @AllArgsConstructor
 @Table(name="docs")

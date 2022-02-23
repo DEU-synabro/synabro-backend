@@ -21,3 +21,7 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+jwt:
+  header: Authorization
+  secret: {secret_key}
+  token-validity-in-seconds: {token_validity_time}
