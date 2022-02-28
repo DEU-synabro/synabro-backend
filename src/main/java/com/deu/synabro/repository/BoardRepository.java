@@ -15,9 +15,7 @@ import java.util.UUID;
 @Repository
 public interface BoardRepository extends JpaRepository<Board,Long> {
     Page<Board> findByTitleContaining(Pageable pageable, String title);
-    Page<Board> findByUserId(Pageable pageable, String userid);
     Page<Board> findByTitleContainingOrContentsContaining(Pageable pageable, String title, String content);
     List<Board> deleteById(UUID id);
     List<Board> findById(UUID id);
-//    List<Board> findByBoardType(@Param("boardType") BoardType boardType);
 }

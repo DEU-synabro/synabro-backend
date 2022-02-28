@@ -1,26 +1,40 @@
 package com.deu.synabro.controller;
 
 import com.deu.synabro.entity.Board;
+import com.deu.synabro.entity.Member;
+import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.response.BoardPageResponse;
 import com.deu.synabro.http.request.BoardRequest;
 import com.deu.synabro.http.response.BoardResponse;
+import com.deu.synabro.http.response.GeneralResponse;
+import com.deu.synabro.http.response.MemberListResponse;
 import com.deu.synabro.service.BoardService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Tag(name="Board", description = "게시판 API")
 @RestController
@@ -31,36 +45,70 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
-    @Operation(tags = "Board", summary = "제목, 사용자, 제목+내용으로 글을 찾습니다.",
+    private static final String DELETE_BOARD = "{\n" +
+            "    \"code\" : 204\n" +
+            "    \"message\" : \"게시글이 삭제되었습니다.\"\n" +
+            "}";
+
+    private static final String DELETE_NOT_BOARD = "{\n" +
+            "    \"code\" : 404\n" +
+            "    \"message\" : \"삭제할 게시글이 없습니다..\"\n" +
+            "}";
+
+    @Operation(tags = "Board", summary = "제목, 제목+내용으로 글을 찾습니다.",
             responses={
-                    @ApiResponse(responseCode = "200", description = "제목, 사용자, 제목+내용으로 글 정보 조회 성공",
+                    @ApiResponse(responseCode = "200", description = "제목, 제목+내용으로 글 정보 조회 성공",
                             content = @Content(schema = @Schema(implementation = BoardPageResponse.class)))
             })
-    @io.swagger.annotations.ApiResponses(
-            @io.swagger.annotations.ApiResponse(
-                    response = BoardPageResponse.class, message = "ok", code=200)
-    )
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "integer", paramType = "query", defaultValue = "0"),
+            @ApiImplicitParam(name = "size", value = "한 페이지당 불러올 콘텐츠 개수", dataType = "integer", paramType = "query", defaultValue = "10"),
+            @ApiImplicitParam(name = "sort", value = "정렬방법(id,desc,asc)", dataType = "string", paramType = "query", defaultValue = "asc")
+    })
     @GetMapping("")   //제목으로 글 찾기
-    public ResponseEntity<BoardPageResponse> boardTitleFind(@PageableDefault Pageable pageable,
-                                                            @RequestParam(name="searchOption", required = false) String searchOption,
+    public ResponseEntity<BoardPageResponse> getBoards(@PageableDefault Pageable pageable,
+                                                       @RequestParam(name="searchOption", required = false) SearchOption option,
                                                             @RequestParam(name="keyword", required = false) String keyword){
+        Page<Board> boards = boardService.findAll(pageable);
+        String searchOption=option.getValue();
         if(keyword==null){
-            BoardPageResponse boardResponse = new BoardPageResponse(boardService.findAll(pageable));
-            return new ResponseEntity<>(boardResponse, HttpStatus.OK);
+            PagedModel.PageMetadata pageMetadata =
+                    new PagedModel.PageMetadata(pageable.getPageSize(), boards.getNumber(), boards.getTotalElements());
+            PagedModel<Board> resources = PagedModel.of(boards.getContent(), pageMetadata);
+            resources.add(linkTo(methodOn(BoardController.class).getBoards(pageable,option, null)).withSelfRel());
+            BoardPageResponse boardPageResponse = new BoardPageResponse(pageable, boards, option, null);
+            return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
         }else{
-            if(searchOption.equals("title")){
-                BoardPageResponse boardResponse = new BoardPageResponse(boardService.findByTitle(pageable,keyword));
-                return new ResponseEntity<>(boardResponse, HttpStatus.OK);
+            try{
+                switch (searchOption){
+                    case "title":
+                        boards = boardService.findByTitle(pageable, keyword);
+                        break;
+                    case "title_contents":
+                        boards = boardService.findByTitleOrContents(pageable, keyword, keyword);
+                        break;
+                }
+            } finally {
+                PagedModel.PageMetadata pageMetadata =
+                        new PagedModel.PageMetadata(pageable.getPageSize(), boards.getNumber(), boards.getTotalElements());
+                PagedModel<Board> resources = PagedModel.of(boards.getContent(), pageMetadata);
+                resources.add(linkTo(methodOn(BoardController.class).getBoards(pageable,option,keyword)).withSelfRel());
+                BoardPageResponse boardPageResponse = new BoardPageResponse(pageable, boards, option, keyword);
+                return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
             }
-            else if(searchOption.equals("userid")){
-                BoardPageResponse boardResponse = new BoardPageResponse(boardService.findByUser_id(pageable,keyword));
-                return new ResponseEntity<>(boardResponse, HttpStatus.OK);
-            }else if(searchOption=="title-content"){
-                BoardPageResponse boardResponse = new BoardPageResponse(boardService.findByTitleOrContents(pageable,keyword,keyword));
-                return new ResponseEntity<>(boardResponse, HttpStatus.OK);
-            }
+
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @Operation(tags = "Board", summary = "id 값으로  게시판 글을 찾습니다.",
+            responses={
+                    @ApiResponse(responseCode = "200", description = "id 값으로 게시판 글 정보 조회 성공",
+                            content = @Content(schema = @Schema(implementation = BoardResponse.class)))
+            })
+    @GetMapping("/{id}")   //제목으로 글 찾기
+    public ResponseEntity<List<Board>> getBoard(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
+        List<Board> boardEntities = boardService.findById(id);
+        return new ResponseEntity<>(boardEntities,HttpStatus.OK);
     }
 
     @Operation(tags = "Board", summary = "게시판 글을 생성 합니다.",
@@ -73,23 +121,27 @@ public class BoardController {
                     response = BoardResponse.class, message = "ok", code=200)
     )
     @PostMapping("") // 게시판 생성
-    public Board boardCreate(@Parameter @RequestBody BoardRequest reqBoard){
-        Board boardEntity = boardService.setBoard(reqBoard);
-        return boardEntity;
+    public ResponseEntity<Board> boardCreate(@Parameter @RequestBody BoardRequest reqBoard){
+        Board board = boardService.setBoard(reqBoard);
+        return new ResponseEntity<>(board, HttpStatus.OK);
     }
 
     @Operation(tags = "Board", summary = "게시판 글을 삭제 합니다.",
             responses={
-                    @ApiResponse(responseCode = "200", description = "게시판 글 삭제 성공",
-                            content = @Content(schema = @Schema(implementation = BoardResponse.class)))
+                    @ApiResponse(responseCode = "204", description = "게시판 글 삭제 성공",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                                examples = @ExampleObject(value = DELETE_BOARD))),
+                    @ApiResponse(responseCode = "404", description = "삭제할 글이 없음",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = DELETE_NOT_BOARD)))
             })
-    @io.swagger.annotations.ApiResponses(
-            @io.swagger.annotations.ApiResponse(
-                    response = BoardResponse.class, message = "ok", code=200)
-    )
     @DeleteMapping("/{id}") // 게시판 삭제
-    public List<Board> boardTitleDelete(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
-        return boardService.deleteById(id);
+    public ResponseEntity<GeneralResponse>  boardTitleDelete(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
+        if(boardService.deleteById(id)){
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"게시글이 삭제되었습니다."), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"삭제할 게시글이 없습니다."), HttpStatus.NOT_FOUND);
+        }
     }
 
     @Operation(tags = "Board", summary = "게시판 글을 수정합니다.",
@@ -102,9 +154,10 @@ public class BoardController {
                     response = BoardResponse.class, message = "ok", code=200)
     )
     @PatchMapping("/update/{id}") // 게시판 수정
-    public Board boardUpdate(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id,
+    public ResponseEntity<Board> boardUpdate(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id,
                               @Parameter @RequestBody BoardRequest boardRequest){
         List<Board> boardEntities = boardService.findById(id);
-        return boardService.UpdateBoard(boardRequest, boardEntities.get(0));
+        Board board = boardService.UpdateBoard(boardRequest, boardEntities.get(0));
+        return new ResponseEntity<>(board, HttpStatus.OK);
     }
 }
