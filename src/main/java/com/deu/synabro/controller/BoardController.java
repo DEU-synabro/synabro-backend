@@ -67,7 +67,7 @@ public class BoardController {
     })
     @GetMapping("")   //제목으로 글 찾기
     public ResponseEntity<BoardPageResponse> getBoards(@PageableDefault Pageable pageable,
-                                                       @RequestParam(name="searchOption", required = false) SearchOption option,
+                                                       @RequestParam(name="searchOption", required = false, defaultValue = "title") SearchOption option,
                                                             @RequestParam(name="keyword", required = false) String keyword){
         Page<Board> boards = boardService.findAll(pageable);
         String searchOption=option.getValue();
