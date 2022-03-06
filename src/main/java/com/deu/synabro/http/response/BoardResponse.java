@@ -9,23 +9,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @Setter
 @ToString
+@Builder
 @Schema(description = "게시판")
-@NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BoardResponse {
     @Schema(description = "고유번호", example = "8857ba20-2cb7-407e-908c-b333cf1257c5")
     private UUID id;
 
-    @Schema(description = "아이디", example = "dnd01")
-    private String userId;
-
-    @Schema(description = "게시판 종류", example = "종류")
+    @Enumerated(value= EnumType.STRING)
+    @Schema(description = "게시판 종류")
     private BoardType boardType;
 
     @Schema(description = "게시판 제목", example = "제목")
