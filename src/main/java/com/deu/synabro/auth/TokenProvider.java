@@ -1,5 +1,6 @@
 package com.deu.synabro.auth;
 
+import com.deu.synabro.entity.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -13,9 +14,10 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Component
@@ -41,7 +43,7 @@ public class TokenProvider implements InitializingBean {
     }
 
     // 토큰의 만료시간을 설정하고 토큰을 생성한다.
-    public String createToken(Authentication authentication) {
+    public String createToken(Authentication authentication, Optional<Member> member) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -51,6 +53,7 @@ public class TokenProvider implements InitializingBean {
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
+                .setId(member.get().getIdx().toString())
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
@@ -71,7 +74,7 @@ public class TokenProvider implements InitializingBean {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities);
+        User principal = new User(claims.getId(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }

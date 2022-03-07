@@ -19,7 +19,6 @@ public class JwtFilter extends GenericFilterBean {
 
     private TokenProvider tokenProvider;
 
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
@@ -33,7 +32,6 @@ public class JwtFilter extends GenericFilterBean {
         } else {
             System.out.println("유효한 JWT 토큰이 없습니다, uri: " + requestURI);
         }
-
         chain.doFilter(request, response);
     }
 
