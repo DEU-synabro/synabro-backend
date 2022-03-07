@@ -4,6 +4,7 @@ import com.deu.synabro.auth.JwtFilter;
 import com.deu.synabro.auth.TokenProvider;
 import com.deu.synabro.http.request.SignInRequest;
 import com.deu.synabro.http.response.TokenResponse;
+import com.deu.synabro.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
@@ -24,10 +25,12 @@ import javax.validation.Valid;
 @RequestMapping("/api")
 @Tag(name = "Member", description = "사용자 관리 API")
 public class AuthController {
+    private final MemberService memberService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public AuthController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    public AuthController(MemberService memberService, TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
+        this.memberService = memberService;
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
@@ -41,7 +44,7 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.createToken(authentication);
+        String jwt = tokenProvider.createToken(authentication, memberService.getMemberWithAuthorities(signInRequest.getEmail()));
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
