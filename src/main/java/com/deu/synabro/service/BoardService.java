@@ -50,7 +50,7 @@ public class BoardService {
         return boardRepository.findById(id);
     }
     @Transactional
-    public Board UpdateBoard(BoardRequest boardRequest, Board boardEntity){
+    public Board updateBoard(BoardRequest boardRequest, Board boardEntity){
         boardEntity.setTitle(boardRequest.getTitle());
         boardEntity.setContents(boardRequest.getContents());
         boardEntity.setUpdatedDate(LocalDateTime.now());
