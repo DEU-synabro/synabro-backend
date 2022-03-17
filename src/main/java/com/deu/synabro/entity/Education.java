@@ -1,67 +1,27 @@
 package com.deu.synabro.entity;
 
-import lombok.Builder;
-import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
-@Data
+@Getter
 @NoArgsConstructor
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 public class Education {
     @Id
-    @Column(unique = true)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idx;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "education_id", columnDefinition = "BINARY(16)")
+    @Schema(description = "교육 콘텐츠 ID", nullable = false, example = "468cc9b5-bca2-494d-9f5c-f00a1af81696")
+    private UUID idx;
 
-    @Column
-    private Long user_id;
-
-    @Column
+    @Column(columnDefinition = "VARCHAR(50)")
+    @Schema(description = "교육 콘텐츠 제목", nullable = false, example = "제목글, 바닥글 적기")
     private String title;
 
-    @Column
-    private String description;
-
-    @Column(name = "work_process")
-    private Integer workProcess;
-
-    @CreatedDate
-    @Column(name = "created_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    @Column(name = "updated_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedDate;
-
-    @Column(name = "ended_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime endedDate;
-
-    public Education(String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
-    @Builder
-    public Education(Long idx, Long user_id, String title, String description, Integer workProcess, LocalDateTime createdDate, LocalDateTime updatedDate, LocalDateTime endedDate) {
-        this.idx = idx;
-        this.user_id = user_id;
-        this.title = title;
-        this.description = description;
-        this.workProcess = workProcess;
-        this.createdDate = createdDate;
-        this.updatedDate = updatedDate;
-        this.endedDate = endedDate;
-    }
+    @Column(columnDefinition = "TEXT")
+    @Schema(description = "교육 콘텐츠 내용", nullable = false, example = "제목글과 바닥글을 적는 방법을 안내합니다.")
+    private String contents;
 }
