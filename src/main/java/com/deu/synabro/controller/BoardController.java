@@ -1,13 +1,9 @@
 package com.deu.synabro.controller;
 
 import com.deu.synabro.entity.Board;
-import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.enums.SearchOption;
-import com.deu.synabro.http.response.BoardPageResponse;
+import com.deu.synabro.http.response.*;
 import com.deu.synabro.http.request.BoardRequest;
-import com.deu.synabro.http.response.BoardResponse;
-import com.deu.synabro.http.response.GeneralResponse;
-import com.deu.synabro.http.response.MemberListResponse;
 import com.deu.synabro.service.BoardService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -23,18 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Tag(name="Board", description = "게시판 API")
 @RestController
@@ -69,34 +60,79 @@ public class BoardController {
     public ResponseEntity<BoardPageResponse> getBoards(@PageableDefault Pageable pageable,
                                                        @RequestParam(name="searchOption", required = false, defaultValue = "title") SearchOption option,
                                                             @RequestParam(name="keyword", required = false) String keyword){
-        Page<Board> boards = boardService.findAll(pageable);
+        Page<Board> boards;
         String searchOption=option.getValue();
-        if(keyword==null){
-            PagedModel.PageMetadata pageMetadata =
-                    new PagedModel.PageMetadata(pageable.getPageSize(), boards.getNumber(), boards.getTotalElements());
-            PagedModel<Board> resources = PagedModel.of(boards.getContent(), pageMetadata);
-            resources.add(linkTo(methodOn(BoardController.class).getBoards(pageable,option, null)).withSelfRel());
-            BoardPageResponse boardPageResponse = new BoardPageResponse(pageable, boards, option, null);
-            return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
-        }else{
-            try{
-                switch (searchOption){
-                    case "title":
-                        boards = boardService.findByTitle(pageable, keyword);
-                        break;
-                    case "title_contents":
-                        boards = boardService.findByTitleOrContents(pageable, keyword, keyword);
-                        break;
-                }
-            } finally {
-                PagedModel.PageMetadata pageMetadata =
-                        new PagedModel.PageMetadata(pageable.getPageSize(), boards.getNumber(), boards.getTotalElements());
-                PagedModel<Board> resources = PagedModel.of(boards.getContent(), pageMetadata);
-                resources.add(linkTo(methodOn(BoardController.class).getBoards(pageable,option,keyword)).withSelfRel());
-                BoardPageResponse boardPageResponse = new BoardPageResponse(pageable, boards, option, keyword);
-                return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
-            }
+        List<BoardListResponse> boardListResponseList = new ArrayList<>();
+        BoardListResponse boardListResponse;
+        BoardPageResponse boardPageResponse;
 
+        if(keyword==null){
+            boards = boardService.findAll(pageable);
+            if(boards.getSize()>=boards.getTotalElements()){
+                for(int i=0; i<boards.getTotalElements(); i++){
+                    boardListResponse = BoardListResponse.builder()
+                            .idx(boards.getContent().get(i).getIdx())
+                            .title(boards.getContent().get(i).getTitle())
+                            .createdDate(boards.getContent().get(i).getCreatedDate())
+                            .build();
+                    boardListResponseList.add(boardListResponse);
+                }
+            }else {
+                int contentSize = boards.getSize()*boards.getNumber();
+                for(int i=0; i<boards.getSize();i++){
+                    if(contentSize>=boards.getTotalElements())
+                        break;
+                    boardListResponse = BoardListResponse.builder()
+                            .idx(boards.getContent().get(i).getIdx())
+                            .title(boards.getContent().get(i).getTitle())
+                            .createdDate(boards.getContent().get(i).getCreatedDate())
+                            .build();
+                    boardListResponseList.add(boardListResponse);
+                    contentSize++;
+                }
+            }
+            boardPageResponse = new BoardPageResponse(pageable, boards, option, null, boardListResponseList);
+            return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
+        }else {
+            if(searchOption=="제목+내용"){
+                boards = boardService.findByTitleOrContents(pageable, keyword, keyword);
+            }else {
+                boards = boardService.findByTitle(pageable, keyword);
+            }
+            if (boards.getContent().isEmpty()) {
+                boardListResponse = BoardListResponse.builder()
+                        .idx(null)
+                        .title(null)
+                        .createdDate(null)
+                        .build();
+                boardListResponseList.add(boardListResponse);
+            } else {
+                if(boards.getSize()>=boards.getTotalElements()){
+                    for(int i=0; i<boards.getTotalElements(); i++){
+                        boardListResponse = BoardListResponse.builder()
+                                .idx(boards.getContent().get(i).getIdx())
+                                .title(boards.getContent().get(i).getTitle())
+                                .createdDate(boards.getContent().get(i).getCreatedDate())
+                                .build();
+                        boardListResponseList.add(boardListResponse);
+                    }
+                }else {
+                    int contentSize = boards.getSize()*boards.getNumber();
+                    for(int i=0; i<boards.getSize();i++){
+                        if(contentSize>=boards.getTotalElements())
+                            break;
+                        boardListResponse = BoardListResponse.builder()
+                                .idx(boards.getContent().get(i).getIdx())
+                                .title(boards.getContent().get(i).getTitle())
+                                .createdDate(boards.getContent().get(i).getCreatedDate())
+                                .build();
+                        boardListResponseList.add(boardListResponse);
+                        contentSize++;
+                    }
+                }
+            }
+            boardPageResponse = new BoardPageResponse(pageable, boards, option, keyword, boardListResponseList);
+            return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
         }
     }
 
@@ -135,6 +171,7 @@ public class BoardController {
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = DELETE_NOT_BOARD)))
             })
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}") // 게시판 삭제
     public ResponseEntity<GeneralResponse>  boardTitleDelete(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
         if(boardService.deleteById(id)){
@@ -157,7 +194,7 @@ public class BoardController {
     public ResponseEntity<Board> boardUpdate(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id,
                               @Parameter @RequestBody BoardRequest boardRequest){
         List<Board> boardEntities = boardService.findById(id);
-        Board board = boardService.UpdateBoard(boardRequest, boardEntities.get(0));
+        Board board = boardService.updateBoard(boardRequest, boardEntities.get(0));
         return new ResponseEntity<>(board, HttpStatus.OK);
     }
 }

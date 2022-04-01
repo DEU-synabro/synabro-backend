@@ -9,7 +9,7 @@
 - [Maintainers](#Maintainers)
 
 ## Introduction
-The final goal of this project is to provide an online volunteer activity platform that can perform word typing service for the visually impaired and hearing impaired.
+The final goal of this project is to provide an online volunteerWork activity platform that can perform word typing service for the visually impaired and hearing impaired.
 
 ## Requriements
 - [JDK 1.8](https://www.azul.com/downloads/?version=java-8-lts&package=jdk) or later
