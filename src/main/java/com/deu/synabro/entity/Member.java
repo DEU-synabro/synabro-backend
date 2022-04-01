@@ -23,7 +23,7 @@ import java.util.UUID;
 public class Member extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "member_id")
+    @Column(name = "member_id", columnDefinition = "BINARY(16)")
     @Schema(description = "사용자 계정 ID", nullable = false, example = "468cc9b5-bca2-494d-9f5c-f00a1af81696")
     private UUID idx;
 
@@ -97,5 +97,9 @@ public class Member extends BaseTime {
         this.warning = 0;
         this.lastLoginTime = LocalDateTime.now();
         this.authorities = authorities;
+    }
+
+    public Member(UUID idx){
+        this.idx = idx;
     }
 }

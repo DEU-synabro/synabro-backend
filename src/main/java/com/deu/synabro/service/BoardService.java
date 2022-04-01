@@ -1,7 +1,6 @@
 package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Board;
-import com.deu.synabro.entity.Member;
 import com.deu.synabro.repository.BoardRepository;
 import com.deu.synabro.http.request.BoardRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,7 @@ public class BoardService {
     }
     @Transactional
     public boolean deleteById(UUID id){
-         if(boardRepository.deleteById(id).isEmpty()){
+         if(boardRepository.deleteByIdx(id).isEmpty()){
              return false;
          }else{
              return true;
@@ -47,7 +46,7 @@ public class BoardService {
     }
 
     public List<Board> findById(UUID id){
-        return boardRepository.findById(id);
+        return boardRepository.findByIdx(id);
     }
     @Transactional
     public Board updateBoard(BoardRequest boardRequest, Board boardEntity){

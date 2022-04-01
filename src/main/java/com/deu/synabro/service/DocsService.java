@@ -1,9 +1,7 @@
 package com.deu.synabro.service;
 
+import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.Docs;
-import com.deu.synabro.entity.Volunteer;
-import com.deu.synabro.http.request.DocsRequest;
-import com.deu.synabro.http.response.VolunteerResponse;
 import com.deu.synabro.repository.DocsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +33,7 @@ public class DocsService {
         }
     }
 
-    public void saveDocs(MultipartFile file, Volunteer volunteer) throws IOException {
+    public void saveDocs(MultipartFile file, Work work) throws IOException {
         System.out.print(uploadPath);
         try{
             if( file.isEmpty() ) {
@@ -49,7 +47,7 @@ public class DocsService {
             }
             try(InputStream inputStream = file.getInputStream()){
 
-                Docs docs = new Docs(volunteer,file.getOriginalFilename());
+                Docs docs = new Docs(work,file.getOriginalFilename());
                 docsRepository.save(docs);
                 Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
             }

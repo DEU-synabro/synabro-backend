@@ -24,7 +24,7 @@ public class Board extends BaseTime {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "board_id", columnDefinition = "BINARY(16)")
     @Schema(description = "고유번호", example = "8857ba20-2cb7-407e-908c-b333cf1257c5")
-    private UUID id;
+    private UUID idx;
 
     @Column(name="title")
     @Schema(description = "게시판 제목", example = "제목")
