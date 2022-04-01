@@ -43,7 +43,7 @@ public class BoardController {
 
     private static final String DELETE_NOT_BOARD = "{\n" +
             "    \"code\" : 404\n" +
-            "    \"message\" : \"삭제할 게시글이 없습니다..\"\n" +
+            "    \"message\" : \"삭제할 게시글이 없습니다.\"\n" +
             "}";
 
     @Operation(tags = "Board", summary = "제목, 제목+내용으로 글을 찾습니다.",
@@ -136,7 +136,7 @@ public class BoardController {
         }
     }
 
-    @Operation(tags = "Board", summary = "id 값으로  게시판 글을 찾습니다.",
+    @Operation(tags = "Board", summary = "id 값으로 게시판 글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "id 값으로 게시판 글 정보 조회 성공",
                             content = @Content(schema = @Schema(implementation = BoardResponse.class)))
@@ -173,7 +173,7 @@ public class BoardController {
             })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}") // 게시판 삭제
-    public ResponseEntity<GeneralResponse>  boardTitleDelete(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
+    public ResponseEntity<GeneralResponse> boardTitleDelete(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
         if(boardService.deleteById(id)){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"게시글이 삭제되었습니다."), HttpStatus.OK);
         }else{

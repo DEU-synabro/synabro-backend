@@ -33,7 +33,7 @@ public class MemberService {
         return memberRepository.findAll(pageable);
     }
 
-    public Member signup(SignUpRequest signUpRequest) {
+    public Member signUp(SignUpRequest signUpRequest) {
         if (memberRepository.findOneWithAuthoritiesByEmail(signUpRequest.getEmail()).orElse(null) != null ){
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
         }
