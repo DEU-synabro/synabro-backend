@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.UUID;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -24,4 +25,12 @@ public class Education {
     @Column(columnDefinition = "TEXT")
     @Schema(description = "교육 콘텐츠 내용", nullable = false, example = "제목글과 바닥글을 적는 방법을 안내합니다.")
     private String contents;
+
+    @OneToMany
+    @JoinColumn(name = "education_docs_id")
+    List<EducationDocs> educationDocs;
+
+    @OneToMany
+    @JoinColumn(name = "education_video_id")
+    List<EducationVideo> educationVideos;
 }

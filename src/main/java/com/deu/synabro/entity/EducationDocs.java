@@ -24,8 +24,4 @@ public class EducationDocs {
     @Column(name="file_name")
     @Schema(description = "교육 콘텐츠 문서 이름", nullable = false, example = "교육 콘텐츠 문서의 이름입니다.")
     private String fileName;
-
-    @ManyToOne
-    @JoinColumn(name = "education_id")
-    private Education education;
 }

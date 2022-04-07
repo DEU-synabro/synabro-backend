@@ -24,8 +24,4 @@ public class EducationVideo {
     @Column(name="file_name")
     @Schema(description = "교육 콘텐츠 영상 파일 이름", nullable = false, example = "교육 콘텐츠 영상 파일의 이름입니다.")
     private String fileName;
-
-    @ManyToOne
-    @JoinColumn(name = "education_id")
-    private Education education;
 }
