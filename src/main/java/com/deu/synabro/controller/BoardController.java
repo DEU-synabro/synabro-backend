@@ -139,7 +139,7 @@ public class BoardController {
     @Operation(tags = "Board", summary = "id 값으로 게시판 글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "id 값으로 게시판 글 정보 조회 성공",
-                            content = @Content(schema = @Schema(implementation = BoardResponse.class)))
+                            content = @Content(schema = @Schema(implementation = Board.class)))
             })
     @GetMapping("/{id}")   //제목으로 글 찾기
     public ResponseEntity<List<Board>> getBoard(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
@@ -150,11 +150,11 @@ public class BoardController {
     @Operation(tags = "Board", summary = "게시판 글을 생성 합니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "게시판 글 생성 성공",
-                            content = @Content(schema = @Schema(implementation = BoardResponse.class)))
+                            content = @Content(schema = @Schema(implementation = Board.class)))
             })
     @io.swagger.annotations.ApiResponses(
             @io.swagger.annotations.ApiResponse(
-                    response = BoardResponse.class, message = "ok", code=200)
+                    response = Board.class, message = "ok", code=200)
     )
     @PostMapping("") // 게시판 생성
     public ResponseEntity<Board> boardCreate(@Parameter @RequestBody BoardRequest reqBoard){
@@ -184,11 +184,11 @@ public class BoardController {
     @Operation(tags = "Board", summary = "게시판 글을 수정합니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "게시판 글 수정 성공",
-                            content = @Content(schema = @Schema(implementation = BoardResponse.class)))
+                            content = @Content(schema = @Schema(implementation = Board.class)))
             })
     @io.swagger.annotations.ApiResponses(
             @io.swagger.annotations.ApiResponse(
-                    response = BoardResponse.class, message = "ok", code=200)
+                    response = Board.class, message = "ok", code=200)
     )
     @PatchMapping("/update/{id}") // 게시판 수정
     public ResponseEntity<Board> boardUpdate(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id,
