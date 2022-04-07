@@ -115,9 +115,8 @@ public class InspectionController {
         if(inspection==null){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 검수글이 없습니다."), HttpStatus.NOT_FOUND);
         }else {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            Optional<Member> member = memberService.getMemberWithAuthorities(username);
-            inspectionService.updateInspection(inspectionUpdateRequest, inspection, member.get().getIdx());
+            UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+            inspectionService.updateInspection(inspectionUpdateRequest, inspection, userId);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "봉사 검수글이 수정되었습니다"), HttpStatus.OK);
         }
     }

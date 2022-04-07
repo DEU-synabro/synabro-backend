@@ -91,9 +91,8 @@ public class WorkController {
             @RequestPart(required = false) MultipartFile file,
             @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             @RequestPart(name = "contentsRequest") WorkRequest workRequest) throws IOException {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<Member> memberId = memberService.getMemberWithAuthorities(username);
-        workRequest.setUserId(memberId.get().getIdx());
+        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+        workRequest.setUserId(userId);
         Work work = workService.setContent(workRequest);
         if (file!=null) {
             if(file.getOriginalFilename().contains(".mp4")){

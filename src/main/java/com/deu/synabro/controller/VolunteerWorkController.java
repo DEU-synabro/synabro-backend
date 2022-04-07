@@ -200,9 +200,8 @@ public class VolunteerWorkController {
                         .title(work.getTitle())
                         .build();
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<Member> memberId = memberService.getMemberWithAuthorities(username);
-        Member member = new Member(memberId.get().getIdx());
+        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+        Member member = new Member(userId);
 
         VolunteerWork volunteerWork = VolunteerWork.builder()
                                                 .userId(member)
@@ -230,9 +229,8 @@ public class VolunteerWorkController {
         if(volunteerWork==null){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 수행글이 없습니다."), HttpStatus.NOT_FOUND);
         }else {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            Optional<Member> member = memberService.getMemberWithAuthorities(username);
-            volunteerWorkService.updateVolunteerWork(volunteerWorkUpdateRequest, volunteerWork, member.get().getIdx());
+            UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+            volunteerWorkService.updateVolunteerWork(volunteerWorkUpdateRequest, volunteerWork, userId);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "봉사 수행글이 수정되었습니다"), HttpStatus.OK);
         }
     }

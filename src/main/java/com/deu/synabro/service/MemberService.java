@@ -5,7 +5,6 @@ import com.deu.synabro.entity.Member;
 import com.deu.synabro.http.request.SignUpRequest;
 import com.deu.synabro.repository.MemberRepository;
 import com.deu.synabro.util.SecurityUtil;
-import org.hibernate.type.TrueFalseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Collections;
+import java.util.UUID;
 
 @Component
 @Service
@@ -60,6 +60,6 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Optional<Member> getMemberWithAuthorities() {
-        return SecurityUtil.getCurrentUsername().flatMap(memberRepository::findWithAuthoritiesByEmail);
+        return SecurityUtil.getCurrentUsername().flatMap(id -> memberRepository.findById(UUID.fromString(id)));
     }
 }
