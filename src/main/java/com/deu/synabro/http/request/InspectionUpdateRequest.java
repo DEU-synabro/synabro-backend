@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class InspectionUpdateRequest {
 
-    @Schema(description = "제목",example = "제목")
-    String title;
+    @Schema(description = "봉사 시간", example = "56")
+    Short volunteerTime;
 
     @Schema(description = "내용",example = "내용")
     String contents;

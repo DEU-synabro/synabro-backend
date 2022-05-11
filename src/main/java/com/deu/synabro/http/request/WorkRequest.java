@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -15,8 +16,8 @@ import java.util.UUID;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WorkRequest {
 
-    @Schema(description = "유저 이름",example = "995bcbaa-15ef-4be0-9c4d-a5eacffa7be7")
-    UUID userId;
+//    @Schema(description = "유저 이름",example = "995bcbaa-15ef-4be0-9c4d-a5eacffa7be7")
+//    UUID userId;
 
     @Schema(description = "제목",example = "제목")
     String title;
@@ -24,17 +25,21 @@ public class WorkRequest {
     @Schema(description = "내용",example = "내용")
     String contents;
 
+    @Schema(description = "봉사 시간", example = "56")
+    Short volunteerTime;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Schema(description = "설명", example = "2022-02-12T12:16:40.77")
     LocalDateTime endedDate;
 
-    public Work toEntity(){
-        Member member = new Member(userId);
+    public Work toEntity(UUID uuid){
+        Member member = new Member(uuid);
         Work work = Work.builder()
                 .userId(member)
                 .title(title)
-                .contents(this.contents)
+                .contents(contents)
                 .endedDate(endedDate)
+                .volunteerTime(volunteerTime)
                 .build();
         return work;
     }

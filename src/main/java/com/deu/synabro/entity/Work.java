@@ -37,17 +37,22 @@ public class Work extends BaseTime implements Serializable {
     @Schema(description = "게시판 내용", example = "내용")
     private String contents;
 
+    @Column(name = "volunteer_time")
+    @Schema(description = "봉사 시간", example = "56")
+    private Short volunteerTime;
+
     @Column(name = "ended_date")
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endedDate;
 
     @Builder
-    public Work(UUID idx, Member userId, String title, String contents, LocalDateTime endedDate) {
+    public Work(UUID idx, Member userId, String title, String contents, LocalDateTime endedDate, Short volunteerTime) {
         this.idx = idx;
         this.userId = userId;
         this.title = title;
         this.contents = contents;
         this.endedDate = endedDate;
+        this.volunteerTime = volunteerTime;
     }
 }

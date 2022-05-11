@@ -38,6 +38,9 @@ public class InspectionResponse {
     @Schema(description = "봉사 검수 설명", example = "설명")
     private String inspectionContents;
 
+    @Schema(description = "봉사 시간", example = "56")
+    Short volunteerTime;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Schema(description = "검수 생성 날짜")
     private LocalDateTime createdDate;

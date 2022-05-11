@@ -68,12 +68,11 @@ public class InspectionService {
                                                 .workContents(inspection.get().getVolunteerWorkId().getWorkId().getContents())
                                                 .volunteerWorkContents(inspection.get().getVolunteerWorkId().getContents())
                                                 .inspectionContents(inspection.get().getContents())
+                                                .volunteerTime(inspection.get().getVolunteerWorkId().getWorkId().getVolunteerTime())
                                                 .createdDate(inspection.get().getCreatedDate())
                                                 .endedDate(inspection.get().getVolunteerWorkId().getWorkId().getEndedDate())
                                                 .updatedDate(inspection.get().getUpdatedDate())
                                                 .build();
-        System.out.println(inspection.get().getUserId().getIdx());
-        System.out.println(inspection.get().getVolunteerWorkId().getUserId().getIdx());
         if(inspection.get().getUserId().getIdx()==inspection.get().getVolunteerWorkId().getUserId().getIdx()){
             inspectionResponse.setUserId(null);
         }
@@ -89,6 +88,7 @@ public class InspectionService {
                 .workContents(null)
                 .volunteerWorkContents(null)
                 .inspectionContents(null)
+                .volunteerTime(null)
                 .createdDate(null)
                 .endedDate(null)
                 .updatedDate(null)
@@ -100,6 +100,7 @@ public class InspectionService {
     public void updateInspection(InspectionUpdateRequest inspectionUpdateRequest, Inspection inspection, UUID uuid){
         Member member = new Member(uuid);
         inspection.setUserId(member);
+        inspection.getVolunteerWorkId().getWorkId().setVolunteerTime(inspectionUpdateRequest.getVolunteerTime());
         inspection.setContents(inspectionUpdateRequest.getContents());
         inspection.setUpdatedDate(LocalDateTime.now());
     }
