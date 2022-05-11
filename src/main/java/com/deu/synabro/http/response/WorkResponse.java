@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -27,6 +28,9 @@ public class WorkResponse {
 
     @Schema(description = "봉사 설명", example = "설명")
     private String contents;
+
+    @Schema(description = "봉사 시간", example = "56")
+    private Short volunteerTime;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Schema(description = "봉사 생성 날짜")
