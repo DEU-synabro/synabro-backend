@@ -5,7 +5,9 @@ import com.deu.synabro.repository.BoardRepository;
 import com.deu.synabro.http.request.BoardRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -28,13 +30,15 @@ public class BoardService {
         return boardRepository.save(board);
     }
     public Page<Board> findAll(Pageable pageable){
-        return boardRepository.findAll(pageable);
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdDate").descending());
+        Page<Board> boardPage = boardRepository.findAll(pageable);
+        return boardPage;
     }
     public  Page<Board> findByTitle(Pageable pageable,String title){
-        return boardRepository.findByTitleContaining(pageable,title);
+        return boardRepository.findByTitleContainingOrderByCreatedDateDesc(pageable,title);
     }
     public Page<Board> findByTitleOrContents(Pageable pageable,String title, String contents) {
-        return boardRepository.findByTitleContainingOrContentsContaining(pageable,title,contents);
+        return boardRepository.findByTitleContainingOrContentsContainingOrderByCreatedDateDesc(pageable,title,contents);
     }
     @Transactional
     public boolean deleteById(UUID id){
