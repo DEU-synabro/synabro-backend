@@ -1,12 +1,13 @@
 package com.deu.synabro.entity.enums;
 
-public enum BoardType {
-    notice ("공지사항"),
-    education ("교육 공지사항");
+public enum EducationType {
+    TODO ("할 일"),
+    PROGRESS ("진행중"),
+    DONE ("완료");
 
     private String value;
 
-    BoardType(String value){
+    EducationType(String value){
         this.value = value;
     }
 
