@@ -7,9 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -18,7 +18,6 @@ import java.util.UUID;
 @Getter
 @RequiredArgsConstructor
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Member extends BaseTime {
     @Id
@@ -27,49 +26,50 @@ public class Member extends BaseTime {
     @Schema(description = "사용자 계정 ID", nullable = false, example = "468cc9b5-bca2-494d-9f5c-f00a1af81696")
     private UUID idx;
 
-    @Column(unique = true, length = 50)
+    @Email
+    @Column(columnDefinition = "VARCHAR(50)", unique = true)
     @Schema(description = "사용자 이메일", example = "test@test.com")
     private String email;
 
     @JsonIgnore
-    @Column(nullable = false)
+    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     @Schema(description = "사용자 암호", example = "testPassword")
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Column(columnDefinition = "VARCHAR(50)", unique = true, nullable = false)
     @Schema(description = "사용자 이름", example = "testUsername")
     private String username;
 
-    @Column(length = 16)
+    @Column(columnDefinition = "VARCHAR(16)")
     @Schema(description = "사용자 휴대폰 번호", example = "010-1234-5678")
     private String phone;
 
-    @Column
+    @Column(columnDefinition = "VARCHAR(255)")
     @Schema(description = "사용자 주소", example = "00시 00구 000 123")
     private String address;
 
-    @Column
+    @Column(columnDefinition = "VARCHAR(255)")
     @Schema(description = "사용자 자기소개 글", example = "test 사용자의 자기소개글입니다.")
     private String introduction;
 
-    @Column(name = "volunteer_time")
+    @Column(name = "volunteer_time", columnDefinition = "SMALLINT(6)")
     @Schema(description = "사용자 봉사 시간", example = "56")
     private Short volunteerTime;
 
-    @Column(name = "work_number")
+    @Column(name = "work_number", columnDefinition = "SMALLINT(6)")
     @Schema(description = "사용자 작업물 개수", example = "23")
     private Short workNumber;
 
-    @Column
+    @Column(columnDefinition = "SMALLINT(6)")
     @Schema(description = "사용자 경고 누적 횟수", example = "4")
     private Short warning;
 
-    @Column(name = "lost_login_time")
+    @Column(name = "lost_login_time", columnDefinition = "DATETIME(6)")
     @Schema(description = "사용자 마지막 로그인 시간", example = "2022-01-030T05:17:22.024")
     private LocalDateTime lastLoginTime;
 
 
-    @Column(name = "activated")
+    @Column(columnDefinition = "BIT(1)")
     private boolean activated;
 
     @ManyToMany

@@ -2,8 +2,10 @@ package com.deu.synabro.repository;
 
 import com.deu.synabro.entity.Education;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.stereotype.Repository;
 
-@RepositoryRestResource
-public interface EducationRepository extends JpaRepository<Education, Long> {
+import java.util.UUID;
+
+@Repository
+public interface EducationRepository extends JpaRepository<Education, UUID> {
 }
