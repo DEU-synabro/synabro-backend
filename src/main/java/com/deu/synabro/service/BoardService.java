@@ -1,6 +1,7 @@
 package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Board;
+import com.deu.synabro.http.response.BoardResponse;
 import com.deu.synabro.repository.BoardRepository;
 import com.deu.synabro.http.request.BoardRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,15 +50,13 @@ public class BoardService {
          }
     }
 
-    public List<Board> findById(UUID id){
+    public Board findById(UUID id){
         return boardRepository.findByIdx(id);
     }
     @Transactional
-    public Board updateBoard(BoardRequest boardRequest, Board boardEntity){
+    public void updateBoard(BoardRequest boardRequest, Board boardEntity){
         boardEntity.setTitle(boardRequest.getTitle());
         boardEntity.setContents(boardRequest.getContents());
-        boardEntity.setUpdatedDate(LocalDateTime.now());
-        return boardEntity;
     }
 }
 

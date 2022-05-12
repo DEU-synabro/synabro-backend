@@ -22,11 +22,7 @@ import java.util.UUID;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BoardResponse {
     @Schema(description = "고유번호", example = "8857ba20-2cb7-407e-908c-b333cf1257c5")
-    private UUID id;
-
-    @Enumerated(value= EnumType.STRING)
-    @Schema(description = "게시판 종류")
-    private BoardType boardType;
+    private UUID idx;
 
     @Schema(description = "게시판 제목", example = "제목")
     private String title;
@@ -36,7 +32,4 @@ public class BoardResponse {
 
     @Schema(description = "게시판 생성 날짜")
     private LocalDateTime created_date;
-
-    @Schema(description = "게시판 수정 날짜")
-    private LocalDateTime updated_date;
 }

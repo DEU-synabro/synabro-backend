@@ -142,8 +142,8 @@ public class BoardController {
                             content = @Content(schema = @Schema(implementation = Board.class)))
             })
     @GetMapping("/{id}")   //제목으로 글 찾기
-    public ResponseEntity<List<Board>> getBoard(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
-        List<Board> boardEntities = boardService.findById(id);
+    public ResponseEntity<Board> getBoard(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
+        Board boardEntities = boardService.findById(id);
         return new ResponseEntity<>(boardEntities,HttpStatus.OK);
     }
 
@@ -191,10 +191,15 @@ public class BoardController {
                     response = Board.class, message = "ok", code=200)
     )
     @PatchMapping("/update/{id}") // 게시판 수정
-    public ResponseEntity<Board> boardUpdate(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id,
+    public ResponseEntity<GeneralResponse> boardUpdate(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id,
                               @Parameter @RequestBody BoardRequest boardRequest){
-        List<Board> boardEntities = boardService.findById(id);
-        Board board = boardService.updateBoard(boardRequest, boardEntities.get(0));
-        return new ResponseEntity<>(board, HttpStatus.OK);
+        Board board = boardService.findById(id);
+        if(board==null){
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 글이 없습니다."), HttpStatus.NOT_FOUND);
+        }else{
+            boardService.updateBoard(boardRequest, board);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "글이 수정되었습니다"), HttpStatus.OK);
+        }
+
     }
 }

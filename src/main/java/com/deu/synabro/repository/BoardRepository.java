@@ -14,5 +14,5 @@ public interface BoardRepository extends JpaRepository<Board,Long> {
     Page<Board> findByTitleContainingOrderByCreatedDateDesc(Pageable pageable, String title);
     Page<Board> findByTitleContainingOrContentsContainingOrderByCreatedDateDesc(Pageable pageable, String title, String content);
     List<Board> deleteByIdx(UUID id);
-    List<Board> findByIdx(UUID id);
+    Board findByIdx(UUID id);
 }
