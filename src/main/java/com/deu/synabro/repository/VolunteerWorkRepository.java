@@ -19,5 +19,7 @@ public interface VolunteerWorkRepository extends JpaRepository<VolunteerWork, Lo
     Page<VolunteerWork> findByWorkId_TitleContainingOrContentsContainingOrderByCreatedDateDesc(Pageable pageable, String title, String content);
     VolunteerWork findByIdx(UUID uuid);
     Optional<VolunteerWork> findOptionalByIdx(UUID uuid);
+    Optional<VolunteerWork> findOptionalByUserId(UUID uuid);
+    List<VolunteerWork> findByUserId_Idx(UUID uuid);
     List<VolunteerWork> deleteByIdx(UUID uuid);
 }

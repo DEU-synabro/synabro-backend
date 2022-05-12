@@ -18,6 +18,9 @@ public class WorkUpdateRequest {
     @Schema(description = "내용",example = "내용")
     String contents;
 
+    @Schema(description = "봉사 시간", example = "56")
+    Short volunteerTime;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Schema(description = "설명", example = "2022-02-12T12:16:40.77")
     LocalDateTime endedDate;

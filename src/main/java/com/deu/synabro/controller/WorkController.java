@@ -34,7 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name="Work", description = "봉사 요청 API")
@@ -91,9 +90,8 @@ public class WorkController {
             @RequestPart(required = false) MultipartFile file,
             @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             @RequestPart(name = "contentsRequest") WorkRequest workRequest) throws IOException {
-        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
-        workRequest.setUserId(userId);
-        Work work = workService.setContent(workRequest);
+        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName())
+        Work work = workService.setContent(workRequest, userId);
         if (file!=null) {
             if(file.getOriginalFilename().contains(".mp4")){
                 videoService.saveVideo(file, work);
