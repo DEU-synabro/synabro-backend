@@ -3,6 +3,8 @@ package com.deu.synabro.controller;
 import com.deu.synabro.http.request.SignUpRequest;
 import com.deu.synabro.http.response.GeneralResponse;
 import com.deu.synabro.http.response.member.MemberResponse;
+import com.deu.synabro.http.response.member.WorkHistoryListResponse;
+import com.deu.synabro.http.response.member.WorkHistoryDetailResponse;
 import com.deu.synabro.service.MemberService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -18,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.UUID;
 
 /*
  * 이 클래스는 회원 정보 관리 및
@@ -50,6 +54,33 @@ public class MemberController {
     @GetMapping(value = "")
     public @ResponseBody ResponseEntity<MemberResponse> getMembers(@PageableDefault(size = 4) Pageable pageable) {
         return new ResponseEntity<>(memberService.findMember(pageable), HttpStatus.OK);
+    }
+
+    @Operation(summary = "사용자 작업 목록 조회", description = "사용자 작업 목록을 반환합니다.", tags = "Member",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공",
+                            content = {@Content(schema = @Schema(implementation = WorkHistoryListResponse.class))}),
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
+            })
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "integer", paramType = "query", defaultValue = "0"),
+            @ApiImplicitParam(name = "size", value = "한 페이지당 불러올 콘텐츠 개수", dataType = "integer", paramType = "query", defaultValue = "10"),
+            @ApiImplicitParam(name = "sort", value = "정렬방법(id,desc,asc)", dataType = "string", paramType = "query", defaultValue = "asc")
+    })
+    @GetMapping(value = "/list")
+    public @ResponseBody ResponseEntity<WorkHistoryListResponse> getMemberWorkLists(@PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(new WorkHistoryListResponse(pageable));
+    }
+
+    @Operation(summary = "사용자 작업 목록 조회", description = "사용자 작업 목록을 반환합니다.", tags = "Member",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공",
+                            content = {@Content(schema = @Schema(implementation = WorkHistoryDetailResponse.class))}),
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
+            })
+    @GetMapping(value = "/list/{id}")
+    public @ResponseBody ResponseEntity<WorkHistoryDetailResponse> getMemberWorkDetail(@PathVariable(name = "id") UUID id) {
+        return new ResponseEntity<>(new WorkHistoryDetailResponse(), HttpStatus.OK);
     }
 
     @Operation(summary = "사용자 등록", description = "사용자가 회원가입시 사용자를 등록합니다.", tags = "Member",
