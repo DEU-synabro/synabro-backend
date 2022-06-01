@@ -15,7 +15,7 @@ public class EducationResponse {
     @Schema(description = "교육글 고유번호", example = "8857ba20-2cb7-407e-908c-b333cf1257c5")
     private final UUID id;
 
-    @Schema(description = "교육글 고유번호", example = "제목글, 바닥글 적기")
+    @Schema(description = "교육글 제목", example = "제목글, 바닥글 적기")
     private final String title;
 
     @Schema(description = "교육 진행 상태", example = "PROGRESS")
