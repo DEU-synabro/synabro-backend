@@ -1,33 +1,23 @@
 package com.deu.synabro.controller;
 
-import com.deu.synabro.entity.Member;
 import com.deu.synabro.http.request.SignUpRequest;
 import com.deu.synabro.http.response.GeneralResponse;
-import com.deu.synabro.http.response.MemberListResponse;
+import com.deu.synabro.http.response.member.MemberResponse;
 import com.deu.synabro.service.MemberService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /*
  * 이 클래스는 회원 정보 관리 및
@@ -46,10 +36,10 @@ public class MemberController {
     @Autowired
     public MemberController(MemberService memberService) { this.memberService = memberService; }
 
-    @Operation(summary = "사용자 전체 정보 조회", description = "사용자 전체 정보를 반환합니다.", tags = "Member",
+    @Operation(summary = "사용자 정보 조회", description = "사용자 정보를 반환합니다.", tags = "Member",
                responses = {
-                       @ApiResponse(responseCode = "200", description = "전체 사용자 정보 조회 성공",
-                               content = {@Content(schema = @Schema(implementation = MemberListResponse.class))}),
+                       @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공",
+                               content = {@Content(schema = @Schema(implementation = String.class))}),
                        @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
                })
     @ApiImplicitParams({
@@ -58,14 +48,8 @@ public class MemberController {
             @ApiImplicitParam(name = "sort", value = "정렬방법(id,desc,asc)", dataType = "string", paramType = "query", defaultValue = "asc")
     })
     @GetMapping(value = "")
-    public @ResponseBody ResponseEntity<MemberListResponse> getMembers(@PageableDefault Pageable pageable) {
-        Page<Member> members = memberService.findAll(pageable);
-        PagedModel.PageMetadata pageMetadata =
-                new PagedModel.PageMetadata(pageable.getPageSize(), members.getNumber(), members.getTotalElements());
-        PagedModel<Member> resources = PagedModel.of(members.getContent(), pageMetadata);
-        resources.add(linkTo(methodOn(MemberController.class).getMembers(pageable)).withSelfRel());
-        MemberListResponse memberListResponse = new MemberListResponse(pageable, members);
-        return new ResponseEntity<>(memberListResponse, HttpStatus.OK);
+    public @ResponseBody ResponseEntity<MemberResponse> getMembers(@PageableDefault(size = 4) Pageable pageable) {
+        return new ResponseEntity<>(memberService.findMember(pageable), HttpStatus.OK);
     }
 
     @Operation(summary = "사용자 등록", description = "사용자가 회원가입시 사용자를 등록합니다.", tags = "Member",
@@ -73,7 +57,9 @@ public class MemberController {
                    @ApiResponse(responseCode = "200", description = "사용자 등록 성공",
                                 content = @Content(mediaType = "application/json",
                                                    schema = @Schema(implementation = GeneralResponse.class),
-                                                   examples = @ExampleObject(value = SET_MEMBER_OK))),
+                                                   examples
+
+                                                           = @ExampleObject(value = SET_MEMBER_OK))),
                    @ApiResponse(responseCode = "400", description = "필수 파라미터 누락",
                                 content = @Content(mediaType = "application/json",
                                                    schema = @Schema(implementation = GeneralResponse.class),

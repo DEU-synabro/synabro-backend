@@ -18,7 +18,6 @@ import java.util.UUID;
 @Getter
 @RequiredArgsConstructor
 @Entity
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Member extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -67,7 +66,6 @@ public class Member extends BaseTime {
     @Column(name = "lost_login_time", columnDefinition = "DATETIME(6)")
     @Schema(description = "사용자 마지막 로그인 시간", example = "2022-01-030T05:17:22.024")
     private LocalDateTime lastLoginTime;
-
 
     @Column(columnDefinition = "BIT(1)")
     private boolean activated;
