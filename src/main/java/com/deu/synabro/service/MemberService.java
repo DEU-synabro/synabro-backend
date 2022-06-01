@@ -3,6 +3,7 @@ package com.deu.synabro.service;
 import com.deu.synabro.entity.Authority;
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.http.request.SignUpRequest;
+import com.deu.synabro.http.response.member.MemberResponse;
 import com.deu.synabro.repository.MemberRepository;
 import com.deu.synabro.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,17 @@ public class MemberService {
 
     public Page<Member> findAll(Pageable pageable) {
         return memberRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberResponse findMember(Pageable pageable) {
+        if (getMemberWithAuthorities().isPresent()) {
+            Member member = getMemberWithAuthorities().get();
+            return new MemberResponse(pageable);
+        } else {
+            // TODO 에러 처리 추가
+        };
+        return null;
     }
 
     public Member signUp(SignUpRequest signUpRequest) {
