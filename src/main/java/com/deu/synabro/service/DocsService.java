@@ -32,8 +32,8 @@ public class DocsService {
     @Autowired
     DocsRepository docsRepository;
 
-    @Value("${spring.servlet.multipart.location}")
-    private String uploadPath;
+//    @Value("${spring.servlet.multipart.location}")
+    private String uploadPath = "./download";
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -49,7 +49,8 @@ public class DocsService {
     public ResponseEntity<Object> downDocs(UUID uuid){
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
         try {
-            Path filePath = Paths.get("./" + docs.getFileName());
+            Path filePath = Paths.get("./download/" + docs.getFileName());
+            logger.info("./download/" + docs.getFileName()+"(()()()()()()()()()()()(");
             String contentType = Files.probeContentType(filePath);
 
             HttpHeaders headers = new HttpHeaders();
