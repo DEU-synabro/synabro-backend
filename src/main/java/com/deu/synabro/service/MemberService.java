@@ -3,12 +3,15 @@ package com.deu.synabro.service;
 import com.deu.synabro.entity.Authority;
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.http.request.SignUpRequest;
+import com.deu.synabro.http.response.GeneralResponse;
 import com.deu.synabro.http.response.member.MemberResponse;
 import com.deu.synabro.repository.MemberRepository;
 import com.deu.synabro.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -45,13 +48,10 @@ public class MemberService {
         return null;
     }
 
-    public Member signUp(SignUpRequest signUpRequest) {
+    public Member signUp(SignUpRequest signUpRequest, Authority authority) {
         if (memberRepository.findOneWithAuthoritiesByEmail(signUpRequest.getEmail()).orElse(null) != null ){
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
         }
-
-        Authority authority = Authority.builder()
-                .authorityName("ROLE_USER").build();
 
         Member member = Member.builder()
                 .email(signUpRequest.getEmail())
@@ -64,6 +64,14 @@ public class MemberService {
 
         return memberRepository.save(member);
     }
+
+    public boolean checkSignUpRequest(SignUpRequest signUpRequest) {
+        if (signUpRequest.getEmail() == null || signUpRequest.getPassword() == null || signUpRequest.getUsername() == null) {
+            return false;
+        }
+        return true;
+    }
+
 
     @Transactional(readOnly = true)
     public Optional<Member> getMemberWithAuthorities(String email) {

@@ -1,5 +1,6 @@
 package com.deu.synabro.controller;
 
+import com.deu.synabro.entity.Authority;
 import com.deu.synabro.http.request.SignUpRequest;
 import com.deu.synabro.http.response.GeneralResponse;
 import com.deu.synabro.http.response.member.MemberResponse;
@@ -43,7 +44,7 @@ public class MemberController {
     @Operation(summary = "사용자 정보 조회", description = "사용자 정보를 반환합니다.", tags = "Member",
                responses = {
                        @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공",
-                               content = {@Content(schema = @Schema(implementation = String.class))}),
+                               content = {@Content(schema = @Schema(implementation = MemberResponse.class))}),
                        @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
                })
     @ApiImplicitParams({
@@ -98,10 +99,36 @@ public class MemberController {
                })
     @PostMapping(value = "/signup")
     public ResponseEntity<GeneralResponse> setMember(@RequestBody SignUpRequest signUpRequest) {
+        if (memberService.checkSignUpRequest(signUpRequest)) {
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.BAD_REQUEST, "잘못된 접근입니다. email, password, username을 확인해주세요."), HttpStatus.BAD_REQUEST);
+        }
+
+        memberService.signUp(signUpRequest, Authority.builder().authorityName("ROLE_USER").build());
+
+        return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "사용자 등록에 성공하였습니다."), HttpStatus.OK);
+    }
+
+    @Operation(summary = "수혜자 등록", description = "사용자가 회원가입시 사용자를 등록합니다.", tags = "Beneficiary",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "사용자 등록 성공",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = GeneralResponse.class),
+                                    examples
+
+                                            = @ExampleObject(value = SET_MEMBER_OK))),
+                    @ApiResponse(responseCode = "400", description = "필수 파라미터 누락",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = SET_MEMBER_BAD_REQUEST)))
+            })
+    @PostMapping(value = "/beneficiary/signup")
+    public ResponseEntity<GeneralResponse> setBeneficiary(@RequestBody SignUpRequest signUpRequest) {
         if (signUpRequest.getEmail() == null || signUpRequest.getPassword() == null || signUpRequest.getUsername() == null) {
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.BAD_REQUEST, "잘못된 접근입니다. email, password, username을 확인해주세요."), HttpStatus.BAD_REQUEST);
         }
-        memberService.signUp(signUpRequest);
+
+        memberService.signUp(signUpRequest, Authority.builder().authorityName("ROLE_BENEFICIARY").build());
+
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "사용자 등록에 성공하였습니다."), HttpStatus.OK);
     }
 
