@@ -2,16 +2,14 @@ package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Authority;
 import com.deu.synabro.entity.Member;
-import com.deu.synabro.http.request.SignUpRequest;
-import com.deu.synabro.http.response.GeneralResponse;
+import com.deu.synabro.http.request.member.MemberPatchRequest;
+import com.deu.synabro.http.request.member.SignUpRequest;
 import com.deu.synabro.http.response.member.MemberResponse;
 import com.deu.synabro.repository.MemberRepository;
 import com.deu.synabro.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -40,12 +38,16 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberResponse findMember(Pageable pageable) {
         if (getMemberWithAuthorities().isPresent()) {
-            Member member = getMemberWithAuthorities().get();
-            return new MemberResponse(pageable);
+            return new MemberResponse(getMemberWithAuthorities().get(), pageable);
         } else {
             // TODO 에러 처리 추가
         };
         return null;
+    }
+
+    public Member update(MemberPatchRequest request) {
+        Member member = getMemberWithAuthorities().get();
+        return memberRepository.save(member.update(request));
     }
 
     public Member signUp(SignUpRequest signUpRequest, Authority authority) {
@@ -66,10 +68,7 @@ public class MemberService {
     }
 
     public boolean checkSignUpRequest(SignUpRequest signUpRequest) {
-        if (signUpRequest.getEmail() == null || signUpRequest.getPassword() == null || signUpRequest.getUsername() == null) {
-            return false;
-        }
-        return true;
+        return signUpRequest.getEmail() == null || signUpRequest.getPassword() == null || signUpRequest.getUsername() == null;
     }
 
 
