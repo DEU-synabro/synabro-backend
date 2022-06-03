@@ -1,6 +1,7 @@
 package com.deu.synabro.auth;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -13,6 +14,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+@Slf4j
 @AllArgsConstructor
 public class JwtFilter extends GenericFilterBean {
     public static final String AUTHORIZATION_HEADER = "Authorization";
@@ -30,7 +32,9 @@ public class JwtFilter extends GenericFilterBean {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             System.out.println("Security Context에 '"+authentication.getName()+"' 인증 정보를 저장했습니다, uri: "+requestURI);
         } else {
-            System.out.println("유효한 JWT 토큰이 없습니다, uri: " + requestURI);
+            if(!(requestURI.contains("swagger")||requestURI.contains("api-docs"))){
+                log.info("유효한 JWT 토큰이 없습니다, uri: " + requestURI);
+            }
         }
         chain.doFilter(request, response);
     }
