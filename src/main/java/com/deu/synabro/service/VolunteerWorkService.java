@@ -104,6 +104,20 @@ public class VolunteerWorkService {
         return volunteerWorkResponse;
     }
 
+    public JSONObject getVolunteerWork(UUID uuid){
+        List<VolunteerWork> volunteerWorks = volunteerWorkRepository.findByUserId_Idx(uuid);
+
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        for(int i=0; i<volunteerWorks.size(); i++){
+            JSONObject data = new JSONObject();
+            data.put("봉사 이름",volunteerWorks.get(i).getWorkId().getTitle());
+            jsonArray.add(data);
+        }
+        jsonObject.put("진행중인 작업",jsonArray);
+        return jsonObject;
+    }
+
     public JSONObject getWeekWork(UUID uuid){
         List<VolunteerWork> volunteerWorks = volunteerWorkRepository.findByUserId_Idx(uuid);
         Calendar[] calendars = new Calendar[7];
@@ -160,8 +174,10 @@ public class VolunteerWorkService {
 
     public JSONArray getWork(UUID uuid){
         JSONArray jsonArray = new JSONArray();
+        JSONObject workjson = getVolunteerWork(uuid);
         JSONObject weekjson = getWeekWork(uuid);
         JSONObject monthjson = getMonthWork(uuid);
+        jsonArray.add(workjson);
         jsonArray.add(weekjson);
         jsonArray.add(monthjson);
         return jsonArray;
