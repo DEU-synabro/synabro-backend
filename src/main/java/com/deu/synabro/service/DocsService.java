@@ -1,8 +1,11 @@
 package com.deu.synabro.service;
 
+import com.deu.synabro.controller.AuthController;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.Docs;
 import com.deu.synabro.repository.DocsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -32,6 +35,8 @@ public class DocsService {
     @Value("${spring.servlet.multipart.location}")
     private String uploadPath;
 
+    private static Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     public void File_init(){
         try{
             Files.createDirectories(Paths.get(uploadPath));
@@ -43,7 +48,6 @@ public class DocsService {
 
     public ResponseEntity<Object> downDocs(UUID uuid){
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
-        System.out.println(docs.getFileName());
         try {
             Path filePath = Paths.get("./" + docs.getFileName());
             String contentType = Files.probeContentType(filePath);
@@ -59,7 +63,9 @@ public class DocsService {
     }
 
     public void saveDocs(MultipartFile file, Work work) throws IOException {
-        System.out.print(uploadPath+"!!!!!");
+//        System.out.print(uploadPath+"!!!!!");
+        logger.debug(uploadPath+"@@@@");
+        logger.info(uploadPath+"###");
         try{
             if( file.isEmpty() ) {
                 System.out.println(file.getOriginalFilename());
