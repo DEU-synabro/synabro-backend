@@ -2,7 +2,7 @@ package com.deu.synabro.controller;
 
 import com.deu.synabro.auth.JwtFilter;
 import com.deu.synabro.auth.TokenProvider;
-import com.deu.synabro.http.request.SignInRequest;
+import com.deu.synabro.http.request.member.SignInRequest;
 import com.deu.synabro.http.response.TokenResponse;
 import com.deu.synabro.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
