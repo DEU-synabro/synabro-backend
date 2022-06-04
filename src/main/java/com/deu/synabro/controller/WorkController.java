@@ -52,8 +52,8 @@ import java.util.UUID;
 @Tag(name="Work", description = "봉사 요청 API")
 @RestController
 @RequestMapping("/api/works")
-@CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
 @AllArgsConstructor
+//@CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
 public class WorkController {
 
     @Autowired

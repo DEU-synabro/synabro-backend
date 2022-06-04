@@ -2,6 +2,8 @@ package com.deu.synabro.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -25,7 +27,7 @@ import java.util.stream.Stream;
  * @see org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  */
 @Configuration
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
     /*
      * Swagger 설정의 핵심이 되는 Bean으로
      * api의 그룹명이나 이동경로, 보여질 api가 속한 패키지 등의
@@ -34,6 +36,14 @@ public class WebConfig {
      * @return API 문서 적용될 설정
      * @see springfox.documentation.spring.web.plugins.Docket
      */
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET", "POST")
+                .maxAge(3000);
+    }
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.OAS_30)
