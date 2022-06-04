@@ -63,6 +63,8 @@ public class DocsService {
 //            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(docs.getFileName()).build());  // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
 //            headers.add(HttpHeaders.CONTENT_TYPE, contentType);
             Resource resource = new FileSystemResource(filePath);
+            logger.info(String.valueOf(headers));
+            logger.info(String.valueOf(resource));
             return new ResponseEntity<Object>(resource, headers, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<Object>(null, HttpStatus.CONFLICT);
