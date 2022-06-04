@@ -74,7 +74,7 @@ public class Member extends BaseTime {
             this.address = request.getAddress();
         }
         if(request.getUsername() != null) {
-            this.email = request.getUsername();
+            this.username = request.getUsername();
         }
         if(request.getPhoneNumber() != null) {
             this.phone = request.getPhoneNumber();
