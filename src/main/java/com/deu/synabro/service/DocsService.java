@@ -52,7 +52,7 @@ public class DocsService {
         logger.info("현재 작업 경로: " + uploadPath+"/download/");
         try {
             Path filePath = Paths.get(uploadPath+ "/download/" + docs.getFileName());
-            logger.info(uploadPath+ "/download/" + docs.getFileName()+ "  ))((");
+            logger.info(uploadPath+ "/download/" + docs.getFileName()+ " ))((");
             String contentType = Files.probeContentType(filePath);
 
             HttpHeaders headers = new HttpHeaders();
