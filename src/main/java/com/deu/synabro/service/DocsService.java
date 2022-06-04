@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,14 +34,14 @@ public class DocsService {
     DocsRepository docsRepository;
 
 //    @Value("${spring.servlet.multipart.location}")
-    private String uploadPath="./download";
+    private String uploadPath=System.getProperty("user.dir")+"\\download";
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     public void File_init(){
         try{
             Files.createDirectories(Paths.get(uploadPath));
-            System.out.print(uploadPath);
+            logger.info(uploadPath);
         }catch (IOException e){
             throw new RuntimeException("Not Create");
         }
@@ -48,9 +49,10 @@ public class DocsService {
 
     public ResponseEntity<Object> downDocs(UUID uuid){
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
+        logger.info("현재 작업 경로: " + uploadPath);
         try {
-            Path filePath = Paths.get("./download/" + docs.getFileName());
-            logger.info("./download/" + docs.getFileName()+"))((");
+            Path filePath = Paths.get(uploadPath+ "\\" + docs.getFileName());
+            logger.info(uploadPath+ "\\" + docs.getFileName()+ " ))((");
             String contentType = Files.probeContentType(filePath);
 
             HttpHeaders headers = new HttpHeaders();
@@ -64,21 +66,18 @@ public class DocsService {
     }
 
     public void saveDocs(MultipartFile file, Work work) throws IOException {
-//        System.out.print(uploadPath+"!!!!!");
-        logger.debug(uploadPath+"@@@@");
-        logger.info(uploadPath+"###");
+        logger.info("현재 작업 경로: " + uploadPath);
         try{
             if( file.isEmpty() ) {
-                System.out.println(file.getOriginalFilename());
+                logger.info(file.getOriginalFilename()+" z");
                 throw new Exception("ERROR : Fil is empty");
             }
             Path root = Paths.get(uploadPath);
             if(!Files.exists(root)){
                 File_init();
-                System.out.println(file.getOriginalFilename());
+                logger.info(file.getOriginalFilename());
             }
             try(InputStream inputStream = file.getInputStream()){
-
                 Docs docs = new Docs(work,file.getOriginalFilename());
                 docsRepository.save(docs);
                 Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
