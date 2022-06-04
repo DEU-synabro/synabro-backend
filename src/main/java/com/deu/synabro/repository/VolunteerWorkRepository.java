@@ -1,6 +1,7 @@
 package com.deu.synabro.repository;
 
 import com.deu.synabro.entity.VolunteerWork;
+import com.deu.synabro.entity.enums.PerformType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,9 +15,10 @@ import java.util.UUID;
 @Repository
 public interface VolunteerWorkRepository extends JpaRepository<VolunteerWork, Long> {
     @Nullable
-    Page<VolunteerWork> findByWorkId_TitleContainingOrderByCreatedDateDesc(Pageable pageable, String title);
+    Page<VolunteerWork> findByWorkId_TitleContainingAndPerformTypeOrderByCreatedDateDesc(Pageable pageable, String title, PerformType performType);
     @Nullable
-    Page<VolunteerWork> findByWorkId_TitleContainingOrContentsContainingOrderByCreatedDateDesc(Pageable pageable, String title, String content);
+    Page<VolunteerWork> findByWorkId_TitleContainingOrContentsContainingAndPerformTypeOrderByCreatedDateDesc(Pageable pageable, String title, String content, PerformType performType);
+    Page<VolunteerWork> findAllByPerformType(Pageable pageable, PerformType performType);
     VolunteerWork findByIdx(UUID uuid);
     Optional<VolunteerWork> findOptionalByIdx(UUID uuid);
     Optional<VolunteerWork> findOptionalByUserId(UUID uuid);

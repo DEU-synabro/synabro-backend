@@ -1,5 +1,6 @@
 package com.deu.synabro.entity;
 
+import com.deu.synabro.entity.enums.PerformType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,11 +34,17 @@ public class VolunteerWork extends BaseTime implements Serializable {
     @Schema(description = "작업 진행 공간", example = "작업 내용")
     private String contents;
 
+    @Enumerated(value=EnumType.STRING)
+    @Column(name="perform_type")
+    @Schema(description = "상태")
+    private PerformType performType;
+
     @Builder
-    public VolunteerWork(UUID idx, Member userId, Work workId, String contents) {
+    public VolunteerWork(UUID idx, Member userId, Work workId, String contents, PerformType performType) {
         this.idx = idx;
         this.userId = userId;
         this.workId = workId;
         this.contents = contents;
+        this.performType = performType;
     }
 }

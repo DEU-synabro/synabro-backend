@@ -1,5 +1,6 @@
 package com.deu.synabro.entity;
 
+import com.deu.synabro.entity.enums.PerformType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -33,10 +34,16 @@ public class Inspection extends BaseTime implements Serializable {
     @Column
     private String contents;
 
+    @Enumerated(value=EnumType.STRING)
+    @Column(name="perform_type")
+    @Schema(description = "상태")
+    private PerformType performType;
+
     @Builder
-    public Inspection(Member userId, VolunteerWork volunteerWorkId, String contents) {
+    public Inspection(Member userId, VolunteerWork volunteerWorkId, String contents, PerformType performType) {
         this.userId = userId;
         this.volunteerWorkId = volunteerWorkId;
         this.contents = contents;
+        this.performType = performType;
     }
 }

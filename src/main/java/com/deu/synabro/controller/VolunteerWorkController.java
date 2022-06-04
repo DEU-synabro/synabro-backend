@@ -3,6 +3,7 @@ package com.deu.synabro.controller;
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.VolunteerWork;
 import com.deu.synabro.entity.Work;
+import com.deu.synabro.entity.enums.PerformType;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.VolunteerWorkUpdateRequest;
 import com.deu.synabro.http.response.*;
@@ -207,6 +208,7 @@ public class VolunteerWorkController {
                                                 .userId(member)
                                                 .workId(workId)
                                                 .contents("")
+                                                .performType(PerformType.PERFORMING)
                                                 .build();
         volunteerWorkService.setVolunteerWork(volunteerWork);
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 수행글이 생성되었습니다."), HttpStatus.OK);

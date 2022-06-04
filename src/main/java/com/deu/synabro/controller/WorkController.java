@@ -23,10 +23,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -34,13 +35,14 @@ import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -276,28 +278,53 @@ public class WorkController {
         }
     }
 
+    private static Logger logger = LoggerFactory.getLogger(AuthController.class);
+    @Autowired
+    ResourceLoader resourceLoader;
     @GetMapping("/download/{work_id}")
-    public ResponseEntity<Resource> download(@Parameter(description = "고유 아이디")
-                                               @PathVariable(name = "work_id") UUID uuid, HttpServletRequest request) throws IOException {
+    public void download(@Parameter(description = "고유 아이디")
+                                               @PathVariable(name = "work_id") UUID uuid, HttpServletResponse response, HttpServletRequest request) throws IOException {
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
-        String path = System.getProperty("user.dir")+"/download/";
-
-        //파일경로, 파일명으로 리소스 객체 생성
-        Resource resource = new FileSystemResource(path + docs.getFileName());
-
-        //파일 명
-        String resourceName = resource.getFilename();
-
-        //Http헤더에 옵션을 추가하기 위해서 헤더 변수 선언
-        HttpHeaders headers = new HttpHeaders();
-
+        String uploadPath=System.getProperty("user.dir");
         try {
-            //헤더에 파일명으로 첨부파일 추가
-            headers.add("Content-Disposition", "attachment; filename=" + new String(resourceName.getBytes("UTF-8"),
-                    "ISO-8859-1"));
-        } catch(UnsupportedEncodingException e) {
+            String originFileName = URLDecoder.decode(docs.getFileName(), "UTF-8");
+            String onlyFileName = originFileName.substring(originFileName.lastIndexOf(".") + 1);
+
+            File file = new File(uploadPath+"/download", originFileName);
+
+            if(file.exists()) {
+                String agent = request.getHeader("User-Agent");
+
+                //브라우저별 한글파일 명 처리
+                if(agent.contains("Trident"))//Internet Explore
+                    onlyFileName = URLEncoder.encode(onlyFileName, "UTF-8").replaceAll("\\+", " ");
+
+                else if(agent.contains("Edge")) //Micro Edge
+                    onlyFileName = URLEncoder.encode(onlyFileName, "UTF-8");
+
+                else //Chrome
+                    onlyFileName = new String(onlyFileName.getBytes("UTF-8"), "ISO-8859-1");
+                //브라우저별 한글파일 명 처리
+
+                response.setHeader("Content-Type", "application/octet-stream");
+                response.setHeader("Content-Disposition", "attachment; filename=" + onlyFileName);
+
+                InputStream is = new FileInputStream(file);
+                OutputStream os = response.getOutputStream();
+
+                int length;
+                byte[] buffer = new byte[1024];
+
+                while( (length = is.read(buffer)) != -1){
+                    os.write(buffer, 0, length);
+                }
+
+                os.flush();
+                os.close();
+                is.close();
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ResponseEntity<Resource>(resource, headers, HttpStatus.OK);
     }
 }

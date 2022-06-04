@@ -3,6 +3,7 @@ package com.deu.synabro.service;
 import com.deu.synabro.entity.Inspection;
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.VolunteerWork;
+import com.deu.synabro.entity.enums.PerformType;
 import com.deu.synabro.http.request.InspectionUpdateRequest;
 import com.deu.synabro.http.response.InspectionResponse;
 import com.deu.synabro.repository.InspectionRepository;
@@ -25,11 +26,13 @@ public class InspectionService {
 
     public void setInspection(VolunteerWork volunteerWork){
         UUID uuid = volunteerWork.getUserId().getIdx();
+        volunteerWork.setPerformType(PerformType.DONE);
         Member member = new Member(uuid);
         Inspection inspection = Inspection.builder()
                                         .volunteerWorkId(volunteerWork)
                                         .contents("")
                                         .userId(member)
+                                        .performType(PerformType.PERFORMING)
                                         .build();
         inspectionRepository.save(inspection);
     }
@@ -47,14 +50,14 @@ public class InspectionService {
     public Inspection findById(UUID uuid) {return inspectionRepository.findByIdx(uuid);}
 
     public  Page<Inspection> findByTitle(Pageable pageable, String title){
-        return inspectionRepository.findByVolunteerWorkId_WorkId_TitleContainingOrderByCreatedDateDesc(pageable,title);
+        return inspectionRepository.findByVolunteerWorkId_WorkId_TitleContainingAndPerformTypeOrderByCreatedDateDesc(pageable,title, PerformType.PERFORMING);
     }
     public Page<Inspection> findByTitleOrContents(Pageable pageable, String title, String contents) {
-        return inspectionRepository.findByVolunteerWorkId_WorkId_TitleContainingOrContentsContainingOrderByCreatedDateDesc(pageable,title,contents);
+        return inspectionRepository.findByVolunteerWorkId_WorkId_TitleContainingOrContentsContainingAndPerformTypeOrderByCreatedDateDesc(pageable,title,contents, PerformType.PERFORMING);
     }
     public Page<Inspection> findAll(Pageable pageable) {
         pageable = PageRequest.of(pageable.getPageNumber(),pageable.getPageSize(), Sort.by("createdDate").descending());
-        Page<Inspection> inspectionPage = inspectionRepository.findAll(pageable);
+        Page<Inspection> inspectionPage = inspectionRepository.findAllByPerformType(pageable, PerformType.PERFORMING);
         return inspectionPage;
     }
 
@@ -103,6 +106,7 @@ public class InspectionService {
         inspection.getVolunteerWorkId().getWorkId().setVolunteerTime(inspectionUpdateRequest.getVolunteerTime());
         inspection.setContents(inspectionUpdateRequest.getContents());
         inspection.setUpdatedDate(LocalDateTime.now());
+        inspection.setPerformType(PerformType.DONE);
     }
 
     @Transactional
