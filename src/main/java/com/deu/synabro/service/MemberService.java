@@ -2,7 +2,8 @@ package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Authority;
 import com.deu.synabro.entity.Member;
-import com.deu.synabro.http.request.SignUpRequest;
+import com.deu.synabro.http.request.member.MemberPatchRequest;
+import com.deu.synabro.http.request.member.SignUpRequest;
 import com.deu.synabro.http.response.member.MemberResponse;
 import com.deu.synabro.repository.MemberRepository;
 import com.deu.synabro.util.SecurityUtil;
@@ -37,21 +38,22 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberResponse findMember(Pageable pageable) {
         if (getMemberWithAuthorities().isPresent()) {
-            Member member = getMemberWithAuthorities().get();
-            return new MemberResponse(pageable);
+            return new MemberResponse(getMemberWithAuthorities().get(), pageable);
         } else {
             // TODO 에러 처리 추가
         };
         return null;
     }
 
-    public Member signUp(SignUpRequest signUpRequest) {
+    public Member update(MemberPatchRequest request) {
+        Member member = getMemberWithAuthorities().get();
+        return memberRepository.save(member.update(request));
+    }
+
+    public Member signUp(SignUpRequest signUpRequest, Authority authority) {
         if (memberRepository.findOneWithAuthoritiesByEmail(signUpRequest.getEmail()).orElse(null) != null ){
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
         }
-
-        Authority authority = Authority.builder()
-                .authorityName("ROLE_USER").build();
 
         Member member = Member.builder()
                 .email(signUpRequest.getEmail())
@@ -64,6 +66,11 @@ public class MemberService {
 
         return memberRepository.save(member);
     }
+
+    public boolean checkSignUpRequest(SignUpRequest signUpRequest) {
+        return signUpRequest.getEmail() == null || signUpRequest.getPassword() == null || signUpRequest.getUsername() == null;
+    }
+
 
     @Transactional(readOnly = true)
     public Optional<Member> getMemberWithAuthorities(String email) {
