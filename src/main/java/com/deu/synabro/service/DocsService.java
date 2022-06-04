@@ -36,7 +36,7 @@ public class DocsService {
     DocsRepository docsRepository;
 
 //    @Value("${spring.servlet.multipart.location}")
-    private String uploadPath=System.getProperty("user.dir");
+    private String uploadPath="/home/ec2-user/a/SynabroBackend";
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
