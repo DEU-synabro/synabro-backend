@@ -282,49 +282,20 @@ public class WorkController {
     @Autowired
     ResourceLoader resourceLoader;
     @GetMapping("/download/{work_id}")
-    public void download(@Parameter(description = "고유 아이디")
+    public ResponseEntity<Resource> download(@Parameter(description = "고유 아이디")
                                                @PathVariable(name = "work_id") UUID uuid, HttpServletResponse response, HttpServletRequest request) throws IOException {
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
         String uploadPath=System.getProperty("user.dir");
-        try {
-            String originFileName = URLDecoder.decode(docs.getFileName(), "UTF-8");
-            String onlyFileName = originFileName.substring(originFileName.lastIndexOf(".") + 1);
 
-            File file = new File(uploadPath+"/download", originFileName);
+        Path filePath = Paths.get(File.separatorChar+"download", File.separatorChar+docs.getFileName());
+        System.out.println(filePath);
+        Resource resource = new InputStreamResource(getClass().getResourceAsStream(filePath.toString()));
 
-            if(file.exists()) {
-                String agent = request.getHeader("User-Agent");
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .cacheControl(CacheControl.noCache())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + docs.getFileName() + "")
+                .body(resource);
 
-                //브라우저별 한글파일 명 처리
-                if(agent.contains("Trident"))//Internet Explore
-                    onlyFileName = URLEncoder.encode(onlyFileName, "UTF-8").replaceAll("\\+", " ");
-
-                else if(agent.contains("Edge")) //Micro Edge
-                    onlyFileName = URLEncoder.encode(onlyFileName, "UTF-8");
-
-                else //Chrome
-                    onlyFileName = new String(onlyFileName.getBytes("UTF-8"), "ISO-8859-1");
-                //브라우저별 한글파일 명 처리
-
-                response.setHeader("Content-Type", "application/octet-stream");
-                response.setHeader("Content-Disposition", "attachment; filename=" + onlyFileName);
-
-                InputStream is = new FileInputStream(file);
-                OutputStream os = response.getOutputStream();
-
-                int length;
-                byte[] buffer = new byte[1024];
-
-                while( (length = is.read(buffer)) != -1){
-                    os.write(buffer, 0, length);
-                }
-
-                os.flush();
-                os.close();
-                is.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
