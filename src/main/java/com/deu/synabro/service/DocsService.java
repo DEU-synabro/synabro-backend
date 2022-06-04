@@ -15,6 +15,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -47,6 +48,7 @@ public class DocsService {
         }
     }
 
+    @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     public ResponseEntity<Object> downDocs(UUID uuid){
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
         System.out.println(docs.getFileName());
