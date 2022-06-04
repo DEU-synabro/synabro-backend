@@ -53,7 +53,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/works")
 @AllArgsConstructor
-//@CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
+@CrossOrigin(origins = "*")
 public class WorkController {
 
     @Autowired
@@ -282,6 +282,7 @@ public class WorkController {
     @Autowired
     ResourceLoader resourceLoader;
 
+    @CrossOrigin(origins = "*")
     @GetMapping("/download/{work_id}")
     public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
                                                @PathVariable(name = "work_id") UUID uuid) throws IOException {
