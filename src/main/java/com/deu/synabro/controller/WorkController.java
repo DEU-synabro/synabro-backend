@@ -40,7 +40,6 @@ import org.springframework.web.util.UriUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -282,20 +281,8 @@ public class WorkController {
     @Autowired
     ResourceLoader resourceLoader;
     @GetMapping("/download/{work_id}")
-    public ResponseEntity<Resource> download(@Parameter(description = "고유 아이디")
-                                               @PathVariable(name = "work_id") UUID uuid, HttpServletResponse response, HttpServletRequest request) throws IOException {
-        Docs docs = docsRepository.findByWorkId_Idx(uuid);
-        String uploadPath=System.getProperty("user.dir");
-
-        Path filePath = Paths.get(File.separatorChar+"download", File.separatorChar+docs.getFileName());
-        System.out.println(filePath);
-        Resource resource = new InputStreamResource(getClass().getResourceAsStream(filePath.toString()));
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .cacheControl(CacheControl.noCache())
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + docs.getFileName() + "")
-                .body(resource);
-
+    public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
+                                               @PathVariable(name = "work_id") UUID uuid) throws IOException {
+        return docsService.downDocs(uuid);
     }
 }

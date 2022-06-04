@@ -112,10 +112,10 @@ public class VolunteerWorkService {
         JSONArray jsonArray = new JSONArray();
         for(int i=0; i<volunteerWorks.size(); i++){
             JSONObject data = new JSONObject();
-            data.put("봉사 이름",volunteerWorks.get(i).getWorkId().getTitle());
+            data.put("volunteer_name",volunteerWorks.get(i).getWorkId().getTitle());
             jsonArray.add(data);
         }
-        jsonObject.put("진행중인 작업",jsonArray);
+        jsonObject.put("work",jsonArray);
         return jsonObject;
     }
 
@@ -144,11 +144,11 @@ public class VolunteerWorkService {
         JSONArray jsonArray = new JSONArray();
         for(int i=0; i<calendars.length; i++){
             JSONObject data = new JSONObject();
-            data.put("날짜",df.format(calendars[i].getTime()));
-            data.put("봉사 개수",counts[i]);
+            data.put("date",df.format(calendars[i].getTime()));
+            data.put("count",counts[i]);
             jsonArray.add(data);
         }
-        jsonObject.put("일주일 작업 현황",jsonArray);
+        jsonObject.put("week",jsonArray);
         return jsonObject;
     }
     public JSONObject getMonthWork(UUID uuid){
@@ -164,12 +164,12 @@ public class VolunteerWorkService {
             if(df.format(calendar.getTime()).equals(date)){
                 JSONObject data = new JSONObject();
                 String endDate = volunteerWorks.get(i).getWorkId().getEndedDate().toString().substring(0,10);
-                data.put("마감 날짜",endDate);
-                data.put("작업 제목",volunteerWorks.get(i).getWorkId().getTitle());
+                data.put("date",endDate);
+                data.put("title",volunteerWorks.get(i).getWorkId().getTitle());
                 jsonArray.add(data);
             }
         }
-        jsonObject.put("작업 마감 일정",jsonArray);
+        jsonObject.put("ended_date",jsonArray);
         return jsonObject;
     }
 
