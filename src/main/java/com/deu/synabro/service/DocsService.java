@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -58,9 +59,10 @@ public class DocsService {
             logger.info("현재 작업 경로: " + filePath);
             System.out.println(filePath+ " _)))");
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(docs.getFileName()).build());  // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
-            headers.add(HttpHeaders.CONTENT_TYPE, contentType);
-            Resource resource = new InputStreamResource(Files.newInputStream(filePath));
+            headers.add("Content-Disposition", "attachment; filename=" + docs.getFileName());
+//            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(docs.getFileName()).build());  // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
+//            headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+            Resource resource = new FileSystemResource(filePath);
             return new ResponseEntity<Object>(resource, headers, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<Object>(null, HttpStatus.CONFLICT);
