@@ -1,11 +1,13 @@
 package com.deu.synabro.controller;
 
+import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.WorkRequest;
 import com.deu.synabro.http.request.WorkUpdateRequest;
 import com.deu.synabro.http.response.*;
+import com.deu.synabro.repository.DocsRepository;
 import com.deu.synabro.service.MemberService;
 import com.deu.synabro.service.WorkService;
 import com.deu.synabro.service.DocsService;
@@ -20,7 +22,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -31,8 +35,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,6 +53,10 @@ import java.util.UUID;
 @RequestMapping("/api/works")
 @AllArgsConstructor
 public class WorkController {
+
+    @Autowired
+    DocsRepository docsRepository;
+
     @Autowired
     WorkService workService;
 
@@ -265,8 +277,27 @@ public class WorkController {
     }
 
     @GetMapping("/download/{work_id}")
-    public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
-                                               @PathVariable(name = "work_id") UUID uuid) {
-        return docsService.downDocs(uuid);
+    public ResponseEntity<Resource> download(@Parameter(description = "고유 아이디")
+                                               @PathVariable(name = "work_id") UUID uuid, HttpServletRequest request) throws IOException {
+        Docs docs = docsRepository.findByWorkId_Idx(uuid);
+        String path = System.getProperty("user.dir")+"/download/";
+
+        //파일경로, 파일명으로 리소스 객체 생성
+        Resource resource = new FileSystemResource(path + docs.getFileName());
+
+        //파일 명
+        String resourceName = resource.getFilename();
+
+        //Http헤더에 옵션을 추가하기 위해서 헤더 변수 선언
+        HttpHeaders headers = new HttpHeaders();
+
+        try {
+            //헤더에 파일명으로 첨부파일 추가
+            headers.add("Content-Disposition", "attachment; filename=" + new String(resourceName.getBytes("UTF-8"),
+                    "ISO-8859-1"));
+        } catch(UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<Resource>(resource, headers, HttpStatus.OK);
     }
 }
