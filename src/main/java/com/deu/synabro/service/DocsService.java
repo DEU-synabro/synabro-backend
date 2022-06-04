@@ -55,6 +55,7 @@ public class DocsService {
         try {
             Path filePath = Paths.get(uploadPath + "/download/" + docs.getFileName());
             String contentType = Files.probeContentType(filePath);
+            logger.info("FilePath: " + filePath);
             System.out.println(filePath+ " _)))");
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDisposition(ContentDisposition.builder("attachment").filename(docs.getFileName()).build());  // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
