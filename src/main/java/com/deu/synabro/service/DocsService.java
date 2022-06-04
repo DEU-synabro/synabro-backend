@@ -34,13 +34,13 @@ public class DocsService {
     DocsRepository docsRepository;
 
 //    @Value("${spring.servlet.multipart.location}")
-    private String uploadPath=System.getProperty("user.dir")+"\\download";
+    private String uploadPath=System.getProperty("user.dir");
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     public void File_init(){
         try{
-            Files.createDirectories(Paths.get(uploadPath));
+            Files.createDirectories(Paths.get(uploadPath+"/download"));
             logger.info(uploadPath);
         }catch (IOException e){
             throw new RuntimeException("Not Create");
@@ -49,10 +49,10 @@ public class DocsService {
 
     public ResponseEntity<Object> downDocs(UUID uuid){
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
-        logger.info("현재 작업 경로: " + uploadPath);
+        logger.info("현재 작업 경로: " + uploadPath+"/download/");
         try {
-            Path filePath = Paths.get(uploadPath+ "\\" + docs.getFileName());
-            logger.info(uploadPath+ "\\" + docs.getFileName()+ "  ))((");
+            Path filePath = Paths.get(uploadPath+ "/download/" + docs.getFileName());
+            logger.info(uploadPath+ "/download/" + docs.getFileName()+ " ))((");
             String contentType = Files.probeContentType(filePath);
 
             HttpHeaders headers = new HttpHeaders();
@@ -66,13 +66,13 @@ public class DocsService {
     }
 
     public void saveDocs(MultipartFile file, Work work) throws IOException {
-        logger.info("현재 작업 경로: " + uploadPath);
+        logger.info("현재 작업 경로: " + uploadPath+"/download");
         try{
             if( file.isEmpty() ) {
                 logger.info(file.getOriginalFilename()+" z");
                 throw new Exception("ERROR : Fil is empty");
             }
-            Path root = Paths.get(uploadPath);
+            Path root = Paths.get(uploadPath+"/download");
             if(!Files.exists(root)){
                 File_init();
                 logger.info(file.getOriginalFilename());
