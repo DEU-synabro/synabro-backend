@@ -1,5 +1,6 @@
 package com.deu.synabro.http.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +21,8 @@ public class VolunteerListResponse {
     @Schema(description = "봉사 제목", example = "제목")
     private String title;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Schema(description = "봉사 종료 날짜")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone = "Asia/Seoul")
+    @Schema(description = "봉사 종료 날짜", example = "2022-04-07")
     private LocalDateTime endedDate;
 }

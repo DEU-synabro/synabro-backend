@@ -2,6 +2,7 @@ package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.VolunteerWork;
+import com.deu.synabro.entity.enums.PerformType;
 import com.deu.synabro.http.request.VolunteerWorkUpdateRequest;
 import com.deu.synabro.http.response.VolunteerWorkResponse;
 import com.deu.synabro.repository.VolunteerWorkRepository;
@@ -46,14 +47,14 @@ public class VolunteerWorkService {
     }
 
     public  Page<VolunteerWork> findByTitle(Pageable pageable, String title){
-        return volunteerWorkRepository.findByWorkId_TitleContainingOrderByCreatedDateDesc(pageable,title);
+        return volunteerWorkRepository.findByWorkId_TitleContainingAndPerformTypeOrderByCreatedDateDesc(pageable,title, PerformType.PERFORMING);
     }
     public Page<VolunteerWork> findByTitleOrContents(Pageable pageable, String title, String contents) {
-        return volunteerWorkRepository.findByWorkId_TitleContainingOrContentsContainingOrderByCreatedDateDesc(pageable,title,contents);
+        return volunteerWorkRepository.findByWorkId_TitleContainingOrContentsContainingAndPerformTypeOrderByCreatedDateDesc(pageable,title,contents, PerformType.PERFORMING);
     }
     public Page<VolunteerWork> findAll(Pageable pageable) {
         pageable = PageRequest.of(pageable.getPageNumber(),pageable.getPageSize(), Sort.by("createdDate").descending());
-        Page<VolunteerWork> volunteerPage = volunteerWorkRepository.findAll(pageable);
+        Page<VolunteerWork> volunteerPage = volunteerWorkRepository.findAllByPerformType(pageable, PerformType.PERFORMING);
         return volunteerPage;
     }
 

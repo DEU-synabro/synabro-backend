@@ -41,7 +41,7 @@ public class DocsService {
     public void File_init(){
         try{
             Files.createDirectories(Paths.get(uploadPath+"/download"));
-            logger.info(uploadPath);
+            logger.info(uploadPath+"/download");
         }catch (IOException e){
             throw new RuntimeException("Not Create");
         }
@@ -76,12 +76,16 @@ public class DocsService {
             if(!Files.exists(root)){
                 File_init();
                 logger.info(file.getOriginalFilename());
-            }
-            try(InputStream inputStream = file.getInputStream()){
+                InputStream inputStream = file.getInputStream();
+                Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
                 Docs docs = new Docs(work,file.getOriginalFilename());
                 docsRepository.save(docs);
-                Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
             }
+//            try(InputStream inputStream = file.getInputStream()){
+//                Docs docs = new Docs(work,file.getOriginalFilename());
+//                docsRepository.save(docs);
+//                Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+//            }
         }catch (Exception e){
             throw new RuntimeException("Not store the file ");
         }
