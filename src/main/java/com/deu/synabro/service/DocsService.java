@@ -109,6 +109,8 @@ public class DocsService {
     }
 
     public void saveDocs(MultipartFile file, Work work) throws IOException {
+        logger.info("경로 " +ClassLoader.getSystemClassLoader().getResource(".").getPath());
+
         logger.info("현재 작업 경로: " + uploadPath + "/download");
         try{
             if( file.isEmpty() ) {

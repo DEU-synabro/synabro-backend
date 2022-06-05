@@ -123,7 +123,7 @@ public class VolunteerWorkService {
     public JSONObject getWeekWork(UUID uuid){
         List<VolunteerWork> volunteerWorks = volunteerWorkRepository.findByUserId_Idx(uuid);
         Calendar[] calendars = new Calendar[7];
-        DateFormat df = new SimpleDateFormat("MM-dd");
+        DateFormat df = new SimpleDateFormat("yyy-MM-dd");
         int[] counts = new int[7];
 
         for(int i=0;i<calendars.length;i++){
