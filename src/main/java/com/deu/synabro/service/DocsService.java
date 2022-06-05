@@ -39,13 +39,16 @@ public class DocsService {
 
 //    @Value("${spring.servlet.multipart.location}")
     private String uploadPath=System.getProperty("user.dir");
+    private static final String BASE_PATH = new File("").getAbsolutePath();
+    private static String RESOURCE_PATH = "/src/resource";
+    private static String FILE_PATH;
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     public void File_init(){
         try{
-            Files.createDirectories(Paths.get(uploadPath+"/download"));
-            logger.info(uploadPath+"/download");
+            Files.createDirectories(Paths.get(FILE_PATH));
+            logger.info(FILE_PATH);
         }catch (IOException e){
             throw new RuntimeException("Not Create");
         }
@@ -56,7 +59,15 @@ public class DocsService {
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
         System.out.println(docs.getFileName());
         try {
-            Path filePath = Paths.get(uploadPath + "/download/" + docs.getFileName());
+            FILE_PATH = BASE_PATH + RESOURCE_PATH + docs.getFileName();
+            if (Files.exists(Paths.get(FILE_PATH))) {
+                logger.info("Run in IDE!");
+            } else {
+                FILE_PATH = BASE_PATH + "/resource" + docs.getFileName();
+                logger.info("Run executable JAR!\n");
+            }
+
+            Path filePath = Paths.get(FILE_PATH);
             String contentType = Files.probeContentType(filePath);
             logger.info("현재 작업 경로: " + filePath);
             System.out.println(filePath+ " _)))");
@@ -108,16 +119,49 @@ public class DocsService {
         }
     }
 
-    public void saveDocs(MultipartFile file, Work work) throws IOException {
-        logger.info("경로 " +ClassLoader.getSystemClassLoader().getResource(".").getPath());
+//    public void saveDocs(MultipartFile file, Work work) throws IOException {
+//        logger.info("경로 " +ClassLoader.getSystemClassLoader().getResource(".").getPath());
+//
+//        logger.info("현재 작업 경로: " + uploadPath + "/download");
+//        try{
+//            if( file.isEmpty() ) {
+//                System.out.println(file.getOriginalFilename());
+//                throw new Exception("ERROR : Fil is empty");
+//            }
+//            Path root = Paths.get(uploadPath+"/download");
+//            if(!Files.exists(root)){
+//                File_init();
+//                System.out.println(file.getOriginalFilename());
+//            }
+//            try(InputStream inputStream = file.getInputStream()){
+//                Docs docs = new Docs(work,file.getOriginalFilename());
+//                docsRepository.save(docs);
+//                Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+//                logger.info(String.valueOf(inputStream));
+//                logger.info(String.valueOf(root.resolve(file.getOriginalFilename())));
+//            }
+//        }catch (Exception e){
+//            throw new RuntimeException("Not store the file ");
+//        }
+//    }
 
-        logger.info("현재 작업 경로: " + uploadPath + "/download");
+    public void saveDocs(MultipartFile file, Work work) throws IOException {
+
+        FILE_PATH = BASE_PATH + RESOURCE_PATH ;
+        if (Files.exists(Paths.get(FILE_PATH))) {
+            logger.info("Run in IDE!");
+        } else {
+            FILE_PATH = BASE_PATH + "/resource" ;
+            logger.info("Run executable JAR!\n");
+        }
+        logger.info("경로: "+FILE_PATH);
+//        logger.info("현재 작업 경로: " + uploadPath + "/download");
         try{
             if( file.isEmpty() ) {
                 System.out.println(file.getOriginalFilename());
                 throw new Exception("ERROR : Fil is empty");
             }
-            Path root = Paths.get(uploadPath+"/download");
+            Path root = Paths.get(FILE_PATH);
             if(!Files.exists(root)){
                 File_init();
                 System.out.println(file.getOriginalFilename());
