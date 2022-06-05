@@ -4,6 +4,9 @@ import com.deu.synabro.controller.AuthController;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.Docs;
 import com.deu.synabro.repository.DocsRepository;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,9 +69,42 @@ public class DocsService {
             Resource resource = new FileSystemResource(filePath);
             logger.info(String.valueOf(headers));
             logger.info(String.valueOf(resource));
+
             return new ResponseEntity<Object>(resource, headers, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<Object>(null, HttpStatus.CONFLICT);
+        }
+    }
+
+    @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
+    public JSONObject downDocsLink(UUID uuid){
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        Docs docs = docsRepository.findByWorkId_Idx(uuid);
+        System.out.println(docs.getFileName());
+        try {
+            Path filePath = Paths.get(uploadPath + "/download/" + docs.getFileName());
+            String contentType = Files.probeContentType(filePath);
+            logger.info("현재 작업 경로: " + filePath);
+            System.out.println(filePath+ " _)))");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(docs.getFileName()).build());
+            headers.set("Content-Disposition", "attachment; filename=" + docs.getFileName());
+//            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(docs.getFileName()).build());  // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
+            headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+            Resource resource = new FileSystemResource(filePath);
+            logger.info(String.valueOf(headers));
+            logger.info(String.valueOf(resource));
+            logger.info(String.valueOf(resource.getURL()));
+            logger.info(String.valueOf(resource.getFile()));
+            jsonObject.put("url: ","http://18.116.2.111:8080/api/works/download/"+uuid);
+            jsonObject.put("url2: ",resource.getFile());
+            jsonObject.put("url3: ",resource.getURL());
+//            jsonObject.put("resource", resource);
+            return jsonObject;
+        } catch(Exception e) {
+            throw new RuntimeException("Not store the file ");
         }
     }
 
@@ -88,6 +124,8 @@ public class DocsService {
                 Docs docs = new Docs(work,file.getOriginalFilename());
                 docsRepository.save(docs);
                 Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+                logger.info(String.valueOf(inputStream));
+                logger.info(String.valueOf(root.resolve(file.getOriginalFilename())));
             }
         }catch (Exception e){
             throw new RuntimeException("Not store the file ");

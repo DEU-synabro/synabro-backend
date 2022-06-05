@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import net.minidev.json.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -282,10 +283,17 @@ public class WorkController {
     @Autowired
     ResourceLoader resourceLoader;
 
+//    @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
+//    @GetMapping("/download/{work_id}")
+//    public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
+//                                               @PathVariable(name = "work_id") UUID uuid) throws IOException {
+//        return docsService.downDocs(uuid);
+//    }
+
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     @GetMapping("/download/{work_id}")
-    public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
-                                               @PathVariable(name = "work_id") UUID uuid) throws IOException {
-        return docsService.downDocs(uuid);
+    public JSONObject download(@Parameter(description = "고유 아이디")
+                                           @PathVariable(name = "work_id") UUID uuid) throws IOException {
+        return docsService.downDocsLink(uuid);
     }
 }

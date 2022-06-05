@@ -29,6 +29,8 @@ public class VolunteerWorkService {
     @Autowired
     VolunteerWorkRepository volunteerWorkRepository;
 
+    JSONObject jsonObject = new JSONObject();
+
     public VolunteerWork setVolunteerWork(VolunteerWork volunteerWork){
         return volunteerWorkRepository.save(volunteerWork);
     }
@@ -108,7 +110,6 @@ public class VolunteerWorkService {
     public JSONObject getVolunteerWork(UUID uuid){
         List<VolunteerWork> volunteerWorks = volunteerWorkRepository.findByUserId_Idx(uuid);
 
-        JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray();
         for(int i=0; i<volunteerWorks.size(); i++){
             JSONObject data = new JSONObject();
@@ -122,7 +123,7 @@ public class VolunteerWorkService {
     public JSONObject getWeekWork(UUID uuid){
         List<VolunteerWork> volunteerWorks = volunteerWorkRepository.findByUserId_Idx(uuid);
         Calendar[] calendars = new Calendar[7];
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat df = new SimpleDateFormat("MM-dd");
         int[] counts = new int[7];
 
         for(int i=0;i<calendars.length;i++){
@@ -140,7 +141,6 @@ public class VolunteerWorkService {
             }
         }
 
-        JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray();
         for(int i=0; i<calendars.length; i++){
             JSONObject data = new JSONObject();
@@ -156,7 +156,6 @@ public class VolunteerWorkService {
         Calendar calendar = Calendar.getInstance();
         DateFormat df = new SimpleDateFormat("yyyy-MM");
         calendar.setTime(new Date());
-        JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray();
 
         for(int i=0; i<volunteerWorks.size(); i++){
@@ -173,14 +172,10 @@ public class VolunteerWorkService {
         return jsonObject;
     }
 
-    public JSONArray getWork(UUID uuid){
-        JSONArray jsonArray = new JSONArray();
-        JSONObject workjson = getVolunteerWork(uuid);
-        JSONObject weekjson = getWeekWork(uuid);
-        JSONObject monthjson = getMonthWork(uuid);
-        jsonArray.add(workjson);
-        jsonArray.add(weekjson);
-        jsonArray.add(monthjson);
-        return jsonArray;
+    public JSONObject getWork(UUID uuid){
+        getVolunteerWork(uuid);
+        getWeekWork(uuid);
+        getMonthWork(uuid);
+        return jsonObject;
     }
 }
