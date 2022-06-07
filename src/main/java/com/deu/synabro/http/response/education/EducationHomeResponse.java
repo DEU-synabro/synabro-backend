@@ -19,15 +19,9 @@ public class EducationHomeResponse {
     List<EducationResponse> education;
     Integer progress;
 
-    public EducationHomeResponse() {
-        List<BoardSimpleResponse> boardSimpleResponses = new ArrayList<>();
+    public EducationHomeResponse(List<BoardSimpleResponse> board) {
+        this.board = board;
         List<EducationResponse> educationResponses = new ArrayList<>();
-
-        // Education Notice Board Sample data
-        boardSimpleResponses.add(new BoardSimpleResponse(UUID.randomUUID(), "[ 필 독 ] 교육 첫 시작시 주의사항"));
-        boardSimpleResponses.add(new BoardSimpleResponse(UUID.randomUUID(), "봉사 활동을 하기 위한 교육 진행 방법"));
-        boardSimpleResponses.add(new BoardSimpleResponse(UUID.randomUUID(), "글 작성 규칙 안내"));
-        boardSimpleResponses.add(new BoardSimpleResponse(UUID.randomUUID(), "교육 완료 후 진행 방법 안내"));
 
         // Education Sample data
         educationResponses.add(new EducationResponse(UUID.randomUUID(), "제목글, 바닥글 적기", EducationType.PROGRESS.getValue()));
@@ -37,7 +31,6 @@ public class EducationHomeResponse {
         educationResponses.add(new EducationResponse(UUID.randomUUID(), "도서 자료 전자화하기", EducationType.DONE.getValue()));
         educationResponses.add(new EducationResponse(UUID.randomUUID(), "문서 자료 전자화하기", EducationType.DONE.getValue()));
 
-        this.board = boardSimpleResponses;
         this.education = educationResponses;
         this.progress = 63;
     }

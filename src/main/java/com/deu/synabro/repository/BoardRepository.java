@@ -1,6 +1,7 @@
 package com.deu.synabro.repository;
 
 import com.deu.synabro.entity.Board;
+import com.deu.synabro.entity.enums.BoardType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,6 @@ public interface BoardRepository extends JpaRepository<Board,Long> {
     Page<Board> findByTitleContainingOrderByCreatedDateDesc(Pageable pageable, String title);
     Page<Board> findByTitleContainingOrContentsContainingOrderByCreatedDateDesc(Pageable pageable, String title, String content);
     List<Board> deleteByIdx(UUID id);
+    List<Board> findBoardByBoardType(BoardType boardType);
     Board findByIdx(UUID id);
 }

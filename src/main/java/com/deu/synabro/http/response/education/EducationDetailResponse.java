@@ -20,6 +20,6 @@ public class EducationDetailResponse extends EducationResponse {
     public EducationDetailResponse() {
         super(UUID.randomUUID(), "제목글, 바닥글 적기", "PROGRESS");
         this.description = "제목글, 바닥글 적는 훈련을 진행합니다.";
-        this.file = "http://localhost:8080/education/downloads/" + UUID.randomUUID();
+        this.file = "https://www.os-book.com/OS10/slide-dir/PPTX-dir/ch1.pptx";
     }
 }
