@@ -34,30 +34,6 @@ public class EducationController {
         this.educationService = educationService;
     }
 
-    @GetMapping(value = "/test")
-    public ResponseEntity<?> downloadTest() {
-        FileUtil fileUtil = new FileUtil();
-
-        Resource resource = null;
-        try {
-            resource = fileUtil.downloadFile("Study-Guide.pdf");
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-
-        if (resource == null) {
-            return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
-        }
-
-        String contentType = "application/octet-stream";
-        String headerValue = "attachment; filename=\"" + "Study-Guide.pdf" + "\"";
-
-        return ResponseEntity.ok()
-                             .contentType(MediaType.parseMediaType(contentType))
-                             .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                             .body(resource);
-    }
-
     @Operation(summary = "교육 홈 화면 조회", description = "교육 메인페이지에 대한 정보를 조회합니다.", tags = "Education",
             responses = {
                     @ApiResponse(responseCode = "200", description = "교육 정보 조회 성공",
