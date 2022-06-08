@@ -5,6 +5,7 @@ import com.deu.synabro.service.VolunteerWorkService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,7 @@ public class HomeController {
     VolunteerWorkService volunteerWorkService;
 
     @GetMapping("")
-    public JSONArray getWeekWork(){
+    public JSONObject getWeekWork(){
         return volunteerWorkService.getWork(memberService.getMemberWithAuthorities().get().getIdx());
     }
 }
