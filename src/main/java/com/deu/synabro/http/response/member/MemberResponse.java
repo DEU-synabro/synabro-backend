@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @Getter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberResponse extends WorkHistoryListResponse {
@@ -27,8 +29,8 @@ public class MemberResponse extends WorkHistoryListResponse {
     @Schema(description = "사용자 경고 누적 횟수", example = "0")
     private final Short warnNumber;
 
-    public MemberResponse(Member member, Pageable pageable) {
-        super(pageable);
+    public MemberResponse(Member member, List<WorkHistoryResponse> work, Pageable pageable) {
+        super(work, pageable);
         this.username = member.getUsername();
         this.introduction = member.getIntroduction();
         this.email = member.getEmail();

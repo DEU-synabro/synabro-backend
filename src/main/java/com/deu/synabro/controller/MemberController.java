@@ -4,10 +4,7 @@ import com.deu.synabro.entity.Authority;
 import com.deu.synabro.http.request.member.MemberPatchRequest;
 import com.deu.synabro.http.request.member.SignUpRequest;
 import com.deu.synabro.http.response.GeneralResponse;
-import com.deu.synabro.http.response.member.MemberResponse;
-import com.deu.synabro.http.response.member.ResponseExample;
-import com.deu.synabro.http.response.member.WorkHistoryListResponse;
-import com.deu.synabro.http.response.member.WorkHistoryDetailResponse;
+import com.deu.synabro.http.response.member.*;
 import com.deu.synabro.service.MemberService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -72,7 +69,7 @@ public class MemberController extends ResponseExample {
     })
     @GetMapping(value = "/list")
     public @ResponseBody ResponseEntity<WorkHistoryListResponse> getMemberWorkLists(@PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(new WorkHistoryListResponse(pageable));
+        return ResponseEntity.ok(memberService.findWorkList(pageable));
     }
 
     @Operation(summary = "사용자 작업 목록 조회", description = "사용자 작업 목록을 반환합니다.", tags = "Member",
@@ -82,8 +79,16 @@ public class MemberController extends ResponseExample {
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             })
     @GetMapping(value = "/list/{id}")
-    public @ResponseBody ResponseEntity<WorkHistoryDetailResponse> getMemberWorkDetail(@PathVariable(name = "id") UUID id) {
-        return new ResponseEntity<>(new WorkHistoryDetailResponse(), HttpStatus.OK);
+    public @ResponseBody ResponseEntity<WorkHistoryDetailResponse> getMemberWorkDetail(
+            @PathVariable(name = "id") UUID id,
+            @RequestParam String type
+    ) {
+        if (type.equals("VOLUNTEER")) {
+            return ResponseEntity.ok(memberService.findVolunteerWork(id));
+        } else if(type.equals("INSPECTION")) {
+            return ResponseEntity.ok(memberService.findInspectionWork(id));
+        }
+        return new ResponseEntity<>(new WorkHistoryDetailResponse(), HttpStatus.BAD_REQUEST);
     }
 
     @Operation(summary = "사용자 등록", description = "사용자가 회원가입시 사용자를 등록합니다.", tags = "Member",
