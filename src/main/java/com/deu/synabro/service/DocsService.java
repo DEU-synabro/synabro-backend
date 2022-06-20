@@ -165,7 +165,8 @@ public class DocsService {
             String filePath = uploadPath+"\\"+file.getOriginalFilename();
             file.transferTo(new File(filePath));
             logger.info("filePath: "+filePath);
-            logger.info(String.valueOf(getClass().getClassLoader().getResource("ip.txt").toURI()));
+            logger.info(String.valueOf(getClass().getClassLoader()));
+//            logger.info(String.valueOf(getClass().getClassLoader().getResource("ip.txt").toURI()));
 //            try(InputStream inputStream = file.getInputStream()){
 //                Docs docs = new Docs(work,file.getOriginalFilename());
 //                docsRepository.save(docs);
