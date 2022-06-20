@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -164,6 +165,7 @@ public class DocsService {
             String filePath = uploadPath+"\\"+file.getOriginalFilename();
             file.transferTo(new File(filePath));
             logger.info("filePath: "+filePath);
+            logger.info(String.valueOf(getClass().getClassLoader().getResource("ip.txt").toURI()));
 //            try(InputStream inputStream = file.getInputStream()){
 //                Docs docs = new Docs(work,file.getOriginalFilename());
 //                docsRepository.save(docs);
