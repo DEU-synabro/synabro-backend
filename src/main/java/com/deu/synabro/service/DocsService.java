@@ -60,7 +60,7 @@ public class DocsService {
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
         System.out.println(docs.getFileName());
         try {
-            FILE_PATH = uploadPath + "/" + docs.getFileName();
+            FILE_PATH = "/"+uploadPath + "/" + docs.getFileName();
 
             Path filePath = Paths.get(FILE_PATH);
             String contentType = Files.probeContentType(filePath);
