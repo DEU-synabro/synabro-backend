@@ -39,7 +39,7 @@ public class DocsService {
     DocsRepository docsRepository;
 
 //    @Value("${spring.servlet.multipart.location}")
-    private String uploadPath=System.getProperty("user.dir")+"\\files";
+    private String uploadPath="files";
     private static final String BASE_PATH = new File("").getAbsolutePath();
     private static String RESOURCE_PATH = "/src/resource";
     private static String FILE_PATH;
@@ -155,25 +155,25 @@ public class DocsService {
                 System.out.println(file.getOriginalFilename());
                 throw new Exception("ERROR : Fil is empty");
             }
-//            Path root = Paths.get(FILE_PATH);
+            Path root = Paths.get(uploadPath);
             if(!new File(uploadPath).exists()){
                 new File(uploadPath).mkdir();
                 System.out.println(file.getOriginalFilename());
             }
-            Docs docs = new Docs(work, file.getOriginalFilename());
-            docsRepository.save(docs);
-            String filePath = uploadPath+"\\"+file.getOriginalFilename();
-            file.transferTo(new File(filePath));
-            logger.info("filePath: "+filePath);
-            logger.info(String.valueOf(getClass().getClassLoader()));
+//            Docs docs = new Docs(work, file.getOriginalFilename());
+//            docsRepository.save(docs);
+//            String filePath = uploadPath+"\\"+file.getOriginalFilename();
+//            file.transferTo(new File(filePath));
+//            logger.info("filePath: "+filePath);
+//            logger.info(String.valueOf(getClass().getClassLoader()));
 //            logger.info(String.valueOf(getClass().getClassLoader().getResource("ip.txt").toURI()));
-//            try(InputStream inputStream = file.getInputStream()){
-//                Docs docs = new Docs(work,file.getOriginalFilename());
-//                docsRepository.save(docs);
-//                Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
-//                logger.info(String.valueOf(inputStream));
-//                logger.info(String.valueOf(root.resolve(file.getOriginalFilename())));
-//            }
+            try(InputStream inputStream = file.getInputStream()){
+                Docs docs = new Docs(work,file.getOriginalFilename());
+                docsRepository.save(docs);
+                Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+                logger.info(String.valueOf(inputStream));
+                logger.info(String.valueOf(root.resolve(file.getOriginalFilename())));
+            }
         }catch (Exception e){
             throw new RuntimeException("Not store the file ");
         }
