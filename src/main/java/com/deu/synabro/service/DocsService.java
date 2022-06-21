@@ -64,7 +64,7 @@ public class DocsService {
             if (Files.exists(Paths.get(FILE_PATH))) {
                 logger.info("Run in IDE!");
             } else {
-                FILE_PATH = BASE_PATH + "/resource/" + docs.getFileName();
+                FILE_PATH = BASE_PATH + "/" + docs.getFileName();
                 logger.info("Run executable JAR!\n");
             }
 
