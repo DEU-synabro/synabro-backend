@@ -60,13 +60,7 @@ public class DocsService {
         Docs docs = docsRepository.findByWorkId_Idx(uuid);
         System.out.println(docs.getFileName());
         try {
-            FILE_PATH = BASE_PATH + RESOURCE_PATH + docs.getFileName();
-            if (Files.exists(Paths.get(FILE_PATH))) {
-                logger.info("Run in IDE!");
-            } else {
-                FILE_PATH = BASE_PATH + "/" + docs.getFileName();
-                logger.info("Run executable JAR!\n");
-            }
+            FILE_PATH = uploadPath + "/" + docs.getFileName();
 
             Path filePath = Paths.get(FILE_PATH);
             String contentType = Files.probeContentType(filePath);
