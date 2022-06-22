@@ -12,7 +12,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     volumes:
-      - ./files:/files
+      - ./files:/files 
     ports:
       - "8080:8080"
     depends_on:
