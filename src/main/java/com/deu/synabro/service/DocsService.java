@@ -57,10 +57,10 @@ public class DocsService {
 
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     public ResponseEntity<Object> downDocs(UUID uuid){
-        Docs docs = docsRepository.findByWorkId_Idx(uuid);
+        Docs docs = docsRepository.findByWork_Idx(uuid);
         System.out.println(docs.getFileName());
         try {
-            FILE_PATH = "/"+uploadPath + "/" + docs.getFileName();
+            FILE_PATH = System.getProperty("user.dir")+"/"+uploadPath + "/" + docs.getFileName();
 
             Path filePath = Paths.get(FILE_PATH);
             String contentType = Files.probeContentType(filePath);
@@ -86,7 +86,7 @@ public class DocsService {
     public JSONObject downDocsLink(UUID uuid){
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray();
-        Docs docs = docsRepository.findByWorkId_Idx(uuid);
+        Docs docs = docsRepository.findByWork_Idx(uuid);
         System.out.println(docs.getFileName());
         try {
             Path filePath = Paths.get(uploadPath + "/download/" + docs.getFileName());
@@ -140,7 +140,7 @@ public class DocsService {
 //        }
 //    }
 
-    public void saveDocs(MultipartFile file, Work work) throws IOException {
+    public Docs saveDocs(MultipartFile file) throws IOException {
 
         logger.info("경로: "+uploadPath);
 //        logger.info("현재 작업 경로: " + uploadPath + "/download");
@@ -162,11 +162,14 @@ public class DocsService {
 //            logger.info(String.valueOf(getClass().getClassLoader()));
 //            logger.info(String.valueOf(getClass().getClassLoader().getResource("ip.txt").toURI()));
             try(InputStream inputStream = file.getInputStream()){
-                Docs docs = new Docs(work,file.getOriginalFilename());
+                Docs docs = Docs.builder()
+                        .fileName(file.getOriginalFilename())
+                        .build();
                 docsRepository.save(docs);
                 Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
                 logger.info(String.valueOf(inputStream));
                 logger.info(String.valueOf(root.resolve(file.getOriginalFilename())));
+                return docs;
             }
         }catch (Exception e){
             throw new RuntimeException("Not store the file ");

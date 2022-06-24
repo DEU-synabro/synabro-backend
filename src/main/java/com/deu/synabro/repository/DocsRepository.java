@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface DocsRepository extends JpaRepository<Docs,Long> {
-    Docs findByWorkId_Idx(UUID uuid);
+    Docs findByWork_Idx(UUID uuid);
 }
