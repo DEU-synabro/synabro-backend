@@ -9,6 +9,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -45,6 +47,14 @@ public class Work extends BaseTime implements Serializable {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endedDate;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    private List<Docs> docsList = new ArrayList<>();
+
+    public void addDocs(Docs docs){
+        this.docsList.add(docs);
+        docs.setWork(this);
+    }
 
     @Builder
     public Work(UUID idx, Member userId, String title, String contents, LocalDateTime endedDate, Short volunteerTime) {

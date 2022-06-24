@@ -37,7 +37,7 @@ public class VideoService {
 
     }
 
-    public void saveVideo(MultipartFile file, Work work) throws IOException {
+    public void saveVideo(MultipartFile file) throws IOException {
         System.out.print(uploadPath);
         try{
             if( file.isEmpty() ) {
@@ -50,7 +50,9 @@ public class VideoService {
                 System.out.println(file.getOriginalFilename());
             }
             try(InputStream inputStream = file.getInputStream()){
-                Video video = new Video(work,file.getOriginalFilename());
+                Video video = Video.builder()
+                        .fileName(file.getOriginalFilename())
+                        .build();
                 videoRepository.save(video);
                 Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
             }

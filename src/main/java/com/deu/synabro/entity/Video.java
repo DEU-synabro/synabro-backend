@@ -18,15 +18,15 @@ public class Video {
     private UUID idx;
 
     @ManyToOne
-    @JoinColumn(name="contents_id")
-    private Work workId;
+    @JoinColumn(name="work_id")
+    private Work work;
 
     @Column(name="file_name")
     private String fileName;
 
-
-    public Video(Work workId, String fileName) {
-        this.workId = workId;
+    @Builder
+    public Video(Work work, String fileName) {
+        this.work = work;
         this.fileName = fileName;
     }
 

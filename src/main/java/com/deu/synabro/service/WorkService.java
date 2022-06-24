@@ -1,5 +1,6 @@
 package com.deu.synabro.service;
 
+import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.http.request.WorkRequest;
 import com.deu.synabro.http.request.WorkUpdateRequest;
@@ -22,8 +23,9 @@ public class WorkService {
     @Autowired
     WorkRepository workRepository;
 
-    public Work setContent(WorkRequest workRequest, UUID uuid){
+    public Work setContent(WorkRequest workRequest, UUID uuid, Docs docs){
         Work work = workRequest.toEntity(uuid);
+        work.addDocs(docs);
         return workRepository.save(work);
     }
     public WorkResponse getContentsResponse(Optional<Work> work){
