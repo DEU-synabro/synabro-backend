@@ -1,14 +1,19 @@
 package com.deu.synabro.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,8 +22,10 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name="off_volunteer")
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @RequiredArgsConstructor
-public class OffVolunteer extends BaseTime {
+@EntityListeners(AuditingEntityListener.class)
+public class OffVolunteer extends BaseTime implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "off_volunteer_id", columnDefinition = "BINARY(16)")
@@ -33,28 +40,24 @@ public class OffVolunteer extends BaseTime {
     private String contents;
 
     @Column(name = "start_period")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "봉사 모집 시작 기간", example = "2022-07-30")
-    private String startPeriod;
+    private LocalDateTime startPeriod;
 
     @Column(name = "end_period")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "봉사 모집 마감 기간", example = "2022-08-10")
-    private String endPeriod;
+    private LocalDateTime endPeriod;
 
     @Column(name = "start_date")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "봉사 수행 시작 날짜", example = "2022-08-14 12:00:00")
-    private String startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "end_date")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "봉사 모집 종료 날짜", example = "2022-08-14 16:00:00")
-    private String endDate;
+    private LocalDateTime endDate;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "offVolunteer")
     private List<Docs> docsList = new ArrayList<>();
@@ -65,7 +68,8 @@ public class OffVolunteer extends BaseTime {
     }
 
     @Builder
-    public OffVolunteer(String title, String contents, String startPeriod, String endPeriod, String startDate, String endDate) {
+
+    public OffVolunteer(String title, String contents, LocalDateTime startPeriod, LocalDateTime endPeriod, LocalDateTime startDate, LocalDateTime endDate) {
         this.title = title;
         this.contents = contents;
         this.startPeriod = startPeriod;
