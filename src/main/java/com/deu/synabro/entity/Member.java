@@ -37,6 +37,9 @@ public class Member extends BaseTime {
     private String address;
 
     @Column(columnDefinition = "VARCHAR(255)")
+    private String teamGroup;
+
+    @Column(columnDefinition = "VARCHAR(255)")
     private String introduction;
 
     @Column(name = "volunteer_time", columnDefinition = "SMALLINT(6)")
@@ -67,6 +70,9 @@ public class Member extends BaseTime {
     }
 
     public Member update(MemberPatchRequest request) {
+        if(request.getTeamGroup() != null) {
+            this.teamGroup = request.getTeamGroup();
+        }
         if(request.getIntroduction() != null) {
             this.introduction = request.getIntroduction();
         }
@@ -90,6 +96,7 @@ public class Member extends BaseTime {
         this.username = username;
         this.phone = "";
         this.address = "";
+        this.teamGroup = "";
         this.introduction = "";
         this.volunteerTime = 0;
         this.workNumber = 0;

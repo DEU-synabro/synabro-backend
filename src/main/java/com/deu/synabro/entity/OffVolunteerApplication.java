@@ -13,16 +13,16 @@ import java.util.UUID;
 @Entity
 @Table(name="ServiceApplication")
 @RequiredArgsConstructor
-public class ServiceApplication extends BaseTime{
+public class OffVolunteerApplication extends BaseTime{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ServiceApplication_id", columnDefinition = "BINARY(16)")
     private UUID idx;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id")
-    @Schema(description = "봉사 아이디")
-    private Service serviceId;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "service_id")
+//    @Schema(description = "봉사 아이디")
+//    private OffVolunteer offVolunteerId;
 
     @Column
     @Schema(description = "신청자 이름", example = "김선웅")

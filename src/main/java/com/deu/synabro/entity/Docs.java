@@ -19,12 +19,17 @@ public class Docs {
     @JoinColumn(name="work_id")
     private Work work;
 
+    @ManyToOne
+    @JoinColumn(name="off_volunteer_id")
+    private OffVolunteer offVolunteer;
+
     @Column(name="file_name")
     private String fileName;
 
     @Builder
-    public Docs(Work work, String fileName) {
+    public Docs(Work work, String fileName, OffVolunteer offVolunteer) {
         this.work = work;
         this.fileName = fileName;
+        this.offVolunteer = offVolunteer;
     }
 }
