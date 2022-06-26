@@ -9,6 +9,9 @@ import lombok.Getter;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberPatchRequest {
 
+    @Schema(description = "사용자 그룹", example = "동의대학교")
+    private String teamGroup;
+
     @Schema(description = "사용자 주소", example = "부산광역시 부산진구 시나브로 12 봉사아파트 802호")
     private String introduction;
 

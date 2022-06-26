@@ -83,7 +83,7 @@ public class WorkService {
         Page<Work> contentsPage = workRepository.findAll(pageable);
         return contentsPage;
     }
-    public  Page<Work> findByTitle(Pageable pageable, String title){
+    public Page<Work> findByTitle(Pageable pageable, String title){
         return workRepository.findByTitleContainingOrderByCreatedDateDesc(pageable,title);
     }
     public Page<Work> findByTitleOrContents(Pageable pageable, String title, String contents) {
