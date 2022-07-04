@@ -27,6 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/*
+ * 이 클래스는 게시판 CRUD에 관한
+ * 메소드들이 정의된 클래스이다.
+ */
 @Tag(name="Board", description = "게시판 API")
 @RestController
 @AllArgsConstructor
@@ -46,6 +50,16 @@ public class BoardController {
             "    \"message\" : \"삭제할 게시글이 없습니다.\"\n" +
             "}";
 
+    private static final String UPDATE_BOARD = "{\n" +
+            "    \"code\" : 204\n" +
+            "    \"message\" : \"게시글이 수정되었습니다.\"\n" +
+            "}";
+
+    private static final String UPDATE_NOT_BOARD = "{\n" +
+            "    \"code\" : 404\n" +
+            "    \"message\" : \"수정할 게시글이 없습니다.\"\n" +
+            "}";
+
     @Operation(tags = "Board", summary = "제목, 제목+내용으로 글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "제목, 제목+내용으로 글 정보 조회 성공",
@@ -63,36 +77,12 @@ public class BoardController {
         Page<Board> boards;
         String searchOption=option.getValue();
         List<BoardListResponse> boardListResponseList = new ArrayList<>();
-        BoardListResponse boardListResponse;
         BoardPageResponse boardPageResponse;
 
         if(keyword==null){
             boards = boardService.findAll(pageable);
-            if(boards.getSize()>=boards.getTotalElements()){
-                for(int i=0; i<boards.getTotalElements(); i++){
-                    boardListResponse = BoardListResponse.builder()
-                            .idx(boards.getContent().get(i).getIdx())
-                            .title(boards.getContent().get(i).getTitle())
-                            .createdDate(boards.getContent().get(i).getCreatedDate())
-                            .build();
-                    boardListResponseList.add(boardListResponse);
-                }
-            }else {
-                int contentSize = boards.getSize()*boards.getNumber();
-                for(int i=0; i<boards.getSize();i++){
-                    if(contentSize>=boards.getTotalElements())
-                        break;
-                    boardListResponse = BoardListResponse.builder()
-                            .idx(boards.getContent().get(i).getIdx())
-                            .title(boards.getContent().get(i).getTitle())
-                            .createdDate(boards.getContent().get(i).getCreatedDate())
-                            .build();
-                    boardListResponseList.add(boardListResponse);
-                    contentSize++;
-                }
-            }
+            getBoardListResponse(boards, boardListResponseList);
             boardPageResponse = new BoardPageResponse(pageable, boards, option, null, boardListResponseList);
-            return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
         }else {
             if(searchOption=="제목+내용"){
                 boards = boardService.findByTitleOrContents(pageable, keyword, keyword);
@@ -100,40 +90,13 @@ public class BoardController {
                 boards = boardService.findByTitle(pageable, keyword);
             }
             if (boards.getContent().isEmpty()) {
-                boardListResponse = BoardListResponse.builder()
-                        .idx(null)
-                        .title(null)
-                        .createdDate(null)
-                        .build();
-                boardListResponseList.add(boardListResponse);
+                BoardListResponse.getNullBoardListResponse(boardListResponseList);
             } else {
-                if(boards.getSize()>=boards.getTotalElements()){
-                    for(int i=0; i<boards.getTotalElements(); i++){
-                        boardListResponse = BoardListResponse.builder()
-                                .idx(boards.getContent().get(i).getIdx())
-                                .title(boards.getContent().get(i).getTitle())
-                                .createdDate(boards.getContent().get(i).getCreatedDate())
-                                .build();
-                        boardListResponseList.add(boardListResponse);
-                    }
-                }else {
-                    int contentSize = boards.getSize()*boards.getNumber();
-                    for(int i=0; i<boards.getSize();i++){
-                        if(contentSize>=boards.getTotalElements())
-                            break;
-                        boardListResponse = BoardListResponse.builder()
-                                .idx(boards.getContent().get(i).getIdx())
-                                .title(boards.getContent().get(i).getTitle())
-                                .createdDate(boards.getContent().get(i).getCreatedDate())
-                                .build();
-                        boardListResponseList.add(boardListResponse);
-                        contentSize++;
-                    }
-                }
+                getBoardListResponse(boards, boardListResponseList);
             }
             boardPageResponse = new BoardPageResponse(pageable, boards, option, keyword, boardListResponseList);
-            return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
         }
+        return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
     }
 
     @Operation(tags = "Board", summary = "id 값으로 게시판 글을 찾습니다.",
@@ -143,8 +106,8 @@ public class BoardController {
             })
     @GetMapping("/{id}")   //제목으로 글 찾기
     public ResponseEntity<Board> getBoard(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
-        Board boardEntities = boardService.findByIdx(id);
-        return new ResponseEntity<>(boardEntities,HttpStatus.OK);
+        Board board = boardService.findByIdx(id);
+        return new ResponseEntity<>(board, HttpStatus.OK);
     }
 
     @Operation(tags = "Board", summary = "게시판 글을 생성 합니다.",
@@ -174,35 +137,58 @@ public class BoardController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}") // 게시판 삭제
     public ResponseEntity<GeneralResponse> boardTitleDelete(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
-        if(boardService.deleteById(id)){
+        try{
+            boardService.deleteByIdx(id);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"게시글이 삭제되었습니다."), HttpStatus.OK);
-        }else{
+        } catch (Exception e) {
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"삭제할 게시글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
 
     @Operation(tags = "Board", summary = "게시판 글을 수정합니다.",
             responses={
-                    @ApiResponse(responseCode = "200", description = "게시판 글 수정 성공",
-                            content = @Content(schema = @Schema(implementation = Board.class)))
+                    @ApiResponse(responseCode = "204", description = "게시판 글 수정 성공",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = DELETE_BOARD))),
+                    @ApiResponse(responseCode = "404", description = "수정할 글이 없음",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = DELETE_NOT_BOARD)))
             })
-    @io.swagger.annotations.ApiResponses(
-            @io.swagger.annotations.ApiResponse(
-                    response = Board.class, message = "ok", code=200)
-    )
     @PatchMapping("/update/{id}") // 게시판 수정
     public ResponseEntity<GeneralResponse> boardUpdate(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id,
                               @Parameter @RequestBody BoardRequest boardRequest){
-        Board board = boardService.findByIdx(id);
-        System.out.println(board.getIdx());
-        System.out.println(board.getContents());
-        System.out.println(board);
-        if(board==null){
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 글이 없습니다."), HttpStatus.NOT_FOUND);
-        }else{
+        try{
+            Board board = boardService.findByIdx(id);
             boardService.updateBoard(boardRequest, board);
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "글이 수정되었습니다"), HttpStatus.OK);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "게시글이 수정되었습니다"), HttpStatus.OK);
+        } catch (NullPointerException e) {
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 게시글이 없습니다."), HttpStatus.NOT_FOUND);
         }
+    }
 
+    private void getBoardListResponse(Page<Board> boards, List<BoardListResponse> boardListResponseList){
+        if(boards.getSize()>=boards.getTotalElements()){
+            for(int i=0; i<boards.getTotalElements(); i++){
+                BoardListResponse boardListResponse = BoardListResponse.builder()
+                        .idx(boards.getContent().get(i).getIdx())
+                        .title(boards.getContent().get(i).getTitle())
+                        .createdDate(boards.getContent().get(i).getCreatedDate())
+                        .build();
+                boardListResponseList.add(boardListResponse);
+            }
+        }else {
+            int contentSize = boards.getSize()*boards.getNumber();
+            for(int i=0; i<boards.getSize();i++){
+                if(contentSize>=boards.getTotalElements())
+                    break;
+                BoardListResponse boardListResponse = BoardListResponse.builder()
+                        .idx(boards.getContent().get(i).getIdx())
+                        .title(boards.getContent().get(i).getTitle())
+                        .createdDate(boards.getContent().get(i).getCreatedDate())
+                        .build();
+                boardListResponseList.add(boardListResponse);
+                contentSize++;
+            }
+        }
     }
 }
