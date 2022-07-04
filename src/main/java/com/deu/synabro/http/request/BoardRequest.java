@@ -2,6 +2,7 @@ package com.deu.synabro.http.request;
 
 import com.deu.synabro.entity.Board;
 import com.deu.synabro.entity.Member;
+import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.enums.BoardType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -26,5 +28,14 @@ public class BoardRequest {
         this.title = title;
         this.contents = contents;
         this.boardType = boardType;
+    }
+
+    public Board toEntity(BoardRequest boardRequest){
+        Board board = Board.builder()
+                .title(boardRequest.getTitle())
+                .contents(boardRequest.getContents())
+                .boardType(boardRequest.getBoardType())
+                .build();
+        return board;
     }
 }

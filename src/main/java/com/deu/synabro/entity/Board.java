@@ -11,7 +11,9 @@ import javax.persistence.*;
 import java.util.UUID;
 
 
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Getter
 @Setter
 @Entity
@@ -39,10 +41,4 @@ public class Board extends BaseTime {
     @Schema(description = "게시판 종류")
     private BoardType boardType;
 
-    @Builder
-    public Board(String title, String contents, BoardType boardType) {
-        this.title = title;
-        this.contents = contents;
-        this.boardType = boardType;
-    }
 }

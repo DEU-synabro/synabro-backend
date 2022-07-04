@@ -15,21 +15,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@Setter
-@ToString
-@Builder
 @Schema(description = "게시판")
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class BoardResponse {
-    @Schema(description = "고유번호", example = "8857ba20-2cb7-407e-908c-b333cf1257c5")
-    private UUID idx;
-
-    @Schema(description = "게시판 제목", example = "제목")
-    private String title;
-
+public class BoardResponse extends BoardListResponse{
     @Schema(description = "게시판 내용", example = "내용")
     private String contents;
 
-    @Schema(description = "게시판 생성 날짜")
-    private LocalDateTime created_date;
+    BoardResponse(UUID idx, String title, LocalDateTime createdDate) {
+        super(idx, title, createdDate);
+    }
 }
