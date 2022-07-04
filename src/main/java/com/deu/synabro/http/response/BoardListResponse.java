@@ -10,6 +10,7 @@ import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -26,4 +27,13 @@ public class BoardListResponse {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone = "Asia/Seoul")
     @Schema(description = "게시판 생성 날짜", example = "2022-04-07")
     private LocalDateTime createdDate;
+
+    public static void getNullBoardListResponse(List<BoardListResponse> boardListResponseList){
+        BoardListResponse boardListResponse = BoardListResponse.builder()
+                .idx(null)
+                .title(null)
+                .createdDate(null)
+                .build();
+        boardListResponseList.add(boardListResponse);
+    }
 }

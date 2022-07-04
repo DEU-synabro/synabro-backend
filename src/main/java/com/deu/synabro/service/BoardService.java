@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,13 +40,8 @@ public class BoardService {
     }
 
     @Transactional
-    public boolean deleteById(UUID uuid){
-//        boardRepository.deleteById(uuid)
-        if(boardRepository.deleteByIdx(uuid).isEmpty()){
-            return false;
-        }else{
-            return true;
-        }
+    public void deleteByIdx(UUID uuid){
+        boardRepository.deleteById(uuid);
     }
 
     public Board findByIdx(UUID uuid){
@@ -56,9 +50,9 @@ public class BoardService {
     }
 
     @Transactional
-    public void updateBoard(BoardRequest boardRequest, Board boardEntity){
-        boardEntity.setTitle(boardRequest.getTitle());
-        boardEntity.setContents(boardRequest.getContents());
+    public void updateBoard(BoardRequest boardRequest, Board board){
+        board.setTitle(boardRequest.getTitle());
+        board.setContents(boardRequest.getContents());
     }
 }
 
