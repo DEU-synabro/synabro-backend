@@ -76,7 +76,7 @@ public class InspectionController {
             })
     @PostMapping("{volunteer_work_id}")
     public ResponseEntity<GeneralResponse> setInspection(@Parameter(description = "고유 아이디") @PathVariable(name = "volunteer_work_id") UUID uuid){
-        VolunteerWork volunteerWork = volunteerWorkService.findById(uuid);
+        VolunteerWork volunteerWork = volunteerWorkService.findByIdx(uuid);
         inspectionService.setInspection(volunteerWork);
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 검수 글이 생성되었습니다."), HttpStatus.OK);
     }

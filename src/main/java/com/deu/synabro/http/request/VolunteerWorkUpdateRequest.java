@@ -9,10 +9,7 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class VolunteerWorkUpdateRequest {
-
-    @Schema(description = "제목",example = "제목")
-    String title;
-
+    
     @Schema(description = "내용",example = "내용")
     String contents;
 

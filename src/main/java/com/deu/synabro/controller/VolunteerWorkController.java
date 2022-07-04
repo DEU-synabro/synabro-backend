@@ -81,13 +81,11 @@ public class VolunteerWorkController {
     @GetMapping("/{volunteer_work_id}")
     public ResponseEntity<VolunteerWorkResponse> getVolunteerWork(@Parameter(description = "고유 아이디")
                                                                 @PathVariable(name = "volunteer_work_id") UUID uuid){
-        VolunteerWorkResponse volunteerWorkResponse;
         try{
-            volunteerWorkResponse = volunteerWorkService.findByIdAndGetResponse(uuid);
-            return new ResponseEntity<>(volunteerWorkResponse,HttpStatus.OK);
-        }catch (IllegalArgumentException e){
-            volunteerWorkResponse = volunteerWorkService.getNullResponse();
-            return new ResponseEntity<>(volunteerWorkResponse,HttpStatus.NOT_FOUND);
+            VolunteerWork volunteerWork = volunteerWorkService.findByIdx(uuid);
+            return new ResponseEntity<>(volunteerWorkService.getVolunteerResponse(volunteerWork),HttpStatus.OK);
+        }catch ( NullPointerException e){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -112,36 +110,12 @@ public class VolunteerWorkController {
         Page<VolunteerWork> volunteerWorks;
         String searchOption = option.getValue();
         List<VolunteerListResponse> volunteerListResponseList = new ArrayList<>();
-        VolunteerListResponse volunteerListResponse;
         VolunteerWorkPageResponse volunteerWorkPageResponse;
 
         if(keyword==null){
             volunteerWorks = volunteerWorkService.findAll(pageable);
-            if(volunteerWorks.getSize()>=volunteerWorks.getTotalElements()){
-                for(int i=0; i<volunteerWorks.getTotalElements(); i++){
-                    volunteerListResponse = VolunteerListResponse.builder()
-                            .idx(volunteerWorks.getContent().get(i).getIdx())
-                            .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
-                            .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
-                            .build();
-                    volunteerListResponseList.add(volunteerListResponse);
-                }
-            }else {
-                int contentSize = volunteerWorks.getSize()*volunteerWorks.getNumber();
-                for(int i=0; i<volunteerWorks.getSize();i++){
-                    if(contentSize>=volunteerWorks.getTotalElements())
-                        break;
-                    volunteerListResponse = VolunteerListResponse.builder()
-                            .idx(volunteerWorks.getContent().get(i).getIdx())
-                            .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
-                            .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
-                            .build();
-                    volunteerListResponseList.add(volunteerListResponse);
-                    contentSize++;
-                }
-            }
+            addVolunteerListResponse(volunteerWorks, volunteerListResponseList);
             volunteerWorkPageResponse = new VolunteerWorkPageResponse(pageable, volunteerWorks, option, null, volunteerListResponseList);
-            return new ResponseEntity<>(volunteerWorkPageResponse, HttpStatus.OK);
         }else {
             if(searchOption=="제목+내용"){
                 volunteerWorks = volunteerWorkService.findByTitleOrContents(pageable, keyword, keyword);
@@ -149,39 +123,38 @@ public class VolunteerWorkController {
                 volunteerWorks = volunteerWorkService.findByTitle(pageable, keyword);
             }
             if (volunteerWorks.getContent().isEmpty()) {
-                volunteerListResponse = VolunteerListResponse.builder()
-                        .idx(null)
-                        .title(null)
-                        .endedDate(null)
-                        .build();
-                volunteerListResponseList.add(volunteerListResponse);
+                VolunteerListResponse.addNullVolunteerListResponse(volunteerListResponseList);
             } else {
-                if(volunteerWorks.getSize()>=volunteerWorks.getTotalElements()){
-                    for(int i=0; i<volunteerWorks.getTotalElements(); i++){
-                        volunteerListResponse = VolunteerListResponse.builder()
-                                .idx(volunteerWorks.getContent().get(i).getIdx())
-                                .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
-                                .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
-                                .build();
-                        volunteerListResponseList.add(volunteerListResponse);
-                    }
-                }else {
-                    int contentSize = volunteerWorks.getSize()*volunteerWorks.getNumber();
-                    for(int i=0; i<volunteerWorks.getSize();i++){
-                        if(contentSize>=volunteerWorks.getTotalElements())
-                            break;
-                        volunteerListResponse = VolunteerListResponse.builder()
-                                .idx(volunteerWorks.getContent().get(i).getIdx())
-                                .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
-                                .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
-                                .build();
-                        volunteerListResponseList.add(volunteerListResponse);
-                        contentSize++;
-                    }
-                }
+                addVolunteerListResponse(volunteerWorks, volunteerListResponseList);
             }
             volunteerWorkPageResponse = new VolunteerWorkPageResponse(pageable, volunteerWorks, option, keyword, volunteerListResponseList);
-            return new ResponseEntity<>(volunteerWorkPageResponse, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(volunteerWorkPageResponse, HttpStatus.OK);
+    }
+
+    private void addVolunteerListResponse(Page<VolunteerWork> volunteerWorks, List<VolunteerListResponse> volunteerListResponseList){
+        if(volunteerWorks.getSize()>=volunteerWorks.getTotalElements()){
+            for(int i=0; i<volunteerWorks.getTotalElements(); i++){
+                VolunteerListResponse volunteerListResponse = VolunteerListResponse.builder()
+                        .idx(volunteerWorks.getContent().get(i).getIdx())
+                        .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
+                        .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
+                        .build();
+                volunteerListResponseList.add(volunteerListResponse);
+            }
+        }else {
+            int contentSize = volunteerWorks.getSize()*volunteerWorks.getNumber();
+            for(int i=0; i<volunteerWorks.getSize();i++){
+                if(contentSize>=volunteerWorks.getTotalElements())
+                    break;
+                VolunteerListResponse volunteerListResponse = VolunteerListResponse.builder()
+                        .idx(volunteerWorks.getContent().get(i).getIdx())
+                        .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
+                        .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
+                        .build();
+                volunteerListResponseList.add(volunteerListResponse);
+                contentSize++;
+            }
         }
     }
 
@@ -195,22 +168,8 @@ public class VolunteerWorkController {
     public ResponseEntity<GeneralResponse> createVolunteerWork(@Parameter(description = "고유 아이디")
                                                                @PathVariable(name = "work_id") UUID uuid){
         Work work = workService.findByIdx(uuid);
-        Work workId = Work.builder()
-                        .idx(work.getIdx())
-                        .contents(work.getContents())
-                        .title(work.getTitle())
-                        .build();
-
         UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
-        Member member = new Member(userId);
-
-        VolunteerWork volunteerWork = VolunteerWork.builder()
-                                                .userId(member)
-                                                .workId(workId)
-                                                .contents("")
-                                                .performType(PerformType.PERFORMING)
-                                                .build();
-        volunteerWorkService.setVolunteerWork(volunteerWork);
+        volunteerWorkService.setVolunteerWork(work, userId);
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 수행글이 생성되었습니다."), HttpStatus.OK);
     }
 
@@ -227,13 +186,13 @@ public class VolunteerWorkController {
     public ResponseEntity<GeneralResponse> updateVolunteerWork(@Parameter(description = "고유 아이디")
                                                              @PathVariable(name = "volunteer_work_id") UUID uuid,
                                                              @Parameter @RequestBody VolunteerWorkUpdateRequest volunteerWorkUpdateRequest){
-        VolunteerWork volunteerWork = volunteerWorkService.findById(uuid);
-        if(volunteerWork==null){
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 수행글이 없습니다."), HttpStatus.NOT_FOUND);
-        }else {
+        try{
+            VolunteerWork volunteerWork = volunteerWorkService.findByIdx(uuid);
             UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
             volunteerWorkService.updateVolunteerWork(volunteerWorkUpdateRequest, volunteerWork, userId);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "봉사 수행글이 수정되었습니다"), HttpStatus.OK);
+        } catch (NullPointerException e){
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 수행글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -250,9 +209,10 @@ public class VolunteerWorkController {
     @DeleteMapping("{volunteer_work_id}")
     public ResponseEntity<GeneralResponse> deleteVolunteerWork(@Parameter(description = "고유 아이디")
                                                                @PathVariable(name = "volunteer_work_id") UUID uuid){
-        if(volunteerWorkService.deleteById(uuid)){
+        try{
+            volunteerWorkService.deleteById(uuid);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 수행글이 삭제되었습니다."), HttpStatus.OK);
-        }else{
+        } catch (Exception e){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"삭제할 봉사 수행글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }

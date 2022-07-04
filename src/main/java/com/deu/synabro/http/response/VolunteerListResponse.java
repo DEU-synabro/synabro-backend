@@ -9,6 +9,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -25,4 +26,13 @@ public class VolunteerListResponse {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone = "Asia/Seoul")
     @Schema(description = "봉사 종료 날짜", example = "2022-04-07")
     private LocalDateTime endedDate;
+
+    public static void addNullVolunteerListResponse(List<VolunteerListResponse> volunteerListResponseList){
+        VolunteerListResponse volunteerListResponse = VolunteerListResponse.builder()
+                .idx(null)
+                .title(null)
+                .endedDate(null)
+                .build();
+        volunteerListResponseList.add(volunteerListResponse);
+    }
 }

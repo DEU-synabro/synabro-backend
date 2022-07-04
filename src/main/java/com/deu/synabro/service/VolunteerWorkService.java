@@ -2,6 +2,7 @@ package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.VolunteerWork;
+import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.enums.PerformType;
 import com.deu.synabro.http.request.VolunteerWorkUpdateRequest;
 import com.deu.synabro.http.response.VolunteerWorkResponse;
@@ -31,21 +32,25 @@ public class VolunteerWorkService {
 
     JSONObject jsonObject = new JSONObject();
 
-    public VolunteerWork setVolunteerWork(VolunteerWork volunteerWork){
+    public VolunteerWork setVolunteerWork(Work work, UUID userId){
+        Work workId = Work.builder()
+                .idx(work.getIdx())
+                .contents(work.getContents())
+                .title(work.getTitle())
+                .build();
+
+        VolunteerWork volunteerWork = VolunteerWork.builder()
+                .userId(new Member(userId))
+                .workId(workId)
+                .contents("")
+                .performType(PerformType.PERFORMING)
+                .build();
         return volunteerWorkRepository.save(volunteerWork);
     }
 
-    public VolunteerWorkResponse findByIdAndGetResponse(UUID uuid){
+    public VolunteerWork findByIdx(UUID uuid){
         Optional<VolunteerWork> volunteerWork = volunteerWorkRepository.findOptionalByIdx(uuid);
-        if(volunteerWork.isPresent()){
-            return getVolunteerResponse(volunteerWork);
-        }else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    public VolunteerWork findById(UUID uuid){
-        return volunteerWorkRepository.findByIdx(uuid);
+        return volunteerWork.orElseThrow(() -> new NullPointerException());
     }
 
     public  Page<VolunteerWork> findByTitle(Pageable pageable, String title){
@@ -61,49 +66,29 @@ public class VolunteerWorkService {
     }
 
     @Transactional
-    public boolean deleteById(UUID uuid){
-        if(volunteerWorkRepository.deleteByIdx(uuid).isEmpty()){
-            return false;
-        }else{
-            return true;
-        }
+    public void deleteById(UUID uuid){
+        volunteerWorkRepository.deleteById(uuid);
     }
 
     @Transactional
     public void updateVolunteerWork(VolunteerWorkUpdateRequest volunteerWorkUpdateRequest, VolunteerWork volunteerWork, UUID uuid){
-        Member member = new Member(uuid);
-        volunteerWork.setUserId(member);
+        volunteerWork.setUserId(new Member(uuid));
         volunteerWork.setContents(volunteerWorkUpdateRequest.getContents());
         volunteerWork.setUpdatedDate(LocalDateTime.now());
     }
 
-    public VolunteerWorkResponse getVolunteerResponse(Optional<VolunteerWork> volunteerWork){
+    public VolunteerWorkResponse getVolunteerResponse(VolunteerWork volunteerWork){
         VolunteerWorkResponse volunteerWorkResponse = VolunteerWorkResponse.builder()
-                    .id(volunteerWork.get().getIdx())
-                    .userId(volunteerWork.get().getUserId().getIdx())
-                    .workId(volunteerWork.get().getWorkId().getIdx())
-                    .workTitle(volunteerWork.get().getWorkId().getTitle())
-                    .workContents(volunteerWork.get().getWorkId().getContents())
-                    .volunteerWorkContents(volunteerWork.get().getContents())
-                    .createdDate(volunteerWork.get().getCreatedDate())
-                    .endedDate(volunteerWork.get().getWorkId().getEndedDate())
-                    .updatedDate(volunteerWork.get().getUpdatedDate())
+                    .id(volunteerWork.getIdx())
+                    .userId(volunteerWork.getUserId().getIdx())
+                    .workId(volunteerWork.getWorkId().getIdx())
+                    .workTitle(volunteerWork.getWorkId().getTitle())
+                    .workContents(volunteerWork.getWorkId().getContents())
+                    .volunteerWorkContents(volunteerWork.getContents())
+                    .createdDate(volunteerWork.getCreatedDate())
+                    .endedDate(volunteerWork.getWorkId().getEndedDate())
+                    .updatedDate(volunteerWork.getUpdatedDate())
                     .build();
-        return volunteerWorkResponse;
-    }
-
-    public VolunteerWorkResponse getNullResponse(){
-        VolunteerWorkResponse volunteerWorkResponse = VolunteerWorkResponse.builder()
-                .id(null)
-                .userId(null)
-                .workId(null)
-                .workTitle(null)
-                .workContents(null)
-                .volunteerWorkContents(null)
-                .createdDate(null)
-                .endedDate(null)
-                .updatedDate(null)
-                .build();
         return volunteerWorkResponse;
     }
 
@@ -123,7 +108,7 @@ public class VolunteerWorkService {
     public JSONObject getWeekWork(UUID uuid){
         List<VolunteerWork> volunteerWorks = volunteerWorkRepository.findByUserId_Idx(uuid);
         Calendar[] calendars = new Calendar[7];
-        DateFormat df = new SimpleDateFormat("yyy-MM-dd");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         int[] counts = new int[7];
 
         for(int i=0;i<calendars.length;i++){

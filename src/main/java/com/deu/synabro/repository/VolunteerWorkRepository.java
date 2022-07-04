@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface VolunteerWorkRepository extends JpaRepository<VolunteerWork, Long> {
+public interface VolunteerWorkRepository extends JpaRepository<VolunteerWork, UUID> {
     @Nullable
     Page<VolunteerWork> findByWorkId_TitleContainingAndPerformTypeOrderByCreatedDateDesc(Pageable pageable, String title, PerformType performType);
     @Nullable
@@ -21,7 +21,5 @@ public interface VolunteerWorkRepository extends JpaRepository<VolunteerWork, Lo
     Page<VolunteerWork> findAllByPerformType(Pageable pageable, PerformType performType);
     VolunteerWork findByIdx(UUID uuid);
     Optional<VolunteerWork> findOptionalByIdx(UUID uuid);
-    Optional<VolunteerWork> findOptionalByUserId(UUID uuid);
     List<VolunteerWork> findByUserId_Idx(UUID uuid);
-    List<VolunteerWork> deleteByIdx(UUID uuid);
 }
