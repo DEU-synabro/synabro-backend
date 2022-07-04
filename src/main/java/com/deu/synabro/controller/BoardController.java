@@ -81,7 +81,7 @@ public class BoardController {
 
         if(keyword==null){
             boards = boardService.findAll(pageable);
-            getBoardListResponse(boards, boardListResponseList);
+            addBoardListResponse(boards, boardListResponseList);
             boardPageResponse = new BoardPageResponse(pageable, boards, option, null, boardListResponseList);
         }else {
             if(searchOption=="제목+내용"){
@@ -90,9 +90,9 @@ public class BoardController {
                 boards = boardService.findByTitle(pageable, keyword);
             }
             if (boards.getContent().isEmpty()) {
-                BoardListResponse.getNullBoardListResponse(boardListResponseList);
+                BoardListResponse.addNullBoardListResponse(boardListResponseList);
             } else {
-                getBoardListResponse(boards, boardListResponseList);
+                addBoardListResponse(boards, boardListResponseList);
             }
             boardPageResponse = new BoardPageResponse(pageable, boards, option, keyword, boardListResponseList);
         }
@@ -166,7 +166,7 @@ public class BoardController {
         }
     }
 
-    private void getBoardListResponse(Page<Board> boards, List<BoardListResponse> boardListResponseList){
+    private void addBoardListResponse(Page<Board> boards, List<BoardListResponse> boardListResponseList){
         if(boards.getSize()>=boards.getTotalElements()){
             for(int i=0; i<boards.getTotalElements(); i++){
                 BoardListResponse boardListResponse = BoardListResponse.builder()

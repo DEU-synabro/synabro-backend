@@ -12,13 +12,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface WorkRepository extends JpaRepository<Work, Long> {
+public interface WorkRepository extends JpaRepository<Work, UUID> {
     @Nullable
     Page<Work> findByTitleContainingOrderByCreatedDateDesc(Pageable pageable, String title);
     @Nullable
     Page<Work> findByTitleContainingOrContentsContainingOrderByCreatedDateDesc(Pageable pageable, String title, String content);
-    Work findByIdx(UUID uuid);
+//    Work findByIdx(UUID uuid);
     Optional<Work> findOptionalByIdx(UUID uuid);
-    List<Work> deleteByIdx(UUID uuid);
 //    Page<Work> findAllByCreatedDate(Pageable pageable);
 }

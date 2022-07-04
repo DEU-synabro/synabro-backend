@@ -68,7 +68,6 @@ public class OffVolunteer extends BaseTime implements Serializable{
     }
 
     @Builder
-
     public OffVolunteer(String title, String contents, LocalDateTime startPeriod, LocalDateTime endPeriod, LocalDateTime startDate, LocalDateTime endDate) {
         this.title = title;
         this.contents = contents;

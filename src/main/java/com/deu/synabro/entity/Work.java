@@ -57,12 +57,12 @@ public class Work extends BaseTime implements Serializable {
     }
 
     @Builder
-    public Work(UUID idx, Member userId, String title, String contents, LocalDateTime endedDate, Short volunteerTime) {
+    public Work(UUID idx, Member userId, String title, String contents, Short volunteerTime, LocalDateTime endedDate) {
         this.idx = idx;
         this.userId = userId;
         this.title = title;
         this.contents = contents;
-        this.endedDate = endedDate;
         this.volunteerTime = volunteerTime;
+        this.endedDate = endedDate;
     }
 }

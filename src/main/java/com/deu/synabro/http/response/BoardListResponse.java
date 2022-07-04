@@ -28,7 +28,7 @@ public class BoardListResponse {
     @Schema(description = "게시판 생성 날짜", example = "2022-04-07")
     private LocalDateTime createdDate;
 
-    public static void getNullBoardListResponse(List<BoardListResponse> boardListResponseList){
+    public static void addNullBoardListResponse(List<BoardListResponse> boardListResponseList){
         BoardListResponse boardListResponse = BoardListResponse.builder()
                 .idx(null)
                 .title(null)

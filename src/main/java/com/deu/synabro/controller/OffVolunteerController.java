@@ -3,10 +3,8 @@ package com.deu.synabro.controller;
 
 import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.OffVolunteer;
-import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
-import com.deu.synabro.http.request.WorkUpdateRequest;
 import com.deu.synabro.http.response.*;
 import com.deu.synabro.service.DocsService;
 import com.deu.synabro.service.OffVolunteerService;

@@ -1,11 +1,11 @@
 package com.deu.synabro.controller;
 
 import com.deu.synabro.entity.Docs;
-import com.deu.synabro.entity.Member;
+import com.deu.synabro.entity.Message;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.enums.SearchOption;
+import com.deu.synabro.entity.enums.StatusEnum;
 import com.deu.synabro.http.request.WorkRequest;
-import com.deu.synabro.http.request.WorkUpdateRequest;
 import com.deu.synabro.http.response.*;
 import com.deu.synabro.repository.DocsRepository;
 import com.deu.synabro.service.MemberService;
@@ -22,9 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import net.minidev.json.JSONObject;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +34,9 @@ import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -91,6 +82,7 @@ public class WorkController {
             "    \"code\" : 200\n" +
             "    \"message\" : \"봉사 요청글이 수정되었습니다.\"\n" +
             "}";
+
     @Operation(tags = "Work", summary = "봉사 요청글을 생성합니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "봉사 요청글 생성 성공",
@@ -130,13 +122,11 @@ public class WorkController {
     @GetMapping("/{work_id}")
     public ResponseEntity<WorkResponse> getContents(@Parameter(description = "고유 아이디")
                                                               @PathVariable(name = "work_id") UUID uuid){
-        WorkResponse workResponse;
         try{
-            workResponse = workService.findByIdAndGetResponse(uuid);
-            return new ResponseEntity<>(workResponse,HttpStatus.OK);
-        }catch (IllegalArgumentException e){
-            workResponse = workService.getNullResponse();
-            return new ResponseEntity<>(workResponse,HttpStatus.NOT_FOUND);
+            Work work = workService.findByIdx(uuid);
+            return new ResponseEntity<>(workService.getContentsResponse(work), HttpStatus.OK);
+        }catch ( NullPointerException e){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -153,9 +143,10 @@ public class WorkController {
     @DeleteMapping("/{work_id}")
     public ResponseEntity<GeneralResponse> deleteContents(@Parameter(description = "고유 아이디")
                                                                @PathVariable(name = "work_id") UUID id){
-        if(workService.deleteById(id)){
+        try{
+            workService.deleteById(id);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 삭제되었습니다."), HttpStatus.OK);
-        }else{
+        } catch (Exception e){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"삭제할 봉사 요청글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
@@ -171,13 +162,13 @@ public class WorkController {
             })
     @PatchMapping("/{work_id}")
     public ResponseEntity<GeneralResponse> updateVolunteerWork(@Parameter(description = "고유 아이디") @PathVariable(name = "work_id") UUID id,
-                                                            @Parameter @RequestBody WorkUpdateRequest workUpdateRequest){
-        Work work = workService.findById(id);
-        if(work==null){
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 요청글이 없습니다."), HttpStatus.NOT_FOUND);
-        }else{
-            workService.updateContents(workUpdateRequest, work);
+                                                            @Parameter @RequestBody WorkRequest workRequest){
+        try{
+            Work work = workService.findByIdx(id);
+            workService.updateContents(workRequest, work);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "봉사 요청글이 수정되었습니다"), HttpStatus.OK);
+        } catch (NullPointerException e) {
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 요청글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -199,84 +190,57 @@ public class WorkController {
     public ResponseEntity<WorkPageResponse> getPagingContents(@PageableDefault Pageable pageable,
                                                               @RequestParam(name="searchOption", required = false, defaultValue = "title") SearchOption option,
                                                               @RequestParam(name="keyword", required = false) String keyword){
-        Page<Work> contents;
+        Page<Work> works;
         String searchOption = option.getValue();
-        List<WorkListResponse> contentsResponseList = new ArrayList<>();
+        List<WorkListResponse> workListResponseList = new ArrayList<>();
         WorkListResponse workListResponse;
         WorkPageResponse workPageResponse;
 
         if(keyword==null){
-            contents = workService.findAll(pageable);
-            if(contents.getSize()>=contents.getTotalElements()){
-                for(int i=0; i<contents.getTotalElements(); i++){
-                    workListResponse = WorkListResponse.builder()
-                            .idx(contents.getContent().get(i).getIdx())
-                            .title(contents.getContent().get(i).getTitle())
-                            .createdDate(contents.getContent().get(i).getCreatedDate())
-                            .endedDate(contents.getContent().get(i).getEndedDate())
-                            .build();
-                    contentsResponseList.add(workListResponse);
-                }
-            }else {
-                int contentSize = contents.getSize()*contents.getNumber();
-                for(int i=0; i<contents.getSize();i++){
-                    if(contentSize>=contents.getTotalElements())
-                        break;
-                    workListResponse = WorkListResponse.builder()
-                            .idx(contents.getContent().get(i).getIdx())
-                            .title(contents.getContent().get(i).getTitle())
-                            .createdDate(contents.getContent().get(i).getCreatedDate())
-                            .endedDate(contents.getContent().get(i).getEndedDate())
-                            .build();
-                    contentsResponseList.add(workListResponse);
-                    contentSize++;
-                }
-            }
-            workPageResponse = new WorkPageResponse(pageable, contents, option, null, contentsResponseList);
-            return new ResponseEntity<>(workPageResponse, HttpStatus.OK);
+            works = workService.findAll(pageable);
+            addWorkListResponse(works, workListResponseList);
+            workPageResponse = new WorkPageResponse(pageable, works, option, null, workListResponseList);
         }else {
             if(searchOption=="제목+내용"){
-                contents = workService.findByTitleOrContents(pageable, keyword, keyword);
+                works = workService.findByTitleOrContents(pageable, keyword, keyword);
             }else {
-                contents = workService.findByTitle(pageable, keyword);
+                works = workService.findByTitle(pageable, keyword);
             }
-            if (contents.getContent().isEmpty()) {
-                workListResponse = WorkListResponse.builder()
-                        .idx(null)
-                        .title(null)
-                        .createdDate(null)
-                        .endedDate(null)
+            if (works.getContent().isEmpty()) {
+                WorkListResponse.addNullWorkListResponse(workListResponseList);
+            } else {
+                addWorkListResponse(works, workListResponseList);
+            }
+            workPageResponse = new WorkPageResponse(pageable, works, option, keyword, workListResponseList);
+        }
+        return new ResponseEntity<>(workPageResponse, HttpStatus.OK);
+    }
+
+    private void addWorkListResponse(Page<Work> works, List<WorkListResponse> contentsResponseList){
+        if(works.getSize()>=works.getTotalElements()){
+            for(int i=0; i<works.getTotalElements(); i++){
+                WorkListResponse workListResponse = WorkListResponse.builder()
+                        .idx(works.getContent().get(i).getIdx())
+                        .title(works.getContent().get(i).getTitle())
+                        .createdDate(works.getContent().get(i).getCreatedDate())
+                        .endedDate(works.getContent().get(i).getEndedDate())
                         .build();
                 contentsResponseList.add(workListResponse);
-            } else {
-                if(contents.getSize()>=contents.getTotalElements()){
-                    for(int i=0; i<contents.getTotalElements(); i++){
-                        workListResponse = WorkListResponse.builder()
-                                .idx(contents.getContent().get(i).getIdx())
-                                .title(contents.getContent().get(i).getTitle())
-                                .createdDate(contents.getContent().get(i).getCreatedDate())
-                                .endedDate(contents.getContent().get(i).getEndedDate())
-                                .build();
-                        contentsResponseList.add(workListResponse);
-                    }
-                }else {
-                    int contentSize = contents.getSize()*contents.getNumber();
-                    for(int i=0; i<contents.getSize();i++){
-                        if(contentSize>=contents.getTotalElements())
-                            break;
-                        workListResponse = WorkListResponse.builder()
-                                .idx(contents.getContent().get(i).getIdx())
-                                .title(contents.getContent().get(i).getTitle())
-                                .createdDate(contents.getContent().get(i).getCreatedDate())
-                                .endedDate(contents.getContent().get(i).getEndedDate())
-                                .build();
-                        contentsResponseList.add(workListResponse);
-                        contentSize++;
-                    }
-                }
             }
-            workPageResponse = new WorkPageResponse(pageable, contents, option, keyword, contentsResponseList);
-            return new ResponseEntity<>(workPageResponse, HttpStatus.OK);
+        }else {
+            int contentSize = works.getSize()*works.getNumber();
+            for(int i=0; i<works.getSize();i++){
+                if(contentSize>=works.getTotalElements())
+                    break;
+                WorkListResponse workListResponse = WorkListResponse.builder()
+                        .idx(works.getContent().get(i).getIdx())
+                        .title(works.getContent().get(i).getTitle())
+                        .createdDate(works.getContent().get(i).getCreatedDate())
+                        .endedDate(works.getContent().get(i).getEndedDate())
+                        .build();
+                contentsResponseList.add(workListResponse);
+                contentSize++;
+            }
         }
     }
 
@@ -291,10 +255,4 @@ public class WorkController {
         return docsService.downDocs(uuid);
     }
 
-//    @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
-//    @GetMapping("/download/{work_id}")
-//    public JSONObject download(@Parameter(description = "고유 아이디")
-//                                           @PathVariable(name = "work_id") UUID uuid) throws IOException {
-//        return docsService.downDocsLink(uuid);
-//    }
 }

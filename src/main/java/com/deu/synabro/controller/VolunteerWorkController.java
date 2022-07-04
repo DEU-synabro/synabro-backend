@@ -194,7 +194,7 @@ public class VolunteerWorkController {
     @PostMapping("{work_id}")
     public ResponseEntity<GeneralResponse> createVolunteerWork(@Parameter(description = "고유 아이디")
                                                                @PathVariable(name = "work_id") UUID uuid){
-        Work work = workService.findById(uuid);
+        Work work = workService.findByIdx(uuid);
         Work workId = Work.builder()
                         .idx(work.getIdx())
                         .contents(work.getContents())

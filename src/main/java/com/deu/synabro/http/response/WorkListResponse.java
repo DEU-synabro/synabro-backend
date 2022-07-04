@@ -9,6 +9,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -31,4 +32,13 @@ public class WorkListResponse {
     @Schema(description = "봉사 종료 날짜", example = "2022-04-07")
     private LocalDateTime endedDate;
 
+    public static void addNullWorkListResponse(List<WorkListResponse> workListResponseList){
+        WorkListResponse workListResponse = WorkListResponse.builder()
+                .idx(null)
+                .title(null)
+                .createdDate(null)
+                .endedDate(null)
+                .build();
+        workListResponseList.add(workListResponse);
+    }
 }
