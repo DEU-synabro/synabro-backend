@@ -24,30 +24,21 @@ public class InspectionService {
     @Autowired
     InspectionRepository inspectionRepository;
 
-    public void setInspection(VolunteerWork volunteerWork){
-        UUID uuid = volunteerWork.getUserId().getIdx();
+    public void setInspection(VolunteerWork volunteerWork, UUID uuid){
         volunteerWork.setPerformType(PerformType.DONE);
-        Member member = new Member(uuid);
         Inspection inspection = Inspection.builder()
                                         .volunteerWorkId(volunteerWork)
                                         .contents("")
-                                        .userId(member)
+                                        .userId(new Member(uuid))
                                         .performType(PerformType.PERFORMING)
                                         .build();
         inspectionRepository.save(inspection);
     }
 
-    public InspectionResponse findByIdAndGetResponse(UUID uuid){
+    public Inspection findByIdx(UUID uuid) {
         Optional<Inspection> inspection = inspectionRepository.findOptionalByIdx(uuid);
-        if(inspection.isPresent()){
-            return getInspectionResponse(inspection);
-        }
-        else {
-            throw new IllegalArgumentException();
-        }
+        return inspection.orElseThrow(() -> new NullPointerException());
     }
-
-    public Inspection findById(UUID uuid) {return inspectionRepository.findByIdx(uuid);}
 
     public  Page<Inspection> findByTitle(Pageable pageable, String title){
         return inspectionRepository.findByVolunteerWorkId_WorkId_TitleContainingAndPerformTypeOrderByCreatedDateDesc(pageable,title, PerformType.PERFORMING);
@@ -61,48 +52,30 @@ public class InspectionService {
         return inspectionPage;
     }
 
-    public InspectionResponse getInspectionResponse(Optional<Inspection> inspection){
+    public InspectionResponse getInspectionResponse(Inspection inspection){
         InspectionResponse inspectionResponse = InspectionResponse.builder()
-                                                .idx(inspection.get().getIdx())
-                                                .userId(inspection.get().getUserId().getIdx())
-                                                .workId(inspection.get().getVolunteerWorkId().getWorkId().getIdx())
-                                                .volunteerWorkId(inspection.get().getVolunteerWorkId().getIdx())
-                                                .workTitle(inspection.get().getVolunteerWorkId().getWorkId().getTitle())
-                                                .workContents(inspection.get().getVolunteerWorkId().getWorkId().getContents())
-                                                .volunteerWorkContents(inspection.get().getVolunteerWorkId().getContents())
-                                                .inspectionContents(inspection.get().getContents())
-                                                .volunteerTime(inspection.get().getVolunteerWorkId().getWorkId().getVolunteerTime())
-                                                .createdDate(inspection.get().getCreatedDate())
-                                                .endedDate(inspection.get().getVolunteerWorkId().getWorkId().getEndedDate())
-                                                .updatedDate(inspection.get().getUpdatedDate())
+                                                .idx(inspection.getIdx())
+                                                .userId(inspection.getUserId().getIdx())
+                                                .workId(inspection.getVolunteerWorkId().getWorkId().getIdx())
+                                                .volunteerWorkId(inspection.getVolunteerWorkId().getIdx())
+                                                .workTitle(inspection.getVolunteerWorkId().getWorkId().getTitle())
+                                                .workContents(inspection.getVolunteerWorkId().getWorkId().getContents())
+                                                .volunteerWorkContents(inspection.getVolunteerWorkId().getContents())
+                                                .inspectionContents(inspection.getContents())
+                                                .volunteerTime(inspection.getVolunteerWorkId().getWorkId().getVolunteerTime())
+                                                .createdDate(inspection.getCreatedDate())
+                                                .endedDate(inspection.getVolunteerWorkId().getWorkId().getEndedDate())
+                                                .updatedDate(inspection.getUpdatedDate())
                                                 .build();
-        if(inspection.get().getUserId().getIdx()==inspection.get().getVolunteerWorkId().getUserId().getIdx()){
+        if(inspection.getUserId().getIdx()==inspection.getVolunteerWorkId().getUserId().getIdx()){
             inspectionResponse.setUserId(null);
         }
         return inspectionResponse;
     }
 
-    public InspectionResponse getNullResponse(){
-        InspectionResponse inspectionResponse = InspectionResponse.builder()
-                .idx(null)
-                .userId(null)
-                .workId(null)
-                .workTitle(null)
-                .workContents(null)
-                .volunteerWorkContents(null)
-                .inspectionContents(null)
-                .volunteerTime(null)
-                .createdDate(null)
-                .endedDate(null)
-                .updatedDate(null)
-                .build();
-        return inspectionResponse;
-    }
-
     @Transactional
     public void updateInspection(InspectionUpdateRequest inspectionUpdateRequest, Inspection inspection, UUID uuid){
-        Member member = new Member(uuid);
-        inspection.setUserId(member);
+        inspection.setUserId(new Member(uuid));
         inspection.getVolunteerWorkId().getWorkId().setVolunteerTime(inspectionUpdateRequest.getVolunteerTime());
         inspection.setContents(inspectionUpdateRequest.getContents());
         inspection.setUpdatedDate(LocalDateTime.now());
@@ -110,12 +83,7 @@ public class InspectionService {
     }
 
     @Transactional
-    public boolean deleteById(UUID uuid){
-        if(inspectionRepository.deleteByIdx(uuid).isEmpty()){
-            return false;
-        }else{
-            return true;
-        }
+    public void deleteById(UUID uuid){
+        inspectionRepository.deleteById(uuid);
     }
-
 }

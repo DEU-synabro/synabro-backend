@@ -77,7 +77,8 @@ public class InspectionController {
     @PostMapping("{volunteer_work_id}")
     public ResponseEntity<GeneralResponse> setInspection(@Parameter(description = "고유 아이디") @PathVariable(name = "volunteer_work_id") UUID uuid){
         VolunteerWork volunteerWork = volunteerWorkService.findByIdx(uuid);
-        inspectionService.setInspection(volunteerWork);
+        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+        inspectionService.setInspection(volunteerWork, userId);
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 검수 글이 생성되었습니다."), HttpStatus.OK);
     }
 
@@ -88,13 +89,11 @@ public class InspectionController {
             })
     @GetMapping("{inspection_id}")
     public ResponseEntity<InspectionResponse> getInspection(@Parameter(description = "고유아이디") @PathVariable(name="inspection_id") UUID uuid){
-        InspectionResponse inspectionResponse;
         try{
-            inspectionResponse = inspectionService.findByIdAndGetResponse(uuid);
-            return new ResponseEntity<>(inspectionResponse,HttpStatus.OK);
-        }catch (IllegalArgumentException e){
-            inspectionResponse = inspectionService.getNullResponse();
-            return new ResponseEntity<>(inspectionResponse,HttpStatus.NOT_FOUND);
+            Inspection inspection = inspectionService.findByIdx(uuid);
+            return new ResponseEntity<>(inspectionService.getInspectionResponse(inspection),HttpStatus.OK);
+        }catch ( NullPointerException e){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -111,13 +110,13 @@ public class InspectionController {
     public ResponseEntity<GeneralResponse> updateInspection(@Parameter(description = "고유 아이디")
                                                                @PathVariable(name = "inspection_id") UUID uuid,
                                                                @Parameter @RequestBody InspectionUpdateRequest inspectionUpdateRequest){
-        Inspection inspection = inspectionService.findById(uuid);
-        if(inspection==null){
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 검수글이 없습니다."), HttpStatus.NOT_FOUND);
-        }else {
+        try{
+            Inspection inspection = inspectionService.findByIdx(uuid);
             UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
             inspectionService.updateInspection(inspectionUpdateRequest, inspection, userId);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "봉사 검수글이 수정되었습니다"), HttpStatus.OK);
+        } catch (NullPointerException e){
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 수행글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -134,9 +133,10 @@ public class InspectionController {
     @DeleteMapping("{inspection_id}")
     public ResponseEntity<GeneralResponse> deleteInspection(@Parameter(description = "고유 아이디")
                                                                 @PathVariable(name = "inspection_id") UUID uuid){
-        if(inspectionService.deleteById(uuid)){
+        try{
+            inspectionService.deleteById(uuid);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 검수글이 삭제되었습니다."), HttpStatus.OK);
-        }else{
+        } catch (Exception e){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"삭제할 봉사 검수글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
@@ -162,36 +162,12 @@ public class InspectionController {
         Page<Inspection> inspections;
         String searchOption = option.getValue();
         List<InspectionListResponse> inspectionListResponseList = new ArrayList<>();
-        InspectionListResponse inspectionListResponse;
         InspectionPageResponse inspectionPageResponse;
 
         if(keyword==null){
             inspections = inspectionService.findAll(pageable);
-            if(inspections.getSize()>=inspections.getTotalElements()){
-                for(int i=0; i<inspections.getTotalElements(); i++){
-                    inspectionListResponse = InspectionListResponse.builder()
-                            .idx(inspections.getContent().get(i).getIdx())
-                            .title(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getTitle())
-                            .endedDate(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getEndedDate())
-                            .build();
-                    inspectionListResponseList.add(inspectionListResponse);
-                }
-            }else {
-                int contentSize = inspections.getSize()*inspections.getNumber();
-                for(int i=0; i<inspections.getSize();i++){
-                    if(contentSize>=inspections.getTotalElements())
-                        break;
-                    inspectionListResponse = InspectionListResponse.builder()
-                            .idx(inspections.getContent().get(i).getIdx())
-                            .title(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getTitle())
-                            .endedDate(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getEndedDate())
-                            .build();
-                    inspectionListResponseList.add(inspectionListResponse);
-                    contentSize++;
-                }
-            }
+            addInspectionListResponse(inspections, inspectionListResponseList);
             inspectionPageResponse = new InspectionPageResponse(pageable, inspections, option, null, inspectionListResponseList);
-            return new ResponseEntity<>(inspectionPageResponse, HttpStatus.OK);
         }else {
             if(searchOption=="제목+내용"){
                 inspections = inspectionService.findByTitleOrContents(pageable, keyword, keyword);
@@ -199,39 +175,38 @@ public class InspectionController {
                 inspections = inspectionService.findByTitle(pageable, keyword);
             }
             if (inspections.getContent().isEmpty()) {
-                inspectionListResponse = InspectionListResponse.builder()
-                        .idx(null)
-                        .title(null)
-                        .endedDate(null)
+                InspectionListResponse.addNullInspectionListResponse(inspectionListResponseList);
+            } else {
+                addInspectionListResponse(inspections, inspectionListResponseList);
+            }
+            inspectionPageResponse = new InspectionPageResponse(pageable, inspections, option, keyword, inspectionListResponseList);
+        }
+        return new ResponseEntity<>(inspectionPageResponse, HttpStatus.OK);
+    }
+
+    private void addInspectionListResponse(Page<Inspection> inspections, List<InspectionListResponse> inspectionListResponseList){
+        if(inspections.getSize()>=inspections.getTotalElements()){
+            for(int i=0; i<inspections.getTotalElements(); i++){
+                InspectionListResponse inspectionListResponse = InspectionListResponse.builder()
+                        .idx(inspections.getContent().get(i).getIdx())
+                        .title(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getTitle())
+                        .endedDate(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getEndedDate())
                         .build();
                 inspectionListResponseList.add(inspectionListResponse);
-            } else {
-                if(inspections.getSize()>=inspections.getTotalElements()){
-                    for(int i=0; i<inspections.getTotalElements(); i++){
-                        inspectionListResponse = InspectionListResponse.builder()
-                                .idx(inspections.getContent().get(i).getIdx())
-                                .title(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getTitle())
-                                .endedDate(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getEndedDate())
-                                .build();
-                        inspectionListResponseList.add(inspectionListResponse);
-                    }
-                }else {
-                    int contentSize = inspections.getSize()*inspections.getNumber();
-                    for(int i=0; i<inspections.getSize();i++){
-                        if(contentSize>=inspections.getTotalElements())
-                            break;
-                        inspectionListResponse = InspectionListResponse.builder()
-                                .idx(inspections.getContent().get(i).getIdx())
-                                .title(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getTitle())
-                                .endedDate(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getEndedDate())
-                                .build();
-                        inspectionListResponseList.add(inspectionListResponse);
-                        contentSize++;
-                    }
-                }
             }
-            inspectionPageResponse = new InspectionPageResponse(pageable, inspections, option, null, inspectionListResponseList);
-            return new ResponseEntity<>(inspectionPageResponse, HttpStatus.OK);
+        }else {
+            int contentSize = inspections.getSize()*inspections.getNumber();
+            for(int i=0; i<inspections.getSize();i++){
+                if(contentSize>=inspections.getTotalElements())
+                    break;
+                InspectionListResponse inspectionListResponse = InspectionListResponse.builder()
+                        .idx(inspections.getContent().get(i).getIdx())
+                        .title(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getTitle())
+                        .endedDate(inspections.getContent().get(i).getVolunteerWorkId().getWorkId().getEndedDate())
+                        .build();
+                inspectionListResponseList.add(inspectionListResponse);
+                contentSize++;
+            }
         }
     }
 }
