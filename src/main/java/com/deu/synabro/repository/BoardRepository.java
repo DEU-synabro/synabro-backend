@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * 게시글 Repository
+ * JpaRepository 를 상속받아 Jpa 메소드를 사용할 수 있다.
+ */
 @Repository
 public interface BoardRepository extends JpaRepository<Board, UUID> {
     Page<Board> findByTitleContainingOrderByCreatedDateDesc(Pageable pageable, String title);

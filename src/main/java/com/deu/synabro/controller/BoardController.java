@@ -30,6 +30,8 @@ import java.util.UUID;
 /*
  * 이 클래스는 게시판 CRUD에 관한
  * 메소드들이 정의된 클래스이다.
+ * @author tkfdkskarl56
+ * @since 1.0
  */
 @Tag(name="Board", description = "게시판 API")
 @RestController
@@ -60,6 +62,13 @@ public class BoardController {
             "    \"message\" : \"수정할 게시글이 없습니다.\"\n" +
             "}";
 
+    /**
+     * 제목, 제목+내용으로 글을 찾아주는 GET API 입니다.
+     *
+     * @param option (제목, 제목+내용) 중을 입력합니다.
+     * @param keyword 검색할 단어를 입력합니다.
+     * @return 제목 이나 제목+내용으로 검색한 게시판의 글을 반환합니다.
+     */
     @Operation(tags = "Board", summary = "제목, 제목+내용으로 글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "제목, 제목+내용으로 글 정보 조회 성공",
@@ -99,17 +108,29 @@ public class BoardController {
         return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
     }
 
+    /**
+     * id 값으로 게시판의 글을 찾아주는 GET API 입니다.
+     *
+     * @param id 게시글의 UUID 값을 입력합니다.
+     * @return 게시글의 정보를 반환합니다.
+     */
     @Operation(tags = "Board", summary = "id 값으로 게시판 글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "id 값으로 게시판 글 정보 조회 성공",
                             content = @Content(schema = @Schema(implementation = Board.class)))
             })
-    @GetMapping("/{id}")   //제목으로 글 찾기
-    public ResponseEntity<Board> getBoard(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id){
+    @GetMapping("/{board_id}")
+    public ResponseEntity<Board> getBoard(@Parameter(description = "고유아이디") @PathVariable(name="board_id") UUID id){
         Board board = boardService.findByIdx(id);
         return new ResponseEntity<>(board, HttpStatus.OK);
     }
 
+    /**
+     * 게시글을 생성하는 POST API 입니다.
+     *
+     * @param boardRequest (제목, 내용, 종류) 클래스를 입력합니다.
+     * @return 게시글 생성 성공 상태를 반환합니다.
+     */
     @Operation(tags = "Board", summary = "게시판 글을 생성 합니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "게시판 글 생성 성공",
@@ -120,11 +141,17 @@ public class BoardController {
                     response = Board.class, message = "ok", code=200)
     )
     @PostMapping("") // 게시판 생성
-    public ResponseEntity<Board> boardCreate(@Parameter @RequestBody BoardRequest reqBoard){
-        Board board = boardService.setBoard(reqBoard);
+    public ResponseEntity<Board> boardCreate(@Parameter @RequestBody BoardRequest boardRequest){
+        Board board = boardService.setBoard(boardRequest);
         return new ResponseEntity<>(board, HttpStatus.OK);
     }
 
+    /**
+     * 게시글을 삭제하는 DELETE API 입니다.
+     *
+     * @param id 게시글의 UUID 값을 입력합니다.
+     * @return 게시글 삭제 성공 상태를 반환합니다.
+     */
     @Operation(tags = "Board", summary = "게시판 글을 삭제 합니다.",
             responses={
                     @ApiResponse(responseCode = "204", description = "게시판 글 삭제 성공",
@@ -145,6 +172,13 @@ public class BoardController {
         }
     }
 
+    /**
+     * 게시글 수정하는 PATCH API 입니다.
+     *
+     * @param id 게시글의 UUID 값을 입력합니다.
+     * @param boardRequest 수정할 (제목, 내용, 종류) 클래스를 입력합니다.
+     * @return 게시글 수정 성공 상태를 반환합니다.
+     */
     @Operation(tags = "Board", summary = "게시판 글을 수정합니다.",
             responses={
                     @ApiResponse(responseCode = "204", description = "게시판 글 수정 성공",
@@ -166,6 +200,12 @@ public class BoardController {
         }
     }
 
+    /**
+     * 페이징 처리할 게시글을 추가하는 메소드입니다.
+     *
+     * @param boards 페이징 처리할 게시글을 입력받습니다.
+     * @param boardListResponseList 페이징 처리를 추가할 리스트를 입력받습니다.
+     */
     private void addBoardListResponse(Page<Board> boards, List<BoardListResponse> boardListResponseList){
         if(boards.getSize()>=boards.getTotalElements()){
             for(int i=0; i<boards.getTotalElements(); i++){

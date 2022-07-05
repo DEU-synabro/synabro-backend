@@ -1,10 +1,8 @@
 package com.deu.synabro.controller;
 
 import com.deu.synabro.entity.Docs;
-import com.deu.synabro.entity.Message;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.enums.SearchOption;
-import com.deu.synabro.entity.enums.StatusEnum;
 import com.deu.synabro.http.request.WorkRequest;
 import com.deu.synabro.http.response.*;
 import com.deu.synabro.repository.DocsRepository;
@@ -36,7 +34,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

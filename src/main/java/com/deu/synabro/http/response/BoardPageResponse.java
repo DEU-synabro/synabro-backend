@@ -16,6 +16,9 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * 페이징 처리한 게시글을 담는 클래스
+ */
 @Getter
 @Setter
 @ToString

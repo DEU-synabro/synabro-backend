@@ -10,7 +10,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.UUID;
 
-
+/**
+ *  게시글 정보를 담는 Entity
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
