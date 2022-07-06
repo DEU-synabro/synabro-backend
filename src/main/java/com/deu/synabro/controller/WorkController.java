@@ -35,6 +35,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 봉사 요청에 대한 CRUD 메소드들이 정의된 클래스입니다.
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Tag(name="Work", description = "봉사 요청 API")
 @RestController
 @RequestMapping("/api/works")
@@ -80,6 +86,13 @@ public class WorkController {
             "    \"message\" : \"봉사 요청글이 수정되었습니다.\"\n" +
             "}";
 
+    /**
+     * 봉사 요청을 생성하는 POST API 입니다.
+     *
+     * @param file 저장할 사진입니다.
+     * @param workRequest 봉사 요청 내용(제목, 내용, 봉사 시간, 마감일) 입니다.
+     * @return 봉사 요청의 성공을 반환합니다.
+     */
     @Operation(tags = "Work", summary = "봉사 요청글을 생성합니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "봉사 요청글 생성 성공",
@@ -97,7 +110,7 @@ public class WorkController {
             )
             @RequestPart(required = false) MultipartFile file,
             @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            @RequestPart(name = "contentsRequest") WorkRequest workRequest) throws IOException {
+            @RequestPart(name = "contentsRequest") WorkRequest workRequest){
         UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
 
         if (file!=null) {
@@ -110,6 +123,12 @@ public class WorkController {
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
     }
 
+    /**
+     * uuid 값으로 봉사 요청글을 찾는 GET API 입니다.
+     *
+     * @param uuid 봉사 요청글의 uuid입니다.
+     * @return 봉사 요청글의 정보를 반환합니다.
+     */
     @Operation(tags = "Work", summary = "id 값으로 봉사 요청글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "id 값으로 봉사 요청글 정보 조회 성공",
@@ -126,6 +145,12 @@ public class WorkController {
         }
     }
 
+    /**
+     * uuid 값으로 봉사 요청글을 삭제하는 DELETE API 입니다.
+     *
+     * @param uuid 봉사 요청글의 uuid입니다.
+     * @return 봉사 요청글의 삭제 상태를 반환합니다.
+     */
     @Operation(tags = "Work", summary = "봉사 요청글을 삭제 합니다.",
             responses={
                     @ApiResponse(responseCode = "204", description = "봉사 요청글 삭제 성공",
@@ -138,15 +163,22 @@ public class WorkController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{work_id}")
     public ResponseEntity<GeneralResponse> deleteContents(@Parameter(description = "고유 아이디")
-                                                               @PathVariable(name = "work_id") UUID id){
+                                                               @PathVariable(name = "work_id") UUID uuid){
         try{
-            workService.deleteById(id);
+            workService.deleteById(uuid);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 삭제되었습니다."), HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"삭제할 봉사 요청글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
 
+    /**
+     * uuid 값으로 수정할 봉사 요청글을 찾고 봉사 요청글을 수정하게 해주는 PATCH API 입니다.
+     *
+     * @param uuid 봉사 요청글의 uuid입니다.
+     * @param workRequest 수정할 봉사 요청 내용(제목, 내용, 봉사 시간, 마감일) 입니다.
+     * @return 봉사 요청글의 수정 상태를 반환합니다.
+     */
     @Operation(tags = "Work", summary = "봉사 요청글을 수정합니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "봉사 요청글 수정 성공",
@@ -157,10 +189,10 @@ public class WorkController {
                                     examples = @ExampleObject(value = NOT_WORKS)))
             })
     @PatchMapping("/{work_id}")
-    public ResponseEntity<GeneralResponse> updateVolunteerWork(@Parameter(description = "고유 아이디") @PathVariable(name = "work_id") UUID id,
+    public ResponseEntity<GeneralResponse> updateVolunteerWork(@Parameter(description = "고유 아이디") @PathVariable(name = "work_id") UUID uuid,
                                                             @Parameter @RequestBody WorkRequest workRequest){
         try{
-            Work work = workService.findByIdx(id);
+            Work work = workService.findByIdx(uuid);
             workService.updateContents(workRequest, work);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "봉사 요청글이 수정되었습니다"), HttpStatus.OK);
         } catch (NullPointerException e) {
@@ -168,6 +200,14 @@ public class WorkController {
         }
     }
 
+    /**
+     * 제목, 제목+내용으로 봉사 요청글을 찾아주는 GET API 입니다.
+     *
+     * @param pageable 페이징처리 객체
+     * @param option (제목, 제목+내용)를 입력받습니다.
+     * @param keyword 검색할 단어를 입력받습니다.
+     * @return 제목이나 제목+내용으로 검색한 봉사 요청글을 반환합니다.
+     */
     @Operation(tags = "Work", summary = "제목, 제목+내용으로 봉사 요청글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "제목, 제목+내용으로 글 정보 조회 성공",
@@ -211,6 +251,12 @@ public class WorkController {
         return new ResponseEntity<>(workPageResponse, HttpStatus.OK);
     }
 
+    /**
+     * 페이징 처리할 봉사 요청글을 추가해주는 메소드입니다.
+     *
+     * @param works 페이징 처리할 봉사 요청글을 입력받습니다.
+     * @param contentsResponseList 페이징 처리된 봉사 요청글을 추가할 리스트를 입력받습니다.
+     */
     private void addWorkListResponse(Page<Work> works, List<WorkListResponse> contentsResponseList){
         if(works.getSize()>=works.getTotalElements()){
             for(int i=0; i<works.getTotalElements(); i++){
@@ -239,7 +285,12 @@ public class WorkController {
         }
     }
 
-
+    /**
+     * 봉사 요청글에 있는 사진을 다운로드 해주는 메소드입니다.
+    *
+     * @param uuid 봉사 요청글의 uuid 값입니다,
+     * @return 봉사 요청글의 사진을 반환합니다.
+     */
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     @GetMapping("/download/{work_id}")
     public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")

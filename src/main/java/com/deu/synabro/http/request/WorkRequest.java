@@ -11,6 +11,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * 봉사 요청 정보를 담는 클래스
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WorkRequest {

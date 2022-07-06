@@ -65,6 +65,7 @@ public class BoardController {
     /**
      * 제목, 제목+내용으로 글을 찾아주는 GET API 입니다.
      *
+     * @param pageable 페이징처리 객체
      * @param option (제목, 제목+내용) 중을 입력합니다.
      * @param keyword 검색할 단어를 입력합니다.
      * @return 제목 이나 제목+내용으로 검색한 게시판의 글을 반환합니다.

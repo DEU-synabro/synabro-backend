@@ -13,6 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 봉사 요청을 담는 Entity
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -51,6 +57,11 @@ public class Work extends BaseTime implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
     private List<Docs> docsList = new ArrayList<>();
 
+    /**
+     * Docs에 Work의 UUID값을 넣어주는 메소드 입니다.
+     *
+     * @param docs 봉사 요청 게시글과 같이 저장할 Docs 객체입니다.
+     */
     public void addDocs(Docs docs){
         this.docsList.add(docs);
         docs.setWork(this);

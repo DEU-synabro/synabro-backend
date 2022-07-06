@@ -1,6 +1,5 @@
 package com.deu.synabro.http.response;
 
-import com.deu.synabro.controller.VolunteerWorkController;
 import com.deu.synabro.controller.WorkController;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.enums.SearchOption;
@@ -19,6 +18,12 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * 페이징 처리한 봉사 요청글을 담는 클래스
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Getter
 @Setter
 @ToString

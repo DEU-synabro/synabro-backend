@@ -12,6 +12,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 봉사 요청 페이징 처리를 위한 정보를 담는 클래스
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Data
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
