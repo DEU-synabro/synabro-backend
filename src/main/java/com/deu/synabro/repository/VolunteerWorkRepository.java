@@ -12,6 +12,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * 봉사 수행 Repository
+ * JpaRepository 를 상속받아 Jpa 메소드를 사용할 수 있다.
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Repository
 public interface VolunteerWorkRepository extends JpaRepository<VolunteerWork, UUID> {
     @Nullable
