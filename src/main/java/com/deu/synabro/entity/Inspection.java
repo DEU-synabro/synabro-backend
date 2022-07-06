@@ -11,6 +11,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * 봉사 검수글 내용을 담든 Entity
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Data
 @RequiredArgsConstructor
 @Entity

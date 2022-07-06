@@ -8,6 +8,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+/**
+ * 수정할 봉사 검수글 내용 정보를 담는 클래스
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class InspectionUpdateRequest {
@@ -18,8 +24,5 @@ public class InspectionUpdateRequest {
     @Schema(description = "내용",example = "내용")
     String contents;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Schema(description = "설명", example = "2022-02-12T12:16:40.77")
-    LocalDateTime endedDate;
 
 }

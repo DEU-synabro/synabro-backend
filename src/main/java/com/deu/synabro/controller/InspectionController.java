@@ -32,7 +32,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-
+/**
+ * 봉사 검수에 대한 CRUD 메소드들이 정의된 클래스입니다.
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Tag(name="Inspection", description = "검수 API")
 @RestController
 @RequestMapping("/api/inspections")
@@ -68,6 +73,12 @@ public class InspectionController {
             "    \"message\" : \"봉사 수행글이 수정되었습니다.\"\n" +
             "}";
 
+    /**
+     * 봉사 검수글을 생성하는 POST API 입니다
+     *
+     * @param uuid VolunteerWork의 uuid 값 입니다.
+     * @return 봉사 검수글의 생성 상태를 반환합니다.
+     */
     @Operation(tags = "Inspection", summary = "봉사 검수글을 생성합니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "봉사 검수글 생성 성공",
@@ -82,6 +93,12 @@ public class InspectionController {
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 검수 글이 생성되었습니다."), HttpStatus.OK);
     }
 
+    /**
+     * 봉사 검수글을 찾는 GET API 입니다.
+     *
+     * @param uuid 봉사 검수글의 uuid 입니다.
+     * @return uuid 값으로 찾은 봉사 검수글을 반환합니다.
+     */
     @Operation(tags = "Inspection", summary = "id 값으로 검수글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "id 값으로 검수글 정보 조회 성공",
@@ -97,6 +114,13 @@ public class InspectionController {
         }
     }
 
+    /**
+     * uuid 값으로 수정할 봉사 검수글을 찾고 봉사 수행글을 수정하게 해주는 PATCH API 입니다.
+     *
+     * @param uuid 봉사 검수글의 uuid 입니다.
+     * @param inspectionUpdateRequest 수정할 봉사 검수 내용 (봉사 시간, 내용, 봉사 마감일) 입니다.
+     * @return 봉사 검수글의 수정 상태를 반환합니다.
+     */
     @Operation(tags = "Inspection", summary = "봉사 검수글을 수정합니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "봉사 검수글 수정 성공",
@@ -120,6 +144,12 @@ public class InspectionController {
         }
     }
 
+    /**
+     * uuid 값으로 봉사 검수글을 삭제하는 DELETE API 입니다.
+     *
+     * @param uuid 봉사 검수글의 uuid 입니다.
+     * @return 봉사 검수글의 삭제 상태를 반환합니다.
+     */
     @Operation(tags = "Inspection", summary = "봉사 검수글을 삭제 합니다.",
             responses={
                     @ApiResponse(responseCode = "204", description = "봉사 검수글 삭제 성공",
@@ -141,6 +171,14 @@ public class InspectionController {
         }
     }
 
+    /**
+     * 제목, 제목+내용으로 봉사 검수글을 찾아주는 GET API 입니다.
+     *
+     * @param pageable 페이징처리 객체
+     * @param option (제목, 제목+내용)를 입력받습니다.
+     * @param keyword 검색할 단어를 입력받습니다.
+     * @return 제목이나 제목+내용으로 검색한 봉사 검수글을 반환합니다.
+     */
     @Operation(tags = "Inspection", summary = "제목, 제목+내용으로 봉사 검수글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "제목, 제목+내용으로 글 정보 조회 성공",
@@ -184,6 +222,12 @@ public class InspectionController {
         return new ResponseEntity<>(inspectionPageResponse, HttpStatus.OK);
     }
 
+    /**
+     * 페이징 처리할 봉사 검수글을 추가해주는 메소드입니다.
+     *
+     * @param inspections 페이징 처리할 봉사 검수글을 입력합니다.
+     * @param inspectionListResponseList 페이징 처리된 봉사 검수글을 추가할 리스트를 입력합니다.
+     */
     private void addInspectionListResponse(Page<Inspection> inspections, List<InspectionListResponse> inspectionListResponseList){
         if(inspections.getSize()>=inspections.getTotalElements()){
             for(int i=0; i<inspections.getTotalElements(); i++){

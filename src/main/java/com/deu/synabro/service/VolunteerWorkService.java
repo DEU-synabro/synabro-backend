@@ -77,7 +77,7 @@ public class VolunteerWorkService {
      *
      * @param pageable 페이징 처리를 위한 Pageable 객체
      * @param title 검색할 제목을 입력합니다.
-     * @return
+     * @return 입력한 제목과 일치한 봉사 수행글을 반환합니다.
      */
     public  Page<VolunteerWork> findByTitle(Pageable pageable, String title){
         return volunteerWorkRepository.findByWorkId_TitleContainingAndPerformTypeOrderByCreatedDateDesc(pageable,title, PerformType.PERFORMING);
@@ -89,7 +89,7 @@ public class VolunteerWorkService {
      * @param pageable 페이징 처리를 해주는 Pageable 객체
      * @param title 검색할 제목을 입력합니다.
      * @param contents 검색할 내용을 입력합니다.
-     * @return
+     * @return 입력한 제목이나 내용과 일치한 봉사 수행글을 반환합니다.
      */
     public Page<VolunteerWork> findByTitleOrContents(Pageable pageable, String title, String contents) {
         return volunteerWorkRepository.findByWorkId_TitleContainingOrContentsContainingAndPerformTypeOrderByCreatedDateDesc(pageable,title,contents, PerformType.PERFORMING);
