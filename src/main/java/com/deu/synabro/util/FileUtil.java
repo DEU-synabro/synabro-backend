@@ -20,6 +20,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+/**
+ * 파일 저장을 도와주는 클래스입니다.
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Service
 public class FileUtil {
 
@@ -28,6 +34,12 @@ public class FileUtil {
 
     private String uploadPath="files";
 
+    /**
+     * 첨부 파일을 저장시킬 Docs 객체를 만들어주는 메소드입니다.
+     *
+     * @param file 저장할 첨부 파일입니다.
+     * @return 첨부 파일이 저장된 Docs 객체를 반환합니다.
+     */
     public Docs saveDocs(MultipartFile file) {
 
         try{
@@ -52,6 +64,12 @@ public class FileUtil {
         }
     }
 
+    /**
+     * 첨부 파일을 다운로드 해주는 메소드입니다.
+     *
+     * @param uuid 첨부 파일이 들어갈 글의 uuid 입니다
+     * @return 첨부 파일을 반환합니다.
+     */
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     public ResponseEntity<Object> downDocs(UUID uuid){
         Docs docs = docsRepository.findByWork_Idx(uuid);
