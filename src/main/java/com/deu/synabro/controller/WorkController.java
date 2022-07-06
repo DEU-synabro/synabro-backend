@@ -1,6 +1,5 @@
 package com.deu.synabro.controller;
 
-import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.WorkRequest;
@@ -10,6 +9,7 @@ import com.deu.synabro.service.MemberService;
 import com.deu.synabro.service.WorkService;
 import com.deu.synabro.service.DocsService;
 import com.deu.synabro.service.VideoService;
+import com.deu.synabro.util.FileUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,10 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -59,6 +56,9 @@ public class WorkController {
 
     @Autowired
     MemberService memberService;
+
+    @Autowired
+    FileUtil fileUtil;
 
     private static final String DELETE_WORKS = "{\n" +
             "    \"code\" : 204\n" +
@@ -104,8 +104,7 @@ public class WorkController {
             if(file.getOriginalFilename().contains(".mp4")){
                 videoService.saveVideo(file);
             }else{
-                Docs docs = docsService.saveDocs(file);
-                Work work = workService.setContent(workRequest, userId, docs);
+                workService.setContent(workRequest, userId, fileUtil.saveDocs(file));
             }
         }
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
@@ -190,7 +189,6 @@ public class WorkController {
         Page<Work> works;
         String searchOption = option.getValue();
         List<WorkListResponse> workListResponseList = new ArrayList<>();
-        WorkListResponse workListResponse;
         WorkPageResponse workPageResponse;
 
         if(keyword==null){
@@ -241,15 +239,12 @@ public class WorkController {
         }
     }
 
-    private static Logger logger = LoggerFactory.getLogger(AuthController.class);
-    @Autowired
-    ResourceLoader resourceLoader;
 
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     @GetMapping("/download/{work_id}")
     public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
-                                               @PathVariable(name = "work_id") UUID uuid) throws IOException {
-        return docsService.downDocs(uuid);
+                                               @PathVariable(name = "work_id") UUID uuid)  {
+        return fileUtil.downDocs(uuid);
     }
 
 }

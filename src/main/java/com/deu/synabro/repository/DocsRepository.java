@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface DocsRepository extends JpaRepository<Docs,Long> {
+public interface DocsRepository extends JpaRepository<Docs, UUID> {
     Docs findByWork_Idx(UUID uuid);
 }

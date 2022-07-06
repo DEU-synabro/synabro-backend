@@ -122,7 +122,7 @@ Referred to [Beom Dev Log](https://beomseok95.tistory.com/328) and [Conventional
 [optional footer(s)]
 ```
 - Type
-    - build, docs, feat, fix, perf, reactor, test
+    - build, docs, feat, fix, perf, refactor, test
 - Example
     ```
     feat: allow provided config object to extend other configs

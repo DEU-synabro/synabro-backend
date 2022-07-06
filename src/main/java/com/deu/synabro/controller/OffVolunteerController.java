@@ -9,6 +9,7 @@ import com.deu.synabro.http.response.*;
 import com.deu.synabro.service.DocsService;
 import com.deu.synabro.service.OffVolunteerService;
 import com.deu.synabro.service.VideoService;
+import com.deu.synabro.util.FileUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +49,9 @@ public class OffVolunteerController {
     @Autowired
     VideoService videoService;
 
+    @Autowired
+    FileUtil fileUtil;
+
     @PostMapping("")
     public ResponseEntity<GeneralResponse> createOffVolunteer(
         @Parameter(
@@ -63,8 +67,7 @@ public class OffVolunteerController {
             if(file.getOriginalFilename().contains(".mp4")){
                 videoService.saveVideo(file);
             }else{
-                Docs docs = docsService.saveDocs(file);
-                offVolunteerService.setOffVolunteer(offVolunteer, userId, docs);
+                offVolunteerService.setOffVolunteer(offVolunteer, userId, fileUtil.saveDocs(file));
             }
         }
         return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 모집글이 생성되었습니다"), HttpStatus.OK);
