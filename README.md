@@ -131,3 +131,4 @@ Referred to [Beom Dev Log](https://beomseok95.tistory.com/328) and [Conventional
 ## Maintainers
 Current maintainers:
 - Jiyoon Bak - https://github.com/jiy00nn
+- Sunwoong Kim - https://github.com/tkfdkskarl56
