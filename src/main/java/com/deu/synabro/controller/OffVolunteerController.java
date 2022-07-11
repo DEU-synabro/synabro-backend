@@ -1,7 +1,6 @@
 package com.deu.synabro.controller;
 
 
-import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.OffVolunteer;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
@@ -35,6 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 오프라인 봉사에 대한 CRUD 메소도들이 정의된 클래스입니다.
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Tag(name="offVolunteer", description = "봉사 모집 API")
 @RestController
 @RequestMapping("/api/offVolunteer")
@@ -62,7 +67,7 @@ public class OffVolunteerController {
         @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
         @RequestPart(name = "contentsRequest") OffVolunteer offVolunteer) throws IOException {
         UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
-        System.out.println(offVolunteer.getStartPeriod());
+
         if (file!=null) {
             if(file.getOriginalFilename().contains(".mp4")){
                 videoService.saveVideo(file);
@@ -76,17 +81,19 @@ public class OffVolunteerController {
     @GetMapping("/{off_volunteer_id}")
     public ResponseEntity<OffVolunteerResponse> getOffVolunteer(@Parameter(description = "고유 아이디") @PathVariable(name = "off_volunteer_id") UUID uuid){
         try{
-            return new ResponseEntity<>(offVolunteerService.findByIdAndGetResponse(uuid), HttpStatus.OK);
-        }catch(IllegalArgumentException e){
-            return new ResponseEntity<>(offVolunteerService.getNullResponse(), HttpStatus.NOT_FOUND);
+            OffVolunteer offVolunteer = offVolunteerService.findByIdx(uuid);
+            return new ResponseEntity<>(offVolunteerService.getOffVolunteerResponse(offVolunteer), HttpStatus.OK);
+        }catch(NullPointerException e){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{off_volunteer_id}")
     public ResponseEntity<GeneralResponse> deleteOffVolunteer(@Parameter(description = "고유 아이디") @PathVariable(name = "off_volunteer_id") UUID uuid){
-        if(offVolunteerService.deleteById(uuid)){
+        try{
+            offVolunteerService.deleteById(uuid);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 삭제되었습니다."), HttpStatus.OK);
-        }else{
+        } catch (Exception e){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"삭제할 봉사 요청글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
@@ -95,7 +102,8 @@ public class OffVolunteerController {
     public ResponseEntity<GeneralResponse> updateOffVolunteer(@Parameter(description = "고유 아이디") @PathVariable(name = "off_volunteer_id") UUID uuid,
                                                               @Parameter @RequestBody OffVolunteerUpdateRequest offVolunteerUpdateRequest){
         try{
-            offVolunteerService.findByIdAndUpdateOffVolunteer(uuid, offVolunteerUpdateRequest);
+            OffVolunteer offVolunteer = offVolunteerService.findByIdx(uuid);
+            offVolunteerService.updateOffVolunteer(offVolunteerUpdateRequest, offVolunteer);
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "봉사 모집글이 수정되었습니다"), HttpStatus.OK);
         }catch(IllegalArgumentException e){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 모집글이 없습니다."), HttpStatus.NOT_FOUND);
@@ -120,80 +128,54 @@ public class OffVolunteerController {
     public ResponseEntity<OffVolunteerPageResponse> getPagingOffVolunteer(@PageableDefault Pageable pageable,
                                                                       @RequestParam(name="searchOption", required = false, defaultValue = "title") SearchOption option,
                                                                       @RequestParam(name="keyword", required = false) String keyword){
-        Page<OffVolunteer> contents;
+        Page<OffVolunteer> offVolunteers;
         String searchOption = option.getValue();
-        List<OffVolunteerListResponse> contentsResponseList = new ArrayList<>();
-        OffVolunteerListResponse offVolunteerListResponse;
+        List<OffVolunteerListResponse> offVolunteerListResponseList = new ArrayList<>();
         OffVolunteerPageResponse offVolunteerPageResponse;
 
         if(keyword==null){
-            contents = offVolunteerService.findAll(pageable);
-            System.out.println(contents);
-            if(contents.getSize()>=contents.getTotalElements()){
-                for(int i=0; i<contents.getTotalElements(); i++){
-                    offVolunteerListResponse = OffVolunteerListResponse.builder()
-                            .idx(contents.getContent().get(i).getIdx())
-                            .title(contents.getContent().get(i).getTitle())
-                            .createdDate(contents.getContent().get(i).getCreatedDate())
-                            .build();
-                    contentsResponseList.add(offVolunteerListResponse);
-                }
-            }else {
-                int contentSize = contents.getSize()*contents.getNumber();
-                for(int i=0; i<contents.getSize();i++){
-                    if(contentSize>=contents.getTotalElements())
-                        break;
-                    offVolunteerListResponse = OffVolunteerListResponse.builder()
-                            .idx(contents.getContent().get(i).getIdx())
-                            .title(contents.getContent().get(i).getTitle())
-                            .createdDate(contents.getContent().get(i).getCreatedDate())
-                            .build();
-                    contentsResponseList.add(offVolunteerListResponse);
-                    contentSize++;
-                }
-            }
-            offVolunteerPageResponse = new OffVolunteerPageResponse(pageable, contents, option, null, contentsResponseList);
-            return new ResponseEntity<>(offVolunteerPageResponse, HttpStatus.OK);
+            offVolunteers = offVolunteerService.findAll(pageable);
+            addOffVolunteerListResponse(offVolunteers, offVolunteerListResponseList);
+            offVolunteerPageResponse = new OffVolunteerPageResponse(pageable, offVolunteers, option, null, offVolunteerListResponseList);
         }else {
             if(searchOption=="제목+내용"){
-                contents = offVolunteerService.findByTitleOrContents(pageable, keyword, keyword);
+                offVolunteers = offVolunteerService.findByTitleOrContents(pageable, keyword, keyword);
             }else {
-                contents = offVolunteerService.findByTitle(pageable, keyword);
+                offVolunteers = offVolunteerService.findByTitle(pageable, keyword);
             }
-            if (contents.getContent().isEmpty()) {
-                offVolunteerListResponse = OffVolunteerListResponse.builder()
-                        .idx(null)
-                        .title(null)
-                        .createdDate(null)
-                        .build();
-                contentsResponseList.add(offVolunteerListResponse);
+            if (offVolunteers.getContent().isEmpty()) {
+                OffVolunteerListResponse.addNullOffVolunteerListResponse(offVolunteerListResponseList);
             } else {
-                if(contents.getSize()>=contents.getTotalElements()){
-                    for(int i=0; i<contents.getTotalElements(); i++){
-                        offVolunteerListResponse = OffVolunteerListResponse.builder()
-                                .idx(contents.getContent().get(i).getIdx())
-                                .title(contents.getContent().get(i).getTitle())
-                                .createdDate(contents.getContent().get(i).getCreatedDate())
-                                .build();
-                        contentsResponseList.add(offVolunteerListResponse);
-                    }
-                }else {
-                    int contentSize = contents.getSize()*contents.getNumber();
-                    for(int i=0; i<contents.getSize();i++){
-                        if(contentSize>=contents.getTotalElements())
-                            break;
-                        offVolunteerListResponse = OffVolunteerListResponse.builder()
-                                .idx(contents.getContent().get(i).getIdx())
-                                .title(contents.getContent().get(i).getTitle())
-                                .createdDate(contents.getContent().get(i).getCreatedDate())
-                                .build();
-                        contentsResponseList.add(offVolunteerListResponse);
-                        contentSize++;
-                    }
-                }
+                addOffVolunteerListResponse(offVolunteers, offVolunteerListResponseList);
             }
-            offVolunteerPageResponse = new OffVolunteerPageResponse(pageable, contents, option, keyword, contentsResponseList);
-            return new ResponseEntity<>(offVolunteerPageResponse, HttpStatus.OK);
+            offVolunteerPageResponse = new OffVolunteerPageResponse(pageable, offVolunteers, option, keyword, offVolunteerListResponseList);
+        }
+        return new ResponseEntity<>(offVolunteerPageResponse, HttpStatus.OK);
+    }
+
+    private void addOffVolunteerListResponse(Page<OffVolunteer> offVolunteers, List<OffVolunteerListResponse> offVolunteerListResponseList){
+        if(offVolunteers.getSize()>=offVolunteers.getTotalElements()){
+            for(int i=0; i<offVolunteers.getTotalElements(); i++){
+                OffVolunteerListResponse offVolunteerListResponse = OffVolunteerListResponse.builder()
+                        .idx(offVolunteers.getContent().get(i).getIdx())
+                        .title(offVolunteers.getContent().get(i).getTitle())
+                        .createdDate(offVolunteers.getContent().get(i).getCreatedDate())
+                        .build();
+                offVolunteerListResponseList.add(offVolunteerListResponse);
+            }
+        }else {
+            int contentSize = offVolunteers.getSize()*offVolunteers.getNumber();
+            for(int i=0; i<offVolunteers.getSize();i++){
+                if(contentSize>=offVolunteers.getTotalElements())
+                    break;
+                OffVolunteerListResponse offVolunteerListResponse = OffVolunteerListResponse.builder()
+                        .idx(offVolunteers.getContent().get(i).getIdx())
+                        .title(offVolunteers.getContent().get(i).getTitle())
+                        .createdDate(offVolunteers.getContent().get(i).getCreatedDate())
+                        .build();
+                offVolunteerListResponseList.add(offVolunteerListResponse);
+                contentSize++;
+            }
         }
     }
 }
