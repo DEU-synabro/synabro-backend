@@ -84,6 +84,10 @@ public class WorkController {
             "    \"code\" : 200\n" +
             "    \"message\" : \"봉사 요청글이 수정되었습니다.\"\n" +
             "}";
+    private static final String FORBIDDEN_WORKS = "{\n" +
+            "    \"code\" : 403\n" +
+            "    \"message\" : \"봉사 수혜자만 신청할 수 있습니다.\"\n" +
+            "}";
 
     /**
      * 봉사 요청을 생성하는 POST API 입니다.
@@ -97,9 +101,9 @@ public class WorkController {
                     @ApiResponse(responseCode = "200", description = "봉사 요청글 생성 성공",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = CREATE_WORKS))),
-                    @ApiResponse(responseCode = "404", description = "삭제할 봉사 요청글이 없음",
+                    @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
-                                    examples = @ExampleObject(value = NOT_WORKS)))
+                                    examples = @ExampleObject(value = FORBIDDEN_WORKS)))
             })
     @PostMapping("")
     public ResponseEntity<GeneralResponse> createWork(
@@ -110,16 +114,21 @@ public class WorkController {
             @RequestPart(required = false) MultipartFile file,
             @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             @RequestPart(name = "contentsRequest") WorkRequest workRequest){
-        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        if (file!=null) {
-            if(file.getOriginalFilename().contains(".mp4")){
-                videoService.saveVideo(file);
-            }else{
-                workService.setContent(workRequest, userId, fileUtil.saveDocs(file));
+        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_BENEFICIARY]")||
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
+            UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+            if (file!=null) {
+                if(file.getOriginalFilename().contains(".mp4")){
+                    videoService.saveVideo(file);
+                }else{
+                    workService.setContent(workRequest, userId, fileUtil.saveDocs(file));
+                }
             }
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.FORBIDDEN,"봉사 수혜자만 신청할 수 있습니다."), HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
+
     }
 
     /**

@@ -73,6 +73,11 @@ public class InspectionController {
             "    \"message\" : \"봉사 수행글이 수정되었습니다.\"\n" +
             "}";
 
+    private static final String FORBIDDEN_WORKS = "{\n" +
+            "    \"code\" : 403\n" +
+            "    \"message\" : \"본인 글은 검수할 수 없습니다.\"\n" +
+            "}";
+
     /**
      * 봉사 검수글을 생성하는 POST API 입니다
      *
@@ -83,14 +88,22 @@ public class InspectionController {
             responses={
                     @ApiResponse(responseCode = "200", description = "봉사 검수글 생성 성공",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
-                                    examples = @ExampleObject(value = CREATE_INSPECTION)))
+                                    examples = @ExampleObject(value = CREATE_INSPECTION))),
+                    @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = FORBIDDEN_WORKS)))
             })
     @PostMapping("{volunteer_work_id}")
     public ResponseEntity<GeneralResponse> setInspection(@Parameter(description = "고유 아이디") @PathVariable(name = "volunteer_work_id") UUID uuid){
         VolunteerWork volunteerWork = volunteerWorkService.findByIdx(uuid);
         UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
-        inspectionService.setInspection(volunteerWork, userId);
-        return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 검수 글이 생성되었습니다."), HttpStatus.OK);
+
+        if(volunteerWork.getUserId().getIdx().equals(userId)){
+            inspectionService.setInspection(volunteerWork, userId);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 검수 글이 생성되었습니다."), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.FORBIDDEN,"본인 글만 검수 요청할 수 없습니다."), HttpStatus.FORBIDDEN);
+        }
     }
 
     /**

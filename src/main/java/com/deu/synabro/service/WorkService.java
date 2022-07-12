@@ -1,9 +1,13 @@
 package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Docs;
+import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.http.request.WorkRequest;
 import com.deu.synabro.http.response.WorkResponse;
+import com.deu.synabro.http.response.member.WorkHistoryDetailResponse;
+import com.deu.synabro.http.response.member.WorkHistoryListResponse;
+import com.deu.synabro.http.response.member.WorkHistoryResponse;
 import com.deu.synabro.repository.WorkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,6 +34,8 @@ public class WorkService {
     @Autowired
     WorkRepository workRepository;
 
+    @Autowired
+    MemberService memberService;
     /**
      * 요청한 봉사 요청글 정보로 봉사 요청글을 생성해주는 메소드입니다.
      *
@@ -132,5 +139,31 @@ public class WorkService {
         work.setEndedDate(workRequest.getEndedDate());
         work.setVolunteerTime(workRequest.getVolunteerTime());
         work.setUpdatedDate(LocalDateTime.now());
+    }
+
+    @Transactional
+    public WorkHistoryListResponse getWorkList(Pageable pageable){
+        if(memberService.getMemberWithAuthorities().isPresent()){
+            List<WorkHistoryResponse> data = workRepository.findWorkByIdx(memberService.getMemberWithAuthorities().get().getIdx());
+            return new WorkHistoryListResponse(data, pageable);
+        }
+        return null;
+    }
+
+    public WorkHistoryDetailResponse getWork(UUID uuid){
+        List<WorkHistoryResponse> data = workRepository.findWorkByIdx(memberService.getMemberWithAuthorities().get().getIdx());
+        WorkHistoryResponse work = data.stream().filter(value -> uuid.equals(value.getId())).findAny().orElse(null);
+        Integer index = data.indexOf(work);
+        System.out.println(data.size());
+        System.out.println(index);
+        WorkHistoryDetailResponse response = workRepository.findWork(uuid);
+        if(index-1 >= 0) {
+            response.setBeforeWork(data.get(index - 1));
+        }
+        if(index+1 < data.size()) {
+            response.setAfterWork(data.get(index+1));
+        }
+
+        return response;
     }
 }
