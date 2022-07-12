@@ -5,13 +5,17 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
-@Data
+/**
+ *  페이징 처리를 위한 정보를 담는 클래스
+ */
+@Getter
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BoardListResponse {
@@ -25,4 +29,13 @@ public class BoardListResponse {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone = "Asia/Seoul")
     @Schema(description = "게시판 생성 날짜", example = "2022-04-07")
     private LocalDateTime createdDate;
+
+    public static void addNullBoardListResponse(List<BoardListResponse> boardListResponseList){
+        BoardListResponse boardListResponse = BoardListResponse.builder()
+                .idx(null)
+                .title(null)
+                .createdDate(null)
+                .build();
+        boardListResponseList.add(boardListResponse);
+    }
 }

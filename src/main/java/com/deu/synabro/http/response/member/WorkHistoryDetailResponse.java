@@ -33,6 +33,14 @@ public class WorkHistoryDetailResponse extends WorkHistoryResponse {
         this.afterWork = null;
     }
 
+    public WorkHistoryDetailResponse(String type, String work_title, LocalDateTime workDate, String work_content, String result) {
+        super(type, null, work_title, workDate);
+        this.work_content = work_content;
+        this.result = result;
+        this.beforeWork = null;
+        this.afterWork = null;
+    }
+
     public void setBeforeWork(WorkHistoryResponse work) {
         this.beforeWork = work;
     }

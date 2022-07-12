@@ -40,8 +40,8 @@ public class DocsService {
 
 //    @Value("${spring.servlet.multipart.location}")
     private String uploadPath="files";
-    private static final String BASE_PATH = new File("").getAbsolutePath();
-    private static String RESOURCE_PATH = "/src/resource";
+//    private static final String BASE_PATH = new File("").getAbsolutePath();
+//    private static String RESOURCE_PATH = "/src/resource";
     private static String FILE_PATH;
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);

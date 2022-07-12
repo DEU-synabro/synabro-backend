@@ -37,7 +37,7 @@ public class VideoService {
 
     }
 
-    public void saveVideo(MultipartFile file) throws IOException {
+    public void saveVideo(MultipartFile file) {
         System.out.print(uploadPath);
         try{
             if( file.isEmpty() ) {

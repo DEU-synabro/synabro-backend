@@ -3,18 +3,21 @@ package com.deu.synabro.http.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * 봉사 요청 정보를 반환시에 사용되는 클래스 입니다
+ *
+ * @author tkfdkskarl56
+ * @since 1.0
+ */
 @Data
 @Builder
-@AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WorkResponse {
     @Schema(description = "고유번호", example = "8857ba20-2cb7-407e-908c-b333cf1257c5")
