@@ -67,6 +67,14 @@ public class OffVolunteer extends BaseTime implements Serializable{
         docs.setOffVolunteer(this);
     }
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    private List<Video> videoList = new ArrayList<>();
+
+    public void addVideo(Video video){
+        this.videoList.add(video);
+        video.setOffVolunteer(this);
+    }
+
     @Builder
     public OffVolunteer(String title, String contents, LocalDateTime startPeriod, LocalDateTime endPeriod, LocalDateTime startDate, LocalDateTime endDate) {
         this.title = title;

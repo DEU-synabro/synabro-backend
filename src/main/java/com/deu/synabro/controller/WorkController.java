@@ -7,8 +7,6 @@ import com.deu.synabro.http.response.*;
 import com.deu.synabro.repository.DocsRepository;
 import com.deu.synabro.service.MemberService;
 import com.deu.synabro.service.WorkService;
-import com.deu.synabro.service.DocsService;
-import com.deu.synabro.service.VideoService;
 import com.deu.synabro.util.FileUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -54,12 +52,6 @@ public class WorkController {
     WorkService workService;
 
     @Autowired
-    DocsService docsService;
-
-    @Autowired
-    VideoService videoService;
-
-    @Autowired
     MemberService memberService;
 
     @Autowired
@@ -92,7 +84,7 @@ public class WorkController {
     /**
      * 봉사 요청을 생성하는 POST API 입니다.
      *
-     * @param file 저장할 사진입니다.
+     * @param files 저장할 사진입니다.
      * @param workRequest 봉사 요청 내용(제목, 내용, 봉사 시간, 마감일) 입니다.
      * @return 봉사 요청의 성공을 반환합니다.
      */
@@ -111,18 +103,23 @@ public class WorkController {
                     description = "Files to be uploaded",
                     content = @Content(mediaType = MediaType.ALL_VALUE)  // Won't work without OCTET_STREAM as the mediaType.
             )
-            @RequestPart(required = false) MultipartFile file,
+            @RequestPart(required = false) List<MultipartFile> files,
             @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             @RequestPart(name = "contentsRequest") WorkRequest workRequest){
         if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_BENEFICIARY]")||
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
             UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
-            if (file!=null) {
-                if(file.getOriginalFilename().contains(".mp4")){
-                    videoService.saveVideo(file);
-                }else{
-                    workService.setContent(workRequest, userId, fileUtil.saveDocs(file));
+            if (files!=null) {
+                for(MultipartFile file : files){
+                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
+                        workService.setWorkVideo(workRequest, userId, fileUtil.saveVideo(file));
+                    }
+                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
+                        workService.setWorkDocs(workRequest, userId, fileUtil.saveDocs(file));
+                    }
                 }
+            }else {
+                workService.setWork(workRequest, userId);
             }
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
         }else {

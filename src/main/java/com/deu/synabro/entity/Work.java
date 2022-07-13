@@ -67,6 +67,14 @@ public class Work extends BaseTime implements Serializable {
         docs.setWork(this);
     }
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    private List<Video> videoList = new ArrayList<>();
+
+    public void addVideo(Video video){
+        this.videoList.add(video);
+        video.setWork(this);
+    }
+
     @Builder
     public Work(UUID idx, Member userId, String title, String contents, Short volunteerTime, LocalDateTime endedDate) {
         this.idx = idx;

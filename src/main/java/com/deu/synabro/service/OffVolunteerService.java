@@ -2,10 +2,9 @@ package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.OffVolunteer;
-import com.deu.synabro.entity.Work;
+import com.deu.synabro.entity.Video;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
 import com.deu.synabro.http.response.OffVolunteerResponse;
-import com.deu.synabro.http.response.WorkResponse;
 import com.deu.synabro.repository.OffVolunteerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,7 @@ public class OffVolunteerService {
     @Autowired
     OffVolunteerRepository offVolunteerRepository;
 
-    public void setOffVolunteer(OffVolunteer offVolunteer, UUID uuid, Docs docs){
+    public void setOffVolunteerDocs(OffVolunteer offVolunteer, UUID uuid, Docs docs){
         OffVolunteer offVolunteers = OffVolunteer.builder()
                 .title(offVolunteer.getTitle())
                 .contents(offVolunteer.getContents())
@@ -34,6 +33,31 @@ public class OffVolunteerService {
                 .endDate(offVolunteer.getEndDate())
                 .build();
         offVolunteers.addDocs(docs);
+        offVolunteerRepository.save(offVolunteers);
+    }
+
+    public void setOffVolunteerVideo(OffVolunteer offVolunteer, UUID uuid, Video video){
+        OffVolunteer offVolunteers = OffVolunteer.builder()
+                .title(offVolunteer.getTitle())
+                .contents(offVolunteer.getContents())
+                .startPeriod(offVolunteer.getStartPeriod())
+                .endPeriod(offVolunteer.getEndPeriod())
+                .startDate(offVolunteer.getStartDate())
+                .endDate(offVolunteer.getEndDate())
+                .build();
+        offVolunteers.addVideo(video);
+        offVolunteerRepository.save(offVolunteers);
+    }
+
+    public void setOffVolunteer(OffVolunteer offVolunteer, UUID uuid){
+        OffVolunteer offVolunteers = OffVolunteer.builder()
+                .title(offVolunteer.getTitle())
+                .contents(offVolunteer.getContents())
+                .startPeriod(offVolunteer.getStartPeriod())
+                .endPeriod(offVolunteer.getEndPeriod())
+                .startDate(offVolunteer.getStartDate())
+                .endDate(offVolunteer.getEndDate())
+                .build();
         offVolunteerRepository.save(offVolunteers);
     }
 
