@@ -5,9 +5,7 @@ import com.deu.synabro.entity.OffVolunteer;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
 import com.deu.synabro.http.response.*;
-import com.deu.synabro.service.DocsService;
 import com.deu.synabro.service.OffVolunteerService;
-import com.deu.synabro.service.VideoService;
 import com.deu.synabro.util.FileUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -49,12 +47,6 @@ public class OffVolunteerController {
     OffVolunteerService offVolunteerService;
 
     @Autowired
-    DocsService docsService;
-
-    @Autowired
-    VideoService videoService;
-
-    @Autowired
     FileUtil fileUtil;
 
     @PostMapping("")
@@ -63,19 +55,28 @@ public class OffVolunteerController {
             description = "Files to be uploaded",
             content = @Content(mediaType = MediaType.ALL_VALUE)  // Won't work without OCTET_STREAM as the mediaType.
         )
-        @RequestPart(required = false) MultipartFile file,
+        @RequestPart(required = false) List<MultipartFile> files,
         @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-        @RequestPart(name = "contentsRequest") OffVolunteer offVolunteer) throws IOException {
-        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        if (file!=null) {
-            if(file.getOriginalFilename().contains(".mp4")){
-                videoService.saveVideo(file);
-            }else{
-                offVolunteerService.setOffVolunteer(offVolunteer, userId, fileUtil.saveDocs(file));
+        @RequestPart(name = "contentsRequest") OffVolunteer offVolunteer) {
+        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_BENEFICIARY]")||
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
+            UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+            if (files!=null) {
+                for(MultipartFile file : files){
+                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
+                        offVolunteerService.setOffVolunteerVideo(offVolunteer, userId, fileUtil.saveVideo(file));
+                    }
+                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
+                        offVolunteerService.setOffVolunteerDocs(offVolunteer, userId, fileUtil.saveDocs(file));
+                    }
+                }
+            }else {
+                offVolunteerService.setOffVolunteer(offVolunteer, userId);
             }
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.FORBIDDEN,"봉사 수혜자만 신청할 수 있습니다."), HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 모집글이 생성되었습니다"), HttpStatus.OK);
     }
 
     @GetMapping("/{off_volunteer_id}")

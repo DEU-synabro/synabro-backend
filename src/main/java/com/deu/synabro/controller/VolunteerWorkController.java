@@ -45,12 +45,6 @@ public class VolunteerWorkController {
     VolunteerWorkService volunteerWorkService;
 
     @Autowired
-    DocsService docsService;
-
-    @Autowired
-    VideoService videoService;
-
-    @Autowired
     WorkService workService;
 
     @Autowired

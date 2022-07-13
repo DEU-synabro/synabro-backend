@@ -10,7 +10,6 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name="video")
-@EntityListeners(AuditingEntityListener.class)
 public class Video {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,13 +20,18 @@ public class Video {
     @JoinColumn(name="work_id")
     private Work work;
 
+    @ManyToOne
+    @JoinColumn(name="off_volunteer_id")
+    private OffVolunteer offVolunteer;
+
     @Column(name="file_name")
     private String fileName;
 
     @Builder
-    public Video(Work work, String fileName) {
+    public Video(Work work, String fileName, OffVolunteer offVolunteer) {
         this.work = work;
         this.fileName = fileName;
+        this.offVolunteer = offVolunteer;
     }
 
 }

@@ -2,6 +2,7 @@ package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.Member;
+import com.deu.synabro.entity.Video;
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.http.request.WorkRequest;
 import com.deu.synabro.http.response.WorkResponse;
@@ -36,6 +37,12 @@ public class WorkService {
 
     @Autowired
     MemberService memberService;
+
+    public void setWork(WorkRequest workRequest, UUID uuid){
+        Work work = workRequest.toEntity(uuid);
+        workRepository.save(work);
+    }
+
     /**
      * 요청한 봉사 요청글 정보로 봉사 요청글을 생성해주는 메소드입니다.
      *
@@ -43,9 +50,15 @@ public class WorkService {
      * @param uuid 봉사 요청하는 사람의 uuid 입니다
      * @param docs 저장할 사진입니다.
      */
-    public void setContent(WorkRequest workRequest, UUID uuid, Docs docs){
+    public void setWorkDocs(WorkRequest workRequest, UUID uuid, Docs docs){
         Work work = workRequest.toEntity(uuid);
         work.addDocs(docs);
+        workRepository.save(work);
+    }
+
+    public void setWorkVideo(WorkRequest workRequest, UUID uuid, Video video){
+        Work work = workRequest.toEntity(uuid);
+        work.addVideo(video);
         workRepository.save(work);
     }
 
