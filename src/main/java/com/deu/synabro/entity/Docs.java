@@ -15,11 +15,11 @@ public class Docs {
     @Column(name = "docs_id", columnDefinition = "BINARY(16)")
     private UUID idx;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="work_id")
     private Work work;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="off_volunteer_id")
     private OffVolunteer offVolunteer;
 
