@@ -1,6 +1,5 @@
 package com.deu.synabro.entity;
 
-import com.deu.synabro.entity.enums.ApplyOption;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -18,10 +19,10 @@ import java.util.UUID;
 @Table(name="off_volunteer_application")
 @RequiredArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class OffVolunteerApplication extends BaseTime implements Serializable {
+public class Certification extends BaseTime implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "off_volunteer_application_id", columnDefinition = "BINARY(16)")
+    @Column(name = "Certifiacation_id", columnDefinition = "BINARY(16)")
     private UUID idx;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,28 +36,29 @@ public class OffVolunteerApplication extends BaseTime implements Serializable {
     private Member userId;
 
     @Column(columnDefinition = "VARCHAR(255)")
-    private String name;
+    private String title;
 
     @Column(columnDefinition = "VARCHAR(255)")
-    private String password;
+    private String contents;
 
-    @Column(columnDefinition = "VARCHAR(255)")
-    private String phone;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    private List<Docs> docsList = new ArrayList<>();
 
-    @Column(columnDefinition = "VARCHAR(255)")
-    private String teamGroup;
-
-    @Column(columnDefinition = "VARCHAR(255)")
-    private ApplyOption applyOption;
+    /**
+     * Docs에 Work의 UUID값을 넣어주는 메소드 입니다.
+     *
+     * @param docs 봉사 요청 게시글과 같이 저장할 Docs 객체입니다.
+     */
+    public void addDocs(Docs docs){
+        this.docsList.add(docs);
+        docs.setCertification(this);
+    }
 
     @Builder
-    public OffVolunteerApplication(OffVolunteer offVolunteerId, Member userId, String name, String password, String phone, String teamGroup, ApplyOption applyOption) {
+    public Certification(OffVolunteer offVolunteerId, Member userId, String title, String contents) {
         this.offVolunteerId = offVolunteerId;
         this.userId = userId;
-        this.name = name;
-        this.password = password;
-        this.phone = phone;
-        this.teamGroup = teamGroup;
-        this.applyOption = applyOption;
+        this.title = title;
+        this.contents = contents;
     }
 }

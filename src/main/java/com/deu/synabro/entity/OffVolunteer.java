@@ -38,6 +38,10 @@ public class OffVolunteer extends BaseTime implements Serializable{
     @Schema(description = "봉사 내용", example = "봉사 내용")
     private String contents;
 
+    @Column
+    @Schema(description = "봉사 태그", example = "봉사 태그")
+    private String tagName;
+
     @Column(name = "start_period")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startPeriod;
