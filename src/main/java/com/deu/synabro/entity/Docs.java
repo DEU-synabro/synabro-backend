@@ -23,13 +23,18 @@ public class Docs {
     @JoinColumn(name="off_volunteer_id")
     private OffVolunteer offVolunteer;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name="certification_id")
+    private Certification certification;
+
     @Column(name="file_name")
     private String fileName;
 
     @Builder
-    public Docs(Work work, String fileName, OffVolunteer offVolunteer) {
+    public Docs(Work work, String fileName, OffVolunteer offVolunteer, Certification certification) {
         this.work = work;
         this.fileName = fileName;
         this.offVolunteer = offVolunteer;
+        this.certification = certification;
     }
 }
