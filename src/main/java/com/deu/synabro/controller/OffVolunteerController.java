@@ -5,6 +5,7 @@ import com.deu.synabro.entity.OffVolunteer;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
 import com.deu.synabro.http.response.*;
+import com.deu.synabro.service.OffVolunteerApplicationService;
 import com.deu.synabro.service.OffVolunteerService;
 import com.deu.synabro.util.FileUtil;
 import io.swagger.annotations.ApiImplicitParam;
@@ -12,6 +13,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +29,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +39,7 @@ import java.util.UUID;
  * @author tkfdkskarl56
  * @since 1.0
  */
-@Tag(name="offVolunteer", description = "봉사 모집 API")
+@Tag(name="offVolunteer", description = "오프라인 봉사 모집 API")
 @RestController
 @RequestMapping("/api/offVolunteer")
 @AllArgsConstructor
@@ -49,6 +50,39 @@ public class OffVolunteerController {
     @Autowired
     FileUtil fileUtil;
 
+    private static final String DELETE_WORKS = "{\n" +
+            "    \"code\" : 204\n" +
+            "    \"message\" : \"봉사 요청글이 삭제되었습니다.\"\n" +
+            "}";
+
+    private static final String NOT_WORKS = "{\n" +
+            "    \"code\" : 404\n" +
+            "    \"message\" : \"봉사 요청글이 없습니다.\"\n" +
+            "}";
+
+    private static final String CREATE_WORKS = "{\n" +
+            "    \"code\" : 200\n" +
+            "    \"message\" : \"봉사 요청글이 생성되었습니다.\"\n" +
+            "}";
+
+    private static final String UPDATE_WORKS = "{\n" +
+            "    \"code\" : 200\n" +
+            "    \"message\" : \"봉사 요청글이 수정되었습니다.\"\n" +
+            "}";
+    private static final String FORBIDDEN_WORKS = "{\n" +
+            "    \"code\" : 403\n" +
+            "    \"message\" : \"봉사 수혜자만 신청할 수 있습니다.\"\n" +
+            "}";
+
+    @Operation(tags = "offVolunteer", summary = "오프라인 봉사 모집글을 생성합니다.",
+            responses={
+                    @ApiResponse(responseCode = "200", description = "오프라인 봉사 모집글 생성 성공",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = CREATE_WORKS))),
+                    @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = FORBIDDEN_WORKS)))
+            })
     @PostMapping("")
     public ResponseEntity<GeneralResponse> createOffVolunteer(
         @Parameter(
@@ -58,8 +92,7 @@ public class OffVolunteerController {
         @RequestPart(required = false) List<MultipartFile> files,
         @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
         @RequestPart(name = "contentsRequest") OffVolunteer offVolunteer) {
-        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_BENEFICIARY]")||
-                SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
+        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
             UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
             if (files!=null) {
                 for(MultipartFile file : files){
@@ -73,12 +106,17 @@ public class OffVolunteerController {
             }else {
                 offVolunteerService.setOffVolunteer(offVolunteer, userId);
             }
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"오프라인 봉사 모집글이 생성되었습니다."), HttpStatus.OK);
         }else {
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.FORBIDDEN,"봉사 수혜자만 신청할 수 있습니다."), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.FORBIDDEN,"봉사 관리자만 신청할 수 있습니다."), HttpStatus.FORBIDDEN);
         }
     }
 
+    @Operation(tags = "offVolunteer", summary = "id 값으로 오프라인 봉사 모집글을 찾습니다.",
+            responses={
+                    @ApiResponse(responseCode = "200", description = "id 값으로 오프라인 봉사 모집글 정보 조회 성공",
+                            content = @Content(schema = @Schema(implementation = WorkResponse.class)))
+            })
     @GetMapping("/{off_volunteer_id}")
     public ResponseEntity<OffVolunteerResponse> getOffVolunteer(@Parameter(description = "고유 아이디") @PathVariable(name = "off_volunteer_id") UUID uuid){
         try{
@@ -89,6 +127,16 @@ public class OffVolunteerController {
         }
     }
 
+    @Operation(tags = "offVolunteer", summary = "오프라인 봉사 모집글을 삭제 합니다.",
+            responses={
+                    @ApiResponse(responseCode = "204", description = "오프라인 봉사 모집글 삭제 성공",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = DELETE_WORKS))),
+                    @ApiResponse(responseCode = "404", description = "삭제할 오프라인 봉사 모집글이 없음",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = NOT_WORKS)))
+            })
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{off_volunteer_id}")
     public ResponseEntity<GeneralResponse> deleteOffVolunteer(@Parameter(description = "고유 아이디") @PathVariable(name = "off_volunteer_id") UUID uuid){
         try{
@@ -99,6 +147,15 @@ public class OffVolunteerController {
         }
     }
 
+    @Operation(tags = "offVolunteer", summary = "오프라인 봉사 모집글을 수정합니다.",
+            responses={
+                    @ApiResponse(responseCode = "200", description = "오프라인 봉사 모집글 수정 성공",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = UPDATE_WORKS))),
+                    @ApiResponse(responseCode = "404", description = "삭제할 오프라인 봉사 모집 글이 없음",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = NOT_WORKS)))
+            })
     @PatchMapping("/{off_volunteer_id}")
     public ResponseEntity<GeneralResponse> updateOffVolunteer(@Parameter(description = "고유 아이디") @PathVariable(name = "off_volunteer_id") UUID uuid,
                                                               @Parameter @RequestBody OffVolunteerUpdateRequest offVolunteerUpdateRequest){
@@ -111,7 +168,7 @@ public class OffVolunteerController {
         }
     }
 
-    @Operation(tags = "Work", summary = "제목, 제목+내용으로 봉사 요청글을 찾습니다.",
+    @Operation(tags = "offVolunteer", summary = "제목, 제목+내용으로 봉사 요청글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "제목, 제목+내용으로 글 정보 조회 성공",
                             content = @Content(schema = @Schema(implementation = WorkPageResponse.class)))

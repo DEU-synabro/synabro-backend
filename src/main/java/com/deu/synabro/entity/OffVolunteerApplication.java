@@ -1,44 +1,64 @@
 package com.deu.synabro.entity;
 
+import com.deu.synabro.entity.enums.ApplyOption;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name="ServiceApplication")
+@Table(name="off_volunteer_application")
 @RequiredArgsConstructor
-public class OffVolunteerApplication extends BaseTime{
+@EntityListeners(AuditingEntityListener.class)
+public class OffVolunteerApplication extends BaseTime implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ServiceApplication_id", columnDefinition = "BINARY(16)")
+    @Column(name = "off_volunteer_application_id", columnDefinition = "BINARY(16)")
     private UUID idx;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "service_id")
-//    @Schema(description = "봉사 아이디")
-//    private OffVolunteer offVolunteerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "off_volunteer_id")
+    @Schema(description = "봉사 uuid")
+    private OffVolunteer offVolunteerId;
 
-    @Column
-    @Schema(description = "신청자 이름", example = "김선웅")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="member_id")
+    @Schema(description = "봉사 요청자 아이디", example = "제목")
+    private Member userId;
+
+    @Column(columnDefinition = "VARCHAR(255)")
     private String name;
 
-    @Column
-    @Schema(description = "신청자 나이", example = "25")
-    private Short age;
+    @Column(columnDefinition = "VARCHAR(255)")
+    private String password;
 
-    @Column
-    @Schema(description = "신청자 소속", example = "동의대학교")
-    private String group;
-
-    @Column
-    @Schema(description = "연락처", example = "010-8921-8709")
+    @Column(columnDefinition = "VARCHAR(255)")
     private String phone;
 
+    @Column(columnDefinition = "VARCHAR(255)")
+    private String teamGroup;
 
+    @Column(columnDefinition = "VARCHAR(255)")
+    private ApplyOption applyOption;
+
+    @Builder
+    public OffVolunteerApplication(OffVolunteer offVolunteerId, Member userId, String name, String password, String phone, String teamGroup, ApplyOption applyOption) {
+        this.offVolunteerId = offVolunteerId;
+        this.userId = userId;
+        this.name = name;
+        this.password = password;
+        this.phone = phone;
+        this.teamGroup = teamGroup;
+        this.applyOption = applyOption;
+    }
 }

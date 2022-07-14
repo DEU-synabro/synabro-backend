@@ -78,7 +78,7 @@ public class WorkController {
             "}";
     private static final String FORBIDDEN_WORKS = "{\n" +
             "    \"code\" : 403\n" +
-            "    \"message\" : \"봉사 수혜자만 신청할 수 있습니다.\"\n" +
+            "    \"message\" : \"봉사 수혜자나 관리자만 신청할 수 있습니다.\"\n" +
             "}";
 
     /**
@@ -123,7 +123,7 @@ public class WorkController {
             }
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
         }else {
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.FORBIDDEN,"봉사 수혜자만 신청할 수 있습니다."), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.FORBIDDEN,"봉사 수혜자나 관리자만 신청할 수 있습니다."), HttpStatus.FORBIDDEN);
         }
 
     }
