@@ -5,18 +5,18 @@ version: "3.8"
 
 # Services or Containers List definition
 services:
-#  backend:
-#    container_name: synabro_backend
-#    image: springio/gs-spring-boot-docker
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile
-#    volumes:
-#      - ./files:/files
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - db
+  backend:
+    container_name: synabro_backend
+    image: springio/gs-spring-boot-docker
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./files:/files
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
   db:
     container_name: synabro_database
     build:
