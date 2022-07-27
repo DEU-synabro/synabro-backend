@@ -4,6 +4,7 @@ package com.deu.synabro.controller;
 import com.deu.synabro.entity.OffVolunteer;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
+import com.deu.synabro.http.request.offVolunteer.OffVolunteerRequest;
 import com.deu.synabro.http.response.*;
 import com.deu.synabro.service.OffVolunteerApplicationService;
 import com.deu.synabro.service.OffVolunteerService;
@@ -91,20 +92,19 @@ public class OffVolunteerController {
         )
         @RequestPart(required = false) List<MultipartFile> files,
         @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-        @RequestPart(name = "contentsRequest") OffVolunteer offVolunteer) {
+        @RequestPart(name = "contentsRequest") OffVolunteerRequest offVolunteerRequest) {
         if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
-            UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
             if (files!=null) {
                 for(MultipartFile file : files){
                     if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
-                        offVolunteerService.setOffVolunteerVideo(offVolunteer, userId, fileUtil.saveVideo(file));
+                        offVolunteerService.setOffVolunteerVideo(offVolunteerRequest, fileUtil.saveVideo(file));
                     }
                     if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
-                        offVolunteerService.setOffVolunteerDocs(offVolunteer, userId, fileUtil.saveDocs(file));
+                        offVolunteerService.setOffVolunteerDocs(offVolunteerRequest, fileUtil.saveDocs(file));
                     }
                 }
             }else {
-                offVolunteerService.setOffVolunteer(offVolunteer, userId);
+                offVolunteerService.setOffVolunteer(offVolunteerRequest);
             }
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"오프라인 봉사 모집글이 생성되었습니다."), HttpStatus.OK);
         }else {
@@ -115,7 +115,7 @@ public class OffVolunteerController {
     @Operation(tags = "offVolunteer", summary = "id 값으로 오프라인 봉사 모집글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "id 값으로 오프라인 봉사 모집글 정보 조회 성공",
-                            content = @Content(schema = @Schema(implementation = WorkResponse.class)))
+                            content = @Content(schema = @Schema(implementation = OffVolunteerResponse.class)))
             })
     @GetMapping("/{off_volunteer_id}")
     public ResponseEntity<OffVolunteerResponse> getOffVolunteer(@Parameter(description = "고유 아이디") @PathVariable(name = "off_volunteer_id") UUID uuid){
@@ -171,11 +171,11 @@ public class OffVolunteerController {
     @Operation(tags = "offVolunteer", summary = "제목, 제목+내용으로 봉사 요청글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "제목, 제목+내용으로 글 정보 조회 성공",
-                            content = @Content(schema = @Schema(implementation = WorkPageResponse.class)))
+                            content = @Content(schema = @Schema(implementation = OffVolunteerPageResponse.class)))
             })
     @io.swagger.annotations.ApiResponses(
             @io.swagger.annotations.ApiResponse(
-                    response = WorkPageResponse.class, message = "ok", code=200)
+                    response = OffVolunteerPageResponse.class, message = "ok", code=200)
     )
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "integer", paramType = "query", defaultValue = "0"),
