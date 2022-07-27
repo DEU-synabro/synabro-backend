@@ -4,6 +4,7 @@ import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.OffVolunteer;
 import com.deu.synabro.entity.Video;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
+import com.deu.synabro.http.request.offVolunteer.OffVolunteerRequest;
 import com.deu.synabro.http.response.OffVolunteerResponse;
 import com.deu.synabro.repository.OffVolunteerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,40 +24,40 @@ public class OffVolunteerService {
     @Autowired
     OffVolunteerRepository offVolunteerRepository;
 
-    public void setOffVolunteerDocs(OffVolunteer offVolunteer, UUID uuid, Docs docs){
+    public void setOffVolunteerDocs(OffVolunteerRequest offVolunteerRequest, Docs docs){
         OffVolunteer offVolunteers = OffVolunteer.builder()
-                .title(offVolunteer.getTitle())
-                .contents(offVolunteer.getContents())
-                .startPeriod(offVolunteer.getStartPeriod())
-                .endPeriod(offVolunteer.getEndPeriod())
-                .startDate(offVolunteer.getStartDate())
-                .endDate(offVolunteer.getEndDate())
+                .title(offVolunteerRequest.getTitle())
+                .contents(offVolunteerRequest.getContents())
+                .startPeriod(offVolunteerRequest.getStartPeriod())
+                .endPeriod(offVolunteerRequest.getEndPeriod())
+                .startDate(offVolunteerRequest.getStartDate())
+                .endDate(offVolunteerRequest.getEndDate())
                 .build();
         offVolunteers.addDocs(docs);
         offVolunteerRepository.save(offVolunteers);
     }
 
-    public void setOffVolunteerVideo(OffVolunteer offVolunteer, UUID uuid, Video video){
+    public void setOffVolunteerVideo(OffVolunteerRequest offVolunteerRequest, Video video){
         OffVolunteer offVolunteers = OffVolunteer.builder()
-                .title(offVolunteer.getTitle())
-                .contents(offVolunteer.getContents())
-                .startPeriod(offVolunteer.getStartPeriod())
-                .endPeriod(offVolunteer.getEndPeriod())
-                .startDate(offVolunteer.getStartDate())
-                .endDate(offVolunteer.getEndDate())
+                .title(offVolunteerRequest.getTitle())
+                .contents(offVolunteerRequest.getContents())
+                .startPeriod(offVolunteerRequest.getStartPeriod())
+                .endPeriod(offVolunteerRequest.getEndPeriod())
+                .startDate(offVolunteerRequest.getStartDate())
+                .endDate(offVolunteerRequest.getEndDate())
                 .build();
         offVolunteers.addVideo(video);
         offVolunteerRepository.save(offVolunteers);
     }
 
-    public void setOffVolunteer(OffVolunteer offVolunteer, UUID uuid){
+    public void setOffVolunteer(OffVolunteerRequest offVolunteerRequest){
         OffVolunteer offVolunteers = OffVolunteer.builder()
-                .title(offVolunteer.getTitle())
-                .contents(offVolunteer.getContents())
-                .startPeriod(offVolunteer.getStartPeriod())
-                .endPeriod(offVolunteer.getEndPeriod())
-                .startDate(offVolunteer.getStartDate())
-                .endDate(offVolunteer.getEndDate())
+                .title(offVolunteerRequest.getTitle())
+                .contents(offVolunteerRequest.getContents())
+                .startPeriod(offVolunteerRequest.getStartPeriod())
+                .endPeriod(offVolunteerRequest.getEndPeriod())
+                .startDate(offVolunteerRequest.getStartDate())
+                .endDate(offVolunteerRequest.getEndDate())
                 .build();
         offVolunteerRepository.save(offVolunteers);
     }

@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,12 +41,12 @@ public class CertificationController {
 
     private static final String DELETE_WORKS = "{\n" +
             "    \"code\" : 204\n" +
-            "    \"message\" : \"봉사 요청글이 삭제되었습니다.\"\n" +
+            "    \"message\" : \"봉사 인증글이 삭제되었습니다.\"\n" +
             "}";
 
     private static final String NOT_WORKS = "{\n" +
             "    \"code\" : 404\n" +
-            "    \"message\" : \"봉사 요청글이 없습니다.\"\n" +
+            "    \"message\" : \"봉사 인증글이 없습니다.\"\n" +
             "}";
 
     private static final String CREATE_WORKS = "{\n" +
@@ -55,13 +56,21 @@ public class CertificationController {
 
     private static final String UPDATE_WORKS = "{\n" +
             "    \"code\" : 200\n" +
-            "    \"message\" : \"봉사 요청글이 수정되었습니다.\"\n" +
+            "    \"message\" : \"봉사 인증글이 수정되었습니다.\"\n" +
             "}";
     private static final String FORBIDDEN_WORKS = "{\n" +
             "    \"code\" : 403\n" +
             "    \"message\" : \"봉사 수혜자나 관리자만 신청할 수 있습니다.\"\n" +
             "}";
-
+    @Operation(tags = "Certification", summary = "봉사 인증글을 생성합니다.",
+            responses={
+                    @ApiResponse(responseCode = "200", description = "봉사 인증글 생성 성공",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = CREATE_WORKS))),
+                    @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = FORBIDDEN_WORKS)))
+            })
     @PostMapping("")
     public ResponseEntity<GeneralResponse> createCertification(@Parameter @RequestPart(name = "tagName") String tagName ,
                                                                @Parameter @RequestPart(name = "certificationRequest")CertificationRequest certificationRequest,
@@ -74,32 +83,32 @@ public class CertificationController {
         }
     }
 
-    @Operation(tags = "certification", summary = "봉사 요청글을 삭제 합니다.",
+    @Operation(tags = "Certification", summary = "봉사 인증글을 삭제 합니다.",
             responses={
-                    @ApiResponse(responseCode = "204", description = "봉사 요청글 삭제 성공",
+                    @ApiResponse(responseCode = "204", description = "봉사 인증글 삭제 성공",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = DELETE_WORKS))),
-                    @ApiResponse(responseCode = "404", description = "삭제할 봉사 요청글이 없음",
+                    @ApiResponse(responseCode = "404", description = "삭제할 봉사 인증글이 없음",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = NOT_WORKS)))
             })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("{certification_id}")
-    public ResponseEntity<GeneralResponse> deleteCertification(@Parameter @PathVariable(name = "certifiacation_id") UUID uuid){
+    public ResponseEntity<GeneralResponse> deleteCertification(@Parameter @PathVariable(name = "certification_id") UUID uuid){
         try{
             certificationService.deleteById(uuid);
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 삭제되었습니다."), HttpStatus.OK);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 인증글이 삭제되었습니다."), HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"삭제할 봉사 요청글이 없습니다."), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"삭제할 봉사 인증글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
 
-    @Operation(tags = "certification", summary = "봉사 요청글을 수정합니다.",
+    @Operation(tags = "Certification", summary = "봉사 인증글을 수정합니다.",
             responses={
-                    @ApiResponse(responseCode = "200", description = "봉사 요청글 수정 성공",
+                    @ApiResponse(responseCode = "200", description = "봉사 인증글 수정 성공",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = UPDATE_WORKS))),
-                    @ApiResponse(responseCode = "404", description = "삭제할 봉사 요청 글이 없음",
+                    @ApiResponse(responseCode = "404", description = "삭제할 봉사 인증 글이 없음",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = NOT_WORKS)))
             })
@@ -109,20 +118,20 @@ public class CertificationController {
         try{
             Certification certification = certificationService.findByIdx(uuid);
             certificationService.updateCertification(certificationRequest, certification);
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "봉사 요청글이 수정되었습니다"), HttpStatus.OK);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "봉사 인증글이 수정되었습니다"), HttpStatus.OK);
         } catch (NullPointerException e) {
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 요청글이 없습니다."), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"수정할 봉사 인증글이 없습니다."), HttpStatus.NOT_FOUND);
         }
     }
 
-    @Operation(tags = "Work", summary = "id 값으로 봉사 요청글을 찾습니다.",
+    @Operation(tags = "Certification", summary = "id 값으로 봉사 인증글을 찾습니다.",
             responses={
-                    @ApiResponse(responseCode = "200", description = "id 값으로 봉사 요청글 정보 조회 성공",
-                            content = @Content(schema = @Schema(implementation = WorkResponse.class)))
+                    @ApiResponse(responseCode = "200", description = "id 값으로 봉사 인증글 정보 조회 성공",
+                            content = @Content(schema = @Schema(implementation = CertificationResponse.class)))
             })
-    @GetMapping("/{work_id}")
+    @GetMapping("/{certification_id}")
     public ResponseEntity<CertificationResponse> getContents(@Parameter(description = "고유 아이디")
-                                                    @PathVariable(name = "work_id") UUID uuid){
+                                                    @PathVariable(name = "certification_id") UUID uuid){
         try{
             Certification certification = certificationService.findByIdx(uuid);
             return new ResponseEntity<>(certificationService.getCertification(certification), HttpStatus.OK);
@@ -131,14 +140,14 @@ public class CertificationController {
         }
     }
 
-    @Operation(tags = "Work", summary = "제목, 제목+내용으로 봉사 요청글을 찾습니다.",
+    @Operation(tags = "Certification", summary = "제목, 제목+내용으로 봉사 인증글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "제목, 제목+내용으로 글 정보 조회 성공",
-                            content = @Content(schema = @Schema(implementation = WorkPageResponse.class)))
+                            content = @Content(schema = @Schema(implementation = CertificationPageResponse.class)))
             })
     @io.swagger.annotations.ApiResponses(
             @io.swagger.annotations.ApiResponse(
-                    response = WorkPageResponse.class, message = "ok", code=200)
+                    response = CertificationPageResponse.class, message = "ok", code=200)
     )
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "integer", paramType = "query", defaultValue = "0"),
@@ -213,6 +222,7 @@ public class CertificationController {
      * @return 봉사 인증글의 사진을 반환합니다.
      */
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
+    @Operation(tags = "Certification", summary = "봉사 인증글에 있는 사진을 다운로드합니다..")
     @GetMapping("/download/{certification_id}")
     public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
                                            @PathVariable(name = "certification_id") UUID uuid)  {

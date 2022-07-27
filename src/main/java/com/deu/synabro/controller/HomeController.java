@@ -5,6 +5,7 @@ import com.deu.synabro.http.response.member.WorkHistoryListResponse;
 import com.deu.synabro.service.MemberService;
 import com.deu.synabro.service.VolunteerWorkService;
 import com.deu.synabro.service.WorkService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import net.minidev.json.JSONArray;
@@ -36,16 +37,19 @@ public class HomeController {
     @Autowired
     WorkService workService;
 
+    @Operation(tags = "DashBoard")
     @GetMapping("")
     public JSONObject getWeekWork(){
         return volunteerWorkService.getWork(memberService.getMemberWithAuthorities().get().getIdx());
     }
 
+    @Operation(tags = "DashBoard")
     @GetMapping("/beneficiary")
     public ResponseEntity<WorkHistoryListResponse> getWork(@PageableDefault Pageable pageable){
         return ResponseEntity.ok(workService.getWorkList(pageable));
     }
 
+    @Operation(tags = "DashBoard")
     @GetMapping("/beneficiary/{work_id}")
     public ResponseEntity<WorkHistoryDetailResponse> getWorkDetail(@PathVariable(name = "work_id") UUID uuid){
         return ResponseEntity.ok(workService.getWork(uuid));
