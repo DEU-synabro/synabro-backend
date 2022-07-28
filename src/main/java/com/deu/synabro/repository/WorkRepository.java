@@ -2,6 +2,7 @@ package com.deu.synabro.repository;
 
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.Work;
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.deu.synabro.http.response.member.WorkHistoryDetailResponse;
 import com.deu.synabro.http.response.member.WorkHistoryResponse;
 import org.springframework.data.domain.Page;
@@ -26,9 +27,11 @@ import java.util.UUID;
 @Repository
 public interface WorkRepository extends JpaRepository<Work, UUID> {
     @Nullable
-    Page<Work> findByTitleContainingOrderByCreatedDateDesc(Pageable pageable, String title);
+    Page<Work> findByApprovalTypeOrderByCreatedDateDesc(Pageable pageable, ApprovalType approvalType);
     @Nullable
-    Page<Work> findByTitleContainingOrContentsContainingOrderByCreatedDateDesc(Pageable pageable, String title, String content);
+    Page<Work> findByTitleContainingAndApprovalTypeOrderByCreatedDateDesc(Pageable pageable, String title, ApprovalType approvalType);
+    @Nullable
+    Page<Work> findByTitleContainingOrContentsContainingAndApprovalTypeOrderByCreatedDateDesc(Pageable pageable, String title, String content, ApprovalType approvalType);
     Optional<Work> findOptionalByIdx(UUID uuid);
     @Query("SELECT new com.deu.synabro.http.response.member.WorkHistoryResponse('WORK', work.idx, work.title, work.createdDate) " +
             "FROM Work work WHERE work.userId.idx = :uuid")

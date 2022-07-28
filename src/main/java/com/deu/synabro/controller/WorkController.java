@@ -1,6 +1,7 @@
 package com.deu.synabro.controller;
 
 import com.deu.synabro.entity.Work;
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.WorkRequest;
 import com.deu.synabro.http.response.*;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -237,19 +240,19 @@ public class WorkController {
         WorkPageResponse workPageResponse;
 
         if(keyword==null){
-            works = workService.findAll(pageable);
-            addWorkListResponse(works, workListResponseList);
+            works = workService.findAll(pageable, ApprovalType.permit);
+            workService.addWorkListResponse(works, workListResponseList);
             workPageResponse = new WorkPageResponse(pageable, works, option, null, workListResponseList);
         }else {
             if(searchOption=="제목+내용"){
-                works = workService.findByTitleOrContents(pageable, keyword, keyword);
+                works = workService.findByTitleOrContents(pageable, keyword, keyword, ApprovalType.permit);
             }else {
-                works = workService.findByTitle(pageable, keyword);
+                works = workService.findByTitle(pageable, keyword, ApprovalType.permit);
             }
             if (works.getContent().isEmpty()) {
                 WorkListResponse.addNullWorkListResponse(workListResponseList);
             } else {
-                addWorkListResponse(works, workListResponseList);
+                workService.addWorkListResponse(works, workListResponseList);
             }
             workPageResponse = new WorkPageResponse(pageable, works, option, keyword, workListResponseList);
         }
@@ -262,33 +265,7 @@ public class WorkController {
      * @param works 페이징 처리할 봉사 요청글을 입력받습니다.
      * @param contentsResponseList 페이징 처리된 봉사 요청글을 추가할 리스트를 입력받습니다.
      */
-    private void addWorkListResponse(Page<Work> works, List<WorkListResponse> contentsResponseList){
-        if(works.getSize()>=works.getTotalElements()){
-            for(int i=0; i<works.getTotalElements(); i++){
-                WorkListResponse workListResponse = WorkListResponse.builder()
-                        .idx(works.getContent().get(i).getIdx())
-                        .title(works.getContent().get(i).getTitle())
-                        .createdDate(works.getContent().get(i).getCreatedDate())
-                        .endedDate(works.getContent().get(i).getEndedDate())
-                        .build();
-                contentsResponseList.add(workListResponse);
-            }
-        }else {
-            int contentSize = works.getSize()*works.getNumber();
-            for(int i=0; i<works.getSize();i++){
-                if(contentSize>=works.getTotalElements())
-                    break;
-                WorkListResponse workListResponse = WorkListResponse.builder()
-                        .idx(works.getContent().get(i).getIdx())
-                        .title(works.getContent().get(i).getTitle())
-                        .createdDate(works.getContent().get(i).getCreatedDate())
-                        .endedDate(works.getContent().get(i).getEndedDate())
-                        .build();
-                contentsResponseList.add(workListResponse);
-                contentSize++;
-            }
-        }
-    }
+
 
     /**
      * 봉사 요청글에 있는 사진을 다운로드 해주는 메소드입니다.
@@ -299,7 +276,7 @@ public class WorkController {
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     @Operation(tags = "Work", summary = "봉사 요청글에 있는 사진을 다운로드합니다..")
     @GetMapping("/download/{work_id}")
-    public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
+    public JSONObject download(@Parameter(description = "고유 아이디")
                                                @PathVariable(name = "work_id") UUID uuid)  {
         return fileUtil.downDocs(uuid);
     }
