@@ -17,6 +17,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -50,16 +52,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 .and()
+                .antMatcher("/api/**")
                 .authorizeHttpRequests()
                 .antMatchers( "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs").permitAll()
                 .antMatchers("/api/boards/**").permitAll()
                 .antMatchers("/api/works/download/**").permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                 .antMatchers("/api/members/signin").permitAll()
                 .antMatchers("/api/members/signup").permitAll()
                 .antMatchers("/api/members/beneficiary/signup").permitAll()
                 .antMatchers("/api/offVolunteerApplication").permitAll()
                 .antMatchers("/api/educations/test").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/works").hasAnyRole("ADMIN", "BENEFICIARY")
+                .antMatchers(HttpMethod.POST, "/api/offVolunteer").hasRole("ADMIN")
                 .anyRequest().authenticated()
 
                 .and()
@@ -78,7 +82,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(false);
-
+        configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Headers", "Authorization, x-xsrf-token, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
+                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers", "Content-Disposition"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

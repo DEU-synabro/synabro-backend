@@ -2,6 +2,7 @@ package com.deu.synabro.http.request;
 
 import com.deu.synabro.entity.Work;
 import com.deu.synabro.entity.Member;
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -41,6 +42,7 @@ public class WorkRequest {
                 .contents(contents)
                 .endedDate(endedDate)
                 .volunteerTime(volunteerTime)
+                .approvalType(ApprovalType.wait)
                 .build();
         return work;
     }

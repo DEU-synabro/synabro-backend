@@ -93,23 +93,19 @@ public class OffVolunteerController {
         @RequestPart(required = false) List<MultipartFile> files,
         @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
         @RequestPart(name = "contentsRequest") OffVolunteerRequest offVolunteerRequest) {
-        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
-            if (files!=null) {
-                for(MultipartFile file : files){
-                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
-                        offVolunteerService.setOffVolunteerVideo(offVolunteerRequest, fileUtil.saveVideo(file));
-                    }
-                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
-                        offVolunteerService.setOffVolunteerDocs(offVolunteerRequest, fileUtil.saveDocs(file));
-                    }
+        if (files!=null) {
+            for(MultipartFile file : files){
+                if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
+                    offVolunteerService.setOffVolunteerVideo(offVolunteerRequest, fileUtil.saveVideo(file));
                 }
-            }else {
-                offVolunteerService.setOffVolunteer(offVolunteerRequest);
+                if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
+                    offVolunteerService.setOffVolunteerDocs(offVolunteerRequest, fileUtil.saveDocs(file));
+                }
             }
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"오프라인 봉사 모집글이 생성되었습니다."), HttpStatus.OK);
         }else {
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.FORBIDDEN,"봉사 관리자만 신청할 수 있습니다."), HttpStatus.FORBIDDEN);
+            offVolunteerService.setOffVolunteer(offVolunteerRequest);
         }
+        return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"오프라인 봉사 모집글이 생성되었습니다."), HttpStatus.OK);
     }
 
     @Operation(tags = "offVolunteer", summary = "id 값으로 오프라인 봉사 모집글을 찾습니다.",

@@ -4,7 +4,9 @@ import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.Video;
 import com.deu.synabro.entity.Work;
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.deu.synabro.http.request.WorkRequest;
+import com.deu.synabro.http.response.WorkListResponse;
 import com.deu.synabro.http.response.WorkResponse;
 import com.deu.synabro.http.response.member.WorkHistoryDetailResponse;
 import com.deu.synabro.http.response.member.WorkHistoryListResponse;
@@ -110,10 +112,9 @@ public class WorkService {
      * @param pageable 페이징 처리를 위한 Pageable 객체
      * @return 페이징 처리한 봉사 요청글을 반환합니다.
      */
-    public Page<Work> findAll(Pageable pageable){
-        pageable = PageRequest.of(pageable.getPageNumber(),pageable.getPageSize(),Sort.by("createdDate").descending());
-        Page<Work> contentsPage = workRepository.findAll(pageable);
-        return contentsPage;
+    public Page<Work> findAll(Pageable pageable, ApprovalType approvalType){
+//        pageable = PageRequest.of(pageable.getPageNumber(),pageable.getPageSize(),Sort.by("createdDate").descending());
+        return workRepository.findByApprovalTypeOrderByCreatedDateDesc(pageable, approvalType);
     }
 
     /**
@@ -123,8 +124,8 @@ public class WorkService {
      * @param title 검색할 제목을 입력합니다.
      * @return
      */
-    public Page<Work> findByTitle(Pageable pageable, String title){
-        return workRepository.findByTitleContainingOrderByCreatedDateDesc(pageable,title);
+    public Page<Work> findByTitle(Pageable pageable, String title, ApprovalType approvalType){
+        return workRepository.findByTitleContainingAndApprovalTypeOrderByCreatedDateDesc(pageable, title, approvalType);
     }
 
     /**
@@ -135,8 +136,8 @@ public class WorkService {
      * @param contents 검색할 내용을 입력합니다.
      * @return
      */
-    public Page<Work> findByTitleOrContents(Pageable pageable, String title, String contents) {
-        return workRepository.findByTitleContainingOrContentsContainingOrderByCreatedDateDesc(pageable,title,contents);
+    public Page<Work> findByTitleOrContents(Pageable pageable, String title, String contents, ApprovalType approvalType) {
+        return workRepository.findByTitleContainingOrContentsContainingAndApprovalTypeOrderByCreatedDateDesc(pageable, title, contents, approvalType);
     }
 
     /**
@@ -167,8 +168,6 @@ public class WorkService {
         List<WorkHistoryResponse> data = workRepository.findWorkByIdx(memberService.getMemberWithAuthorities().get().getIdx());
         WorkHistoryResponse work = data.stream().filter(value -> uuid.equals(value.getId())).findAny().orElse(null);
         Integer index = data.indexOf(work);
-        System.out.println(data.size());
-        System.out.println(index);
         WorkHistoryDetailResponse response = workRepository.findWork(uuid);
         if(index-1 >= 0) {
             response.setBeforeWork(data.get(index - 1));
@@ -178,5 +177,49 @@ public class WorkService {
         }
 
         return response;
+    }
+
+    /**
+     * 페이징 처리할 봉사 요청글을 추가해주는 메소드입니다.
+     *
+     * @param works 페이징 처리할 봉사 요청글을 입력받습니다.
+     * @param contentsResponseList 페이징 처리된 봉사 요청글을 추가할 리스트를 입력받습니다.
+     */
+    public void addWorkListResponse(Page<Work> works, List<WorkListResponse> contentsResponseList){
+        if(works.getSize()>=works.getTotalElements()){
+            for(int i=0; i<works.getTotalElements(); i++){
+                WorkListResponse workListResponse = WorkListResponse.builder()
+                        .idx(works.getContent().get(i).getIdx())
+                        .title(works.getContent().get(i).getTitle())
+                        .createdDate(works.getContent().get(i).getCreatedDate())
+                        .endedDate(works.getContent().get(i).getEndedDate())
+                        .build();
+                contentsResponseList.add(workListResponse);
+            }
+        }else {
+            int contentSize = works.getSize()*works.getNumber();
+            for(int i=0; i<works.getSize();i++){
+                if(contentSize>=works.getTotalElements())
+                    break;
+                WorkListResponse workListResponse = WorkListResponse.builder()
+                        .idx(works.getContent().get(i).getIdx())
+                        .title(works.getContent().get(i).getTitle())
+                        .createdDate(works.getContent().get(i).getCreatedDate())
+                        .endedDate(works.getContent().get(i).getEndedDate())
+                        .build();
+                contentsResponseList.add(workListResponse);
+                contentSize++;
+            }
+        }
+    }
+
+    @Transactional
+    public void permitWork(Work work){
+        work.setApprovalType(ApprovalType.permit);
+    }
+
+    @Transactional
+    public void refuseWork(Work work){
+        work.setApprovalType(ApprovalType.refuse);
     }
 }
