@@ -4,7 +4,7 @@ import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.Video;
 import com.deu.synabro.repository.DocsRepository;
 import com.deu.synabro.repository.VideoRepository;
-import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -93,6 +93,15 @@ public class FileUtil {
         }
     }
 
+    public Resource downloadFile(String filename) {
+        Path filePath = Paths.get(uploadPath + filename);
+        Resource resource = new FileSystemResource(filePath);
+        if(resource.exists()) {
+            return resource;
+        }
+        return null;
+    }
+
     /**
      * 첨부 파일을 다운로드 해주는 메소드입니다.
      *
@@ -100,7 +109,7 @@ public class FileUtil {
      * @return 첨부 파일을 반환합니다.
      */
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
-    public ResponseEntity<Object> downDocs(UUID uuid){
+    public JSONObject downDocs(UUID uuid){
         Docs docs = docsRepository.findByWork_Idx(uuid);
         try {
             String FILE_PATH = System.getProperty("user.dir")+"/"+uploadPath + "/" + docs.getFileName();
@@ -113,10 +122,13 @@ public class FileUtil {
             headers.set("Content-Disposition", "attachment; filename=" + docs.getFileName());   // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
             headers.add(HttpHeaders.CONTENT_TYPE, contentType);
             Resource resource = new FileSystemResource(filePath);
-
-            return new ResponseEntity<Object>(resource, headers, HttpStatus.OK);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("url ",resource.getURL());
+            return jsonObject;
+//            return new ResponseEntity<Object>(resource, headers, HttpStatus.OK);
         } catch(Exception e) {
-            return new ResponseEntity<Object>(null, HttpStatus.CONFLICT);
+//            return new ResponseEntity<Object>(null, HttpStatus.CONFLICT);
+            return null;
         }
     }
 

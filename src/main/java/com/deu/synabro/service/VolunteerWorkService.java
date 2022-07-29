@@ -3,8 +3,10 @@ package com.deu.synabro.service;
 import com.deu.synabro.entity.Member;
 import com.deu.synabro.entity.VolunteerWork;
 import com.deu.synabro.entity.Work;
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.deu.synabro.entity.enums.PerformType;
 import com.deu.synabro.http.request.VolunteerWorkUpdateRequest;
+import com.deu.synabro.http.response.VolunteerListResponse;
 import com.deu.synabro.http.response.VolunteerWorkResponse;
 import com.deu.synabro.repository.VolunteerWorkRepository;
 import net.minidev.json.JSONArray;
@@ -246,5 +248,59 @@ public class VolunteerWorkService {
         getWeekWork(uuid);
         getMonthWork(uuid);
         return jsonObject;
+    }
+
+    /**
+     * 페이징 처리할 봉사 수행글을 추가해주는 메소드입니다.
+     *
+     * @param volunteerWorks 페이징 처리할 봉사 수행글을 입력합니다.
+     * @param volunteerListResponseList 페이징 처리된 봉사 요청글을 추가할 리스트를 입력합니다.
+     */
+    public void addVolunteerListResponse(Page<VolunteerWork> volunteerWorks, List<VolunteerListResponse> volunteerListResponseList){
+        if(volunteerWorks.getSize()>=volunteerWorks.getTotalElements()){
+            for(int i=0; i<volunteerWorks.getTotalElements(); i++){
+                VolunteerListResponse volunteerListResponse = VolunteerListResponse.builder()
+                        .idx(volunteerWorks.getContent().get(i).getIdx())
+                        .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
+                        .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
+                        .build();
+                volunteerListResponseList.add(volunteerListResponse);
+            }
+        }else {
+            int contentSize = volunteerWorks.getSize()*volunteerWorks.getNumber();
+            for(int i=0; i<volunteerWorks.getSize();i++){
+                if(contentSize>=volunteerWorks.getTotalElements())
+                    break;
+                VolunteerListResponse volunteerListResponse = VolunteerListResponse.builder()
+                        .idx(volunteerWorks.getContent().get(i).getIdx())
+                        .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
+                        .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
+                        .build();
+                volunteerListResponseList.add(volunteerListResponse);
+                contentSize++;
+            }
+        }
+    }
+
+    public  Page<VolunteerWork> findByTitleAndApproval(Pageable pageable, String title, ApprovalType approvalType){
+        return volunteerWorkRepository.findByWorkId_TitleContainingAndApprovalTypeOrderByCreatedDateDesc(pageable,title, approvalType);
+    }
+
+    public Page<VolunteerWork> findByTitleOrContentsAndApproval(Pageable pageable, String title, String contents, ApprovalType approvalType) {
+        return volunteerWorkRepository.findByWorkId_TitleContainingOrContentsContainingAndApprovalTypeOrderByCreatedDateDesc(pageable,title,contents, approvalType);
+    }
+
+    public Page<VolunteerWork> findAllApproval(Pageable pageable, ApprovalType approvalType) {
+        return volunteerWorkRepository.findByApprovalTypeOrderByCreatedDateDesc(pageable, approvalType);
+    }
+
+    @Transactional
+    public void permitVolunteerWork(VolunteerWork volunteerWork){
+        volunteerWork.setApprovalType(ApprovalType.permit);
+    }
+
+    @Transactional
+    public void refuseVolunteerWork(VolunteerWork volunteerWork){
+        volunteerWork.setApprovalType(ApprovalType.refuse);
     }
 }

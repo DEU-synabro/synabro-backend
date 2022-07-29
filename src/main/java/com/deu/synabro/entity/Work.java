@@ -1,5 +1,6 @@
 package com.deu.synabro.entity;
 
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -49,6 +50,11 @@ public class Work extends BaseTime implements Serializable {
     @Schema(description = "봉사 시간", example = "56")
     private Short volunteerTime;
 
+    @Enumerated(value=EnumType.STRING)
+    @Column(name = "approval")
+    @Schema(description = "봉사 승인", example = "확인")
+    private ApprovalType approvalType;
+
     @Column(name = "ended_date")
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -76,12 +82,13 @@ public class Work extends BaseTime implements Serializable {
     }
 
     @Builder
-    public Work(UUID idx, Member userId, String title, String contents, Short volunteerTime, LocalDateTime endedDate) {
+    public Work(UUID idx, Member userId, String title, String contents, Short volunteerTime, LocalDateTime endedDate, ApprovalType approvalType) {
         this.idx = idx;
         this.userId = userId;
         this.title = title;
         this.contents = contents;
         this.volunteerTime = volunteerTime;
         this.endedDate = endedDate;
+        this.approvalType = approvalType;
     }
 }
