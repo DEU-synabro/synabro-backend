@@ -109,26 +109,21 @@ public class WorkController {
             @RequestPart(required = false) List<MultipartFile> files,
             @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             @RequestPart(name = "contentsRequest") WorkRequest workRequest){
-        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_BENEFICIARY]")||
-                SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
-            UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
-            if (files!=null) {
-                for(MultipartFile file : files){
-                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
-                        workService.setWorkVideo(workRequest, userId, fileUtil.saveVideo(file));
-                    }
-                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
-                        workService.setWorkDocs(workRequest, userId, fileUtil.saveDocs(file));
-                    }
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (files!=null) {
+            for(MultipartFile file : files){
+                if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
+                    workService.setWorkVideo(workRequest, userId, fileUtil.saveVideo(file));
                 }
-            }else {
-                workService.setWork(workRequest, userId);
+                if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
+                    workService.setWorkDocs(workRequest, userId, fileUtil.saveDocs(file));
+                }
             }
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
         }else {
-            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.FORBIDDEN,"봉사 수혜자나 관리자만 신청할 수 있습니다."), HttpStatus.FORBIDDEN);
+            workService.setWork(workRequest, userId);
         }
-
+        return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
     }
 
     /**

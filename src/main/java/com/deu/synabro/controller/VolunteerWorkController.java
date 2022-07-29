@@ -125,7 +125,7 @@ public class VolunteerWorkController {
 
         if(keyword==null){
             volunteerWorks = volunteerWorkService.findAll(pageable);
-            addVolunteerListResponse(volunteerWorks, volunteerListResponseList);
+            volunteerWorkService.addVolunteerListResponse(volunteerWorks, volunteerListResponseList);
             volunteerWorkPageResponse = new VolunteerWorkPageResponse(pageable, volunteerWorks, option, null, volunteerListResponseList);
         }else {
             if(searchOption=="제목+내용"){
@@ -136,44 +136,13 @@ public class VolunteerWorkController {
             if (volunteerWorks.getContent().isEmpty()) {
                 VolunteerListResponse.addNullVolunteerListResponse(volunteerListResponseList);
             } else {
-                addVolunteerListResponse(volunteerWorks, volunteerListResponseList);
+                volunteerWorkService.addVolunteerListResponse(volunteerWorks, volunteerListResponseList);
             }
             volunteerWorkPageResponse = new VolunteerWorkPageResponse(pageable, volunteerWorks, option, keyword, volunteerListResponseList);
         }
         return new ResponseEntity<>(volunteerWorkPageResponse, HttpStatus.OK);
     }
 
-    /**
-     * 페이징 처리할 봉사 수행글을 추가해주는 메소드입니다.
-     *
-     * @param volunteerWorks 페이징 처리할 봉사 수행글을 입력합니다.
-     * @param volunteerListResponseList 페이징 처리된 봉사 요청글을 추가할 리스트를 입력합니다.
-     */
-    private void addVolunteerListResponse(Page<VolunteerWork> volunteerWorks, List<VolunteerListResponse> volunteerListResponseList){
-        if(volunteerWorks.getSize()>=volunteerWorks.getTotalElements()){
-            for(int i=0; i<volunteerWorks.getTotalElements(); i++){
-                VolunteerListResponse volunteerListResponse = VolunteerListResponse.builder()
-                        .idx(volunteerWorks.getContent().get(i).getIdx())
-                        .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
-                        .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
-                        .build();
-                volunteerListResponseList.add(volunteerListResponse);
-            }
-        }else {
-            int contentSize = volunteerWorks.getSize()*volunteerWorks.getNumber();
-            for(int i=0; i<volunteerWorks.getSize();i++){
-                if(contentSize>=volunteerWorks.getTotalElements())
-                    break;
-                VolunteerListResponse volunteerListResponse = VolunteerListResponse.builder()
-                        .idx(volunteerWorks.getContent().get(i).getIdx())
-                        .title(volunteerWorks.getContent().get(i).getWorkId().getTitle())
-                        .endedDate(volunteerWorks.getContent().get(i).getWorkId().getEndedDate())
-                        .build();
-                volunteerListResponseList.add(volunteerListResponse);
-                contentSize++;
-            }
-        }
-    }
 
     /**
      * 봉사 수행글을 생성하는 POST API 입니다

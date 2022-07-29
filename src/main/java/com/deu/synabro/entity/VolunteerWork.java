@@ -1,5 +1,6 @@
 package com.deu.synabro.entity;
 
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.deu.synabro.entity.enums.PerformType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -45,12 +46,18 @@ public class VolunteerWork extends BaseTime implements Serializable {
     @Schema(description = "상태")
     private PerformType performType;
 
+    @Enumerated(value=EnumType.STRING)
+    @Column(name = "approval")
+    @Schema(description = "봉사 승인", example = "확인")
+    private ApprovalType approvalType;
+
     @Builder
-    public VolunteerWork(UUID idx, Member userId, Work workId, String contents, PerformType performType) {
+    public VolunteerWork(UUID idx, Member userId, Work workId, String contents, PerformType performType, ApprovalType approvalType) {
         this.idx = idx;
         this.userId = userId;
         this.workId = workId;
         this.contents = contents;
         this.performType = performType;
+        this.approvalType = approvalType;
     }
 }

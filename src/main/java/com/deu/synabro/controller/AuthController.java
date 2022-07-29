@@ -2,6 +2,7 @@ package com.deu.synabro.controller;
 
 import com.deu.synabro.auth.JwtFilter;
 import com.deu.synabro.auth.TokenProvider;
+import com.deu.synabro.entity.Member;
 import com.deu.synabro.http.request.member.SignInRequest;
 import com.deu.synabro.http.response.TokenResponse;
 import com.deu.synabro.service.MemberService;
@@ -48,7 +49,7 @@ public class AuthController {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, authentication.getAuthorities().toString());
         return new ResponseEntity<>(new TokenResponse(jwt), httpHeaders, HttpStatus.OK);
     }
 }

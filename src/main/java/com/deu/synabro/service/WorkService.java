@@ -219,7 +219,7 @@ public class WorkService {
     }
 
     @Transactional
-    public void refusetWork(Work work){
+    public void refuseWork(Work work){
         work.setApprovalType(ApprovalType.refuse);
     }
 }
