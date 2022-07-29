@@ -226,7 +226,7 @@ public class CertificationController {
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     @Operation(tags = "Certification", summary = "봉사 인증글에 있는 사진을 다운로드합니다..")
     @GetMapping("/download/{certification_id}")
-    public JSONObject download(@Parameter(description = "고유 아이디")
+    public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
                                            @PathVariable(name = "certification_id") UUID uuid)  {
         return fileUtil.downDocs(uuid);
     }

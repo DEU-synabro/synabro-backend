@@ -271,7 +271,7 @@ public class WorkController {
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     @Operation(tags = "Work", summary = "봉사 요청글에 있는 사진을 다운로드합니다..")
     @GetMapping("/download/{work_id}")
-    public JSONObject download(@Parameter(description = "고유 아이디")
+    public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
                                                @PathVariable(name = "work_id") UUID uuid)  {
         return fileUtil.downDocs(uuid);
     }
