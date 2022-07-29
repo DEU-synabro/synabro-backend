@@ -109,7 +109,7 @@ public class FileUtil {
      * @return 첨부 파일을 반환합니다.
      */
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
-    public JSONObject downDocs(UUID uuid){
+    public ResponseEntity<Object> downDocs(UUID uuid){
         Docs docs = docsRepository.findByWork_Idx(uuid);
         try {
             String FILE_PATH = System.getProperty("user.dir")+"/"+uploadPath + "/" + docs.getFileName();
@@ -124,11 +124,11 @@ public class FileUtil {
             Resource resource = new FileSystemResource(filePath);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("url ",resource.getURL());
-            return jsonObject;
-//            return new ResponseEntity<Object>(resource, headers, HttpStatus.OK);
+//            return jsonObject;
+            return new ResponseEntity<Object>(resource, headers, HttpStatus.OK);
         } catch(Exception e) {
-//            return new ResponseEntity<Object>(null, HttpStatus.CONFLICT);
-            return null;
+            return new ResponseEntity<Object>(null, HttpStatus.CONFLICT);
+//            return null;
         }
     }
 
