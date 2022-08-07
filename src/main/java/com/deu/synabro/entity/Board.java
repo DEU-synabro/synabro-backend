@@ -8,6 +8,8 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,7 +17,6 @@ import java.util.UUID;
  */
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Getter
 @Setter
 @Entity
@@ -43,4 +44,27 @@ public class Board extends BaseTime {
     @Schema(description = "게시판 종류")
     private BoardType boardType;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    private List<Docs> docsList = new ArrayList<>();
+
+    public void addDocs(Docs docs){
+        this.docsList.add(docs);
+        docs.setBoard(this);
+    }
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    private List<Video> videoList = new ArrayList<>();
+
+    public void addVideo(Video video){
+        this.videoList.add(video);
+        video.setBoard(this);
+    }
+
+    @Builder
+    public Board(UUID idx, String title, String contents, BoardType boardType) {
+        this.idx = idx;
+        this.title = title;
+        this.contents = contents;
+        this.boardType = boardType;
+    }
 }

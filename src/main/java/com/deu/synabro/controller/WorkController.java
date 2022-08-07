@@ -74,7 +74,10 @@ public class WorkController {
             "    \"code\" : 200\n" +
             "    \"message\" : \"봉사 요청글이 생성되었습니다.\"\n" +
             "}";
-
+    private static final String NOT_CREATE_WORKS = "{\n" +
+            "    \"code\" : 200\n" +
+            "    \"message\" : \"봉사 요청글이 생성이 실패하였습니다.\"\n" +
+            "}";
     private static final String UPDATE_WORKS = "{\n" +
             "    \"code\" : 200\n" +
             "    \"message\" : \"봉사 요청글이 수정되었습니다.\"\n" +
@@ -96,9 +99,9 @@ public class WorkController {
                     @ApiResponse(responseCode = "200", description = "봉사 요청글 생성 성공",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = CREATE_WORKS))),
-                    @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                    @ApiResponse(responseCode = "400", description = "봉사 요청글이 생성이 실패하였습니다.",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
-                                    examples = @ExampleObject(value = FORBIDDEN_WORKS)))
+                                    examples = @ExampleObject(value = NOT_CREATE_WORKS)))
             })
     @PostMapping("")
     public ResponseEntity<GeneralResponse> createWork(
@@ -109,21 +112,23 @@ public class WorkController {
             @RequestPart(required = false) List<MultipartFile> files,
             @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             @RequestPart(name = "contentsRequest") WorkRequest workRequest){
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-        UUID userId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
-        if (files!=null) {
-            for(MultipartFile file : files){
-                if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
-                    workService.setWorkVideo(workRequest, userId, fileUtil.saveVideo(file));
+        try{
+            if (files!=null) {
+                for(MultipartFile file : files){
+                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
+                        workService.setWorkVideo(workRequest, fileUtil.saveVideo(file));
+                    }
+                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
+                        workService.setWorkDocs(workRequest, fileUtil.saveDocs(file));
+                    }
                 }
-                if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
-                    workService.setWorkDocs(workRequest, userId, fileUtil.saveDocs(file));
-                }
+            }else {
+                workService.setWork(workRequest);
             }
-        }else {
-            workService.setWork(workRequest, userId);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.BAD_REQUEST,"봉사 요청글이 생성이 실패하였습니다."), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 요청글이 생성되었습니다."), HttpStatus.OK);
     }
 
     /**

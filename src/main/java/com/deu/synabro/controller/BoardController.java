@@ -2,9 +2,11 @@ package com.deu.synabro.controller;
 
 import com.deu.synabro.entity.Board;
 import com.deu.synabro.entity.enums.SearchOption;
+import com.deu.synabro.http.request.WorkRequest;
 import com.deu.synabro.http.response.*;
 import com.deu.synabro.http.request.BoardRequest;
 import com.deu.synabro.service.BoardService;
+import com.deu.synabro.util.FileUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,8 +22,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +47,9 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
+    @Autowired
+    FileUtil fileUtil;
+
     private static final String DELETE_BOARD = "{\n" +
             "    \"code\" : 204\n" +
             "    \"message\" : \"게시글이 삭제되었습니다.\"\n" +
@@ -60,6 +68,14 @@ public class BoardController {
     private static final String UPDATE_NOT_BOARD = "{\n" +
             "    \"code\" : 404\n" +
             "    \"message\" : \"수정할 게시글이 없습니다.\"\n" +
+            "}";
+    private static final String CREATE_WORKS = "{\n" +
+            "    \"code\" : 200\n" +
+            "    \"message\" : \"게시판 글이 생성되었습니다.\"\n" +
+            "}";
+    private static final String NOT_CREATE_WORKS = "{\n" +
+            "    \"code\" : 400\n" +
+            "    \"message\" : \"게시판 글이 생성이 실패하였습니다.\"\n" +
             "}";
 
     /**
@@ -129,22 +145,51 @@ public class BoardController {
     /**
      * 게시글을 생성하는 POST API 입니다.
      *
+     * @param files 저장할 사진입니다.
      * @param boardRequest (제목, 내용, 종류) 클래스를 입력합니다.
      * @return 게시글 생성 성공 상태를 반환합니다.
      */
     @Operation(tags = "Board", summary = "게시판 글을 생성 합니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "게시판 글 생성 성공",
-                            content = @Content(schema = @Schema(implementation = Board.class)))
+                            content = @Content(schema = @Schema(implementation = Board.class),
+                            examples = @ExampleObject(value = CREATE_WORKS))),
+                    @ApiResponse(responseCode = "400", description = "게시판 글이 생성이 실패하였습니다.",
+                            content = @Content(schema = @Schema(implementation = GeneralResponse.class),
+                                    examples = @ExampleObject(value = NOT_CREATE_WORKS)))
             })
     @io.swagger.annotations.ApiResponses(
             @io.swagger.annotations.ApiResponse(
                     response = Board.class, message = "ok", code=200)
     )
     @PostMapping("") // 게시판 생성
-    public ResponseEntity<Board> boardCreate(@Parameter @RequestBody BoardRequest boardRequest){
-        Board board = boardService.setBoard(boardRequest);
-        return new ResponseEntity<>(board, HttpStatus.OK);
+    public ResponseEntity<GeneralResponse> boardCreate(
+            @Parameter(
+                    description = "Files to be uploaded",
+                    content = @Content(mediaType = MediaType.ALL_VALUE)  // Won't work without OCTET_STREAM as the mediaType.
+            )
+            @RequestPart(required = false) List<MultipartFile> files,
+            @Parameter(name = "boardRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart(name = "boardRequest") BoardRequest boardRequest
+    ){
+        try{
+            if (files!=null) {
+                for(MultipartFile file : files){
+                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
+                        boardService.setBoardVideo(boardRequest, fileUtil.saveVideo(file));
+                    }
+                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
+                        boardService.setBoardDocs(boardRequest, fileUtil.saveDocs(file));
+                    }
+                }
+            }else {
+                boardService.setBoard(boardRequest);
+            }
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"게시판 글이 생성되었습니다."), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.BAD_REQUEST,"게시판 글이 생성이 실패하였습니다."), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     /**

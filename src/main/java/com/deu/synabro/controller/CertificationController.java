@@ -55,6 +55,10 @@ public class CertificationController {
             "    \"code\" : 200\n" +
             "    \"message\" : \"봉사 요청글이 생성되었습니다.\"\n" +
             "}";
+    private static final String NOT_CREATE_WORKS = "{\n" +
+            "    \"code\" : 200\n" +
+            "    \"message\" : \"봉사 인증글이 생성이 실패하였습니다.\"\n" +
+            "}";
 
     private static final String UPDATE_WORKS = "{\n" +
             "    \"code\" : 200\n" +
@@ -69,16 +73,32 @@ public class CertificationController {
                     @ApiResponse(responseCode = "200", description = "봉사 인증글 생성 성공",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = CREATE_WORKS))),
-                    @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                    @ApiResponse(responseCode = "400", description = "봉사 인증글이 생성이 실패하였습니다.",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
-                                    examples = @ExampleObject(value = FORBIDDEN_WORKS)))
+                                    examples = @ExampleObject(value = NOT_CREATE_WORKS)))
             })
     @PostMapping("")
-    public ResponseEntity<GeneralResponse> createCertification(@Parameter @RequestPart(name = "tagName") String tagName ,
-                                                               @Parameter @RequestPart(name = "certificationRequest")CertificationRequest certificationRequest,
-                                                               @Parameter @RequestPart MultipartFile file){
+    public ResponseEntity<GeneralResponse> createCertification(
+            @Parameter(
+                    description = "Files to be uploaded",
+                    content = @Content(mediaType = MediaType.ALL_VALUE)  // Won't work without OCTET_STREAM as the mediaType.
+            )
+            @RequestPart(required = false) List<MultipartFile> files,
+            @Parameter @RequestPart(name = "tagName") String tagName ,
+            @Parameter @RequestPart(name = "certificationRequest")CertificationRequest certificationRequest){
         try{
-            certificationService.setCertificationRepository(certificationRequest, tagName, fileUtil.saveDocs(file));
+            if (files!=null) {
+                for(MultipartFile file : files){
+                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
+                        certificationService.setCertificationVideo(certificationRequest, tagName, fileUtil.saveVideo(file));
+                    }
+                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
+                        certificationService.setCertificationDocs(certificationRequest, tagName, fileUtil.saveDocs(file));
+                    }
+                }
+            }else {
+                certificationService.setCertification(certificationRequest, tagName);
+            }
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"봉사 인증글이 생성되었습니다."), HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.BAD_REQUEST,"봉사 인증글이 생성이 실패하였습니다."), HttpStatus.BAD_REQUEST);

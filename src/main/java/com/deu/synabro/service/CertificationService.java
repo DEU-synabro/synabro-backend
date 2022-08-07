@@ -26,7 +26,18 @@ public class CertificationService {
     @Autowired
     OffVolunteerRepository offVolunteerRepository;
 
-    public void setCertificationRepository(CertificationRequest certificationRequest, String tagName, Docs docs){
+    public void setCertification(CertificationRequest certificationRequest, String tagName){
+        OffVolunteer offVolunteer = offVolunteerRepository.findByTagName(tagName);
+        Certification certification = Certification.builder()
+                .offVolunteerId(offVolunteer)
+                .userId(new Member(UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName())))
+                .title(certificationRequest.getTitle())
+                .contents(certificationRequest.getContents())
+                .build();
+        certificationRepository.save(certification);
+    }
+
+    public void setCertificationDocs(CertificationRequest certificationRequest, String tagName, Docs docs){
         OffVolunteer offVolunteer = offVolunteerRepository.findByTagName(tagName);
         Certification certification = Certification.builder()
                 .offVolunteerId(offVolunteer)
@@ -35,6 +46,18 @@ public class CertificationService {
                 .contents(certificationRequest.getContents())
                 .build();
         certification.addDocs(docs);
+        certificationRepository.save(certification);
+    }
+
+    public void setCertificationVideo(CertificationRequest certificationRequest, String tagName, Video video){
+        OffVolunteer offVolunteer = offVolunteerRepository.findByTagName(tagName);
+        Certification certification = Certification.builder()
+                .offVolunteerId(offVolunteer)
+                .userId(new Member(UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName())))
+                .title(certificationRequest.getTitle())
+                .contents(certificationRequest.getContents())
+                .build();
+        certification.addVideo(video);
         certificationRepository.save(certification);
     }
 

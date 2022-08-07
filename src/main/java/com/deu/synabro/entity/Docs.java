@@ -16,6 +16,10 @@ public class Docs {
     private UUID idx;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name="board_id")
+    private Board board;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="work_id")
     private Work work;
 
@@ -31,10 +35,12 @@ public class Docs {
     private String fileName;
 
     @Builder
-    public Docs(Work work, String fileName, OffVolunteer offVolunteer, Certification certification) {
+
+    public Docs(Board board, Work work, OffVolunteer offVolunteer, Certification certification, String fileName) {
+        this.board = board;
         this.work = work;
-        this.fileName = fileName;
         this.offVolunteer = offVolunteer;
         this.certification = certification;
+        this.fileName = fileName;
     }
 }
