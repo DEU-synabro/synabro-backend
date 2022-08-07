@@ -65,7 +65,10 @@ public class OffVolunteerController {
             "    \"code\" : 200\n" +
             "    \"message\" : \"봉사 요청글이 생성되었습니다.\"\n" +
             "}";
-
+    private static final String NOT_CREATE_WORKS = "{\n" +
+            "    \"code\" : 200\n" +
+            "    \"message\" : \"오프라인 봉사 모집글이 생성이 실패하였습니다.\"\n" +
+            "}";
     private static final String UPDATE_WORKS = "{\n" +
             "    \"code\" : 200\n" +
             "    \"message\" : \"봉사 요청글이 수정되었습니다.\"\n" +
@@ -80,9 +83,9 @@ public class OffVolunteerController {
                     @ApiResponse(responseCode = "200", description = "오프라인 봉사 모집글 생성 성공",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = CREATE_WORKS))),
-                    @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                    @ApiResponse(responseCode = "400", description = "오프라인 봉사 모집글이 생성이 실패하였습니다.",
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
-                                    examples = @ExampleObject(value = FORBIDDEN_WORKS)))
+                                    examples = @ExampleObject(value = NOT_CREATE_WORKS)))
             })
     @PostMapping("")
     public ResponseEntity<GeneralResponse> createOffVolunteer(
@@ -93,19 +96,24 @@ public class OffVolunteerController {
         @RequestPart(required = false) List<MultipartFile> files,
         @Parameter(name = "contentsRequest", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
         @RequestPart(name = "contentsRequest") OffVolunteerRequest offVolunteerRequest) {
-        if (files!=null) {
-            for(MultipartFile file : files){
-                if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
-                    offVolunteerService.setOffVolunteerVideo(offVolunteerRequest, fileUtil.saveVideo(file));
+        try{
+            if (files!=null) {
+                for(MultipartFile file : files){
+                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
+                        offVolunteerService.setOffVolunteerVideo(offVolunteerRequest, fileUtil.saveVideo(file));
+                    }
+                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
+                        offVolunteerService.setOffVolunteerDocs(offVolunteerRequest, fileUtil.saveDocs(file));
+                    }
                 }
-                if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
-                    offVolunteerService.setOffVolunteerDocs(offVolunteerRequest, fileUtil.saveDocs(file));
-                }
+            }else {
+                offVolunteerService.setOffVolunteer(offVolunteerRequest);
             }
-        }else {
-            offVolunteerService.setOffVolunteer(offVolunteerRequest);
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"오프라인 봉사 모집글이 생성되었습니다."), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(GeneralResponse.of(HttpStatus.BAD_REQUEST,"오프라인 봉사 모집글이 생성이 실패하였습니다."), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"오프라인 봉사 모집글이 생성되었습니다."), HttpStatus.OK);
+
     }
 
     @Operation(tags = "offVolunteer", summary = "id 값으로 오프라인 봉사 모집글을 찾습니다.",

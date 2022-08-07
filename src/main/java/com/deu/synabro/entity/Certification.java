@@ -44,14 +44,17 @@ public class Certification extends BaseTime implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
     private List<Docs> docsList = new ArrayList<>();
 
-    /**
-     * Docs에 Work의 UUID값을 넣어주는 메소드 입니다.
-     *
-     * @param docs 봉사 요청 게시글과 같이 저장할 Docs 객체입니다.
-     */
     public void addDocs(Docs docs){
         this.docsList.add(docs);
         docs.setCertification(this);
+    }
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    private List<Video> videoList = new ArrayList<>();
+
+    public void addVideo(Video video){
+        this.videoList.add(video);
+        video.setCertification(this);
     }
 
     @Builder

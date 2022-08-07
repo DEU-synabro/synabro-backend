@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -40,8 +41,8 @@ public class WorkService {
     @Autowired
     MemberService memberService;
 
-    public void setWork(WorkRequest workRequest, UUID uuid){
-        Work work = workRequest.toEntity(uuid);
+    public void setWork(WorkRequest workRequest){
+        Work work = workRequest.toEntity(UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName()));
         workRepository.save(work);
     }
 
@@ -49,17 +50,16 @@ public class WorkService {
      * 요청한 봉사 요청글 정보로 봉사 요청글을 생성해주는 메소드입니다.
      *
      * @param workRequest 봉사 요청 내용(제목, 내용, 봉사 시간, 마감일) 입니다.
-     * @param uuid 봉사 요청하는 사람의 uuid 입니다
      * @param docs 저장할 사진입니다.
      */
-    public void setWorkDocs(WorkRequest workRequest, UUID uuid, Docs docs){
-        Work work = workRequest.toEntity(uuid);
+    public void setWorkDocs(WorkRequest workRequest, Docs docs){
+        Work work = workRequest.toEntity(UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName()));
         work.addDocs(docs);
         workRepository.save(work);
     }
 
-    public void setWorkVideo(WorkRequest workRequest, UUID uuid, Video video){
-        Work work = workRequest.toEntity(uuid);
+    public void setWorkVideo(WorkRequest workRequest, Video video){
+        Work work = workRequest.toEntity(UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName()));
         work.addVideo(video);
         workRepository.save(work);
     }

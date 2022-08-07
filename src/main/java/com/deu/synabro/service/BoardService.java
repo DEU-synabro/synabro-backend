@@ -1,6 +1,8 @@
 package com.deu.synabro.service;
 
 import com.deu.synabro.entity.Board;
+import com.deu.synabro.entity.Docs;
+import com.deu.synabro.entity.Video;
 import com.deu.synabro.repository.BoardRepository;
 import com.deu.synabro.http.request.BoardRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +31,9 @@ public class BoardService {
      * @param boardRequest 게시글 정보 클래스(제목, 내용, 종류)를 입력합니다.
      * @return 게시글 생성을 반환합니다.
      */
-    public Board setBoard(BoardRequest boardRequest){
+    public void setBoard(BoardRequest boardRequest){
         Board board = boardRequest.toEntity(boardRequest);
-        return boardRepository.save(board);
+        boardRepository.save(board);
     }
 
     /**
@@ -96,6 +98,18 @@ public class BoardService {
     public void updateBoard(BoardRequest boardRequest, Board board){
         board.setTitle(boardRequest.getTitle());
         board.setContents(boardRequest.getContents());
+    }
+
+    public void setBoardVideo(BoardRequest boardRequest, Video video) {
+        Board board = boardRequest.toEntity(boardRequest);
+        board.addVideo(video);
+        boardRepository.save(board);
+    }
+
+    public void setBoardDocs(BoardRequest boardRequest, Docs docs) {
+        Board board = boardRequest.toEntity(boardRequest);
+        board.addDocs(docs);
+        boardRepository.save(board);
     }
 }
 
