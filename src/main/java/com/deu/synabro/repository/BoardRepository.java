@@ -17,8 +17,9 @@ import java.util.UUID;
  */
 @Repository
 public interface BoardRepository extends JpaRepository<Board, UUID> {
-    Page<Board> findByTitleContainingOrderByCreatedDateDesc(Pageable pageable, String title);
-    Page<Board> findByTitleContainingOrContentsContainingOrderByCreatedDateDesc(Pageable pageable, String title, String content);
+    Page<Board> findByBoardType(Pageable pageable, BoardType boardType);
+    Page<Board> findByTitleContainingAndBoardType(Pageable pageable, String title, BoardType boardType);
+    Page<Board> findByTitleContainingOrContentsContainingAndBoardType(Pageable pageable, String title, String content, BoardType boardType);
     List<Board> findBoardByBoardType(BoardType boardType);
     Optional<Board> findByIdx(UUID uuid);
 }

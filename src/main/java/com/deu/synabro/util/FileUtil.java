@@ -20,6 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -69,6 +71,33 @@ public class FileUtil {
         }
     }
 
+    public List<Docs> saveFiles(List<MultipartFile> files) {
+        List<Docs> docsList = new ArrayList<>();
+        for (MultipartFile file : files){
+            try{
+                if( file.isEmpty() ) {
+                    throw new Exception("ERROR : Fil is empty");
+                }
+                Path root = Paths.get(uploadPath);
+                if(!new File(uploadPath).exists()){
+                    new File(uploadPath).mkdir();
+                    System.out.println(file.getOriginalFilename());
+                }
+                try(InputStream inputStream = file.getInputStream()){
+                    Docs docs = Docs.builder()
+                            .fileName(file.getOriginalFilename())
+                            .build();
+                    docsRepository.save(docs);
+                    Files.copy(inputStream, root.resolve(file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+                    docsList.add(docs);
+                }
+            }catch (Exception e){
+                throw new RuntimeException("Not store the file ");
+            }
+        }
+        return docsList;
+    }
+
     public Video saveVideo(MultipartFile file) {
 
         try{
@@ -108,9 +137,8 @@ public class FileUtil {
      * @param uuid 첨부 파일이 들어갈 글의 uuid 입니다
      * @return 첨부 파일을 반환합니다.
      */
-    @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     public ResponseEntity<Object> downDocs(UUID uuid){
-        Docs docs = docsRepository.findByWork_Idx(uuid);
+        Docs docs = docsRepository.findById(uuid).orElseThrow(() -> new NullPointerException());
         try {
             String FILE_PATH = System.getProperty("user.dir")+"/"+uploadPath + "/" + docs.getFileName();
 
@@ -124,11 +152,9 @@ public class FileUtil {
             Resource resource = new FileSystemResource(filePath);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("url ",resource.getURL());
-//            return jsonObject;
             return new ResponseEntity<Object>(resource, headers, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<Object>(null, HttpStatus.CONFLICT);
-//            return null;
         }
     }
 

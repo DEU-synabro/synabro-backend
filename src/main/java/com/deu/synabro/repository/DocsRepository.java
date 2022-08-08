@@ -5,9 +5,11 @@ import com.deu.synabro.entity.Work;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface DocsRepository extends JpaRepository<Docs, UUID> {
-    Docs findByWork_Idx(UUID uuid);
+    List<Docs> findByBoard_Idx(UUID uuid);
 }
