@@ -44,7 +44,7 @@ public class Board extends BaseTime {
     @Schema(description = "게시판 종류")
     private BoardType boardType;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "board")
     private List<Docs> docsList = new ArrayList<>();
 
     public void addDocs(Docs docs){
@@ -52,7 +52,7 @@ public class Board extends BaseTime {
         docs.setBoard(this);
     }
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "board")
     private List<Video> videoList = new ArrayList<>();
 
     public void addVideo(Video video){

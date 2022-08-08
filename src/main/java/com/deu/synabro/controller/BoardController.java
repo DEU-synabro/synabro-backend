@@ -1,6 +1,7 @@
 package com.deu.synabro.controller;
 
 import com.deu.synabro.entity.Board;
+import com.deu.synabro.entity.enums.BoardType;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.WorkRequest;
 import com.deu.synabro.http.response.*;
@@ -19,7 +20,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -96,32 +99,33 @@ public class BoardController {
             @ApiImplicitParam(name = "size", value = "한 페이지당 불러올 콘텐츠 개수", dataType = "integer", paramType = "query", defaultValue = "10"),
             @ApiImplicitParam(name = "sort", value = "정렬방법(id,desc,asc)", dataType = "string", paramType = "query", defaultValue = "asc")
     })
-    @GetMapping("")   //제목으로 글 찾기
+    @GetMapping("/{board_type}")   //제목으로 글 찾기
     public ResponseEntity<BoardPageResponse> getBoards(@PageableDefault Pageable pageable,
                                                        @RequestParam(name="searchOption", required = false, defaultValue = "title") SearchOption option,
-                                                            @RequestParam(name="keyword", required = false) String keyword){
+                                                       @RequestParam(name="keyword", required = false) String keyword,
+                                                       @PathVariable(name="board_type") BoardType boardType){
         Page<Board> boards;
         String searchOption=option.getValue();
         List<BoardListResponse> boardListResponseList = new ArrayList<>();
         BoardPageResponse boardPageResponse;
 
         if(keyword==null){
-            boards = boardService.findAll(pageable);
+            boards = boardService.findAll(pageable, boardType);
             addBoardListResponse(boards, boardListResponseList);
-            boardPageResponse = new BoardPageResponse(pageable, boards, option, null, boardListResponseList);
         }else {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdDate").descending());
             if(searchOption=="제목+내용"){
-                boards = boardService.findByTitleOrContents(pageable, keyword, keyword);
+                boards = boardService.findByTitleOrContents(pageable, keyword, keyword, boardType);
             }else {
-                boards = boardService.findByTitle(pageable, keyword);
+                boards = boardService.findByTitle(pageable, keyword, boardType);
             }
             if (boards.getContent().isEmpty()) {
                 BoardListResponse.addNullBoardListResponse(boardListResponseList);
             } else {
                 addBoardListResponse(boards, boardListResponseList);
             }
-            boardPageResponse = new BoardPageResponse(pageable, boards, option, keyword, boardListResponseList);
         }
+        boardPageResponse = new BoardPageResponse(pageable, boards, option, keyword, boardListResponseList, boardType);
         return new ResponseEntity<>(boardPageResponse, HttpStatus.OK);
     }
 
@@ -134,12 +138,19 @@ public class BoardController {
     @Operation(tags = "Board", summary = "id 값으로 게시판 글을 찾습니다.",
             responses={
                     @ApiResponse(responseCode = "200", description = "id 값으로 게시판 글 정보 조회 성공",
-                            content = @Content(schema = @Schema(implementation = Board.class)))
+                            content = @Content(schema = @Schema(implementation = BoardResponse.class)))
             })
-    @GetMapping("/{board_id}")
-    public ResponseEntity<Board> getBoard(@Parameter(description = "고유아이디") @PathVariable(name="board_id") UUID id){
-        Board board = boardService.findByIdx(id);
-        return new ResponseEntity<>(board, HttpStatus.OK);
+    @GetMapping("/{board_type}/{board_id}")
+    public ResponseEntity<BoardResponse> getBoard(@Parameter(description = "게시판 종류") @PathVariable(name="board_type") BoardType boardType,
+                                          @Parameter(description = "고유아이디") @PathVariable(name="board_id") UUID id){
+        BoardResponse boardResponse = null;
+        try{
+             boardResponse = boardService.getBoardResponse(boardService.findByIdx(id));
+            return new ResponseEntity<>(boardResponse, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(boardResponse, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     /**
@@ -174,14 +185,7 @@ public class BoardController {
     ){
         try{
             if (files!=null) {
-                for(MultipartFile file : files){
-                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
-                        boardService.setBoardVideo(boardRequest, fileUtil.saveVideo(file));
-                    }
-                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
-                        boardService.setBoardDocs(boardRequest, fileUtil.saveDocs(file));
-                    }
-                }
+                boardService.setBoardDocs(boardRequest, fileUtil.saveFiles(files));
             }else {
                 boardService.setBoard(boardRequest);
             }
@@ -234,9 +238,9 @@ public class BoardController {
                             content = @Content(schema = @Schema(implementation = GeneralResponse.class),
                                     examples = @ExampleObject(value = UPDATE_NOT_BOARD)))
             })
-    @PatchMapping("/update/{id}") // 게시판 수정
+    @PatchMapping("/{id}") // 게시판 수정
     public ResponseEntity<GeneralResponse> boardUpdate(@Parameter(description = "고유아이디") @PathVariable(name="id") UUID id,
-                              @Parameter @RequestBody BoardRequest boardRequest){
+                                                       @Parameter @RequestBody BoardRequest boardRequest){
         try{
             Board board = boardService.findByIdx(id);
             boardService.updateBoard(boardRequest, board);
@@ -246,6 +250,12 @@ public class BoardController {
         }
     }
 
+    @Operation(tags = "Board", summary = "게시판에 있는 파일을 다운로드합니다.")
+    @GetMapping("/download/{docs_id}")
+    public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
+                                           @PathVariable(name = "docs_id") UUID uuid)  {
+        return fileUtil.downDocs(uuid);
+    }
     /**
      * 페이징 처리할 게시글을 추가하는 메소드입니다.
      *

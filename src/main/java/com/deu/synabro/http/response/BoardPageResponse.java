@@ -2,6 +2,7 @@ package com.deu.synabro.http.response;
 
 import com.deu.synabro.controller.BoardController;
 import com.deu.synabro.entity.Board;
+import com.deu.synabro.entity.enums.BoardType;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -27,10 +28,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class BoardPageResponse {
     private PagedModel<BoardListResponse> boards;
 
-    public BoardPageResponse(Pageable pageable, Page<Board> boardPage, SearchOption searchOption, String keyword, List<BoardListResponse> boardListResponseList) {
+    public BoardPageResponse(Pageable pageable, Page<Board> boardPage, SearchOption searchOption, String keyword, List<BoardListResponse> boardListResponseList, BoardType boardType) {
         PagedModel.PageMetadata pageMetadata =
                 new PagedModel.PageMetadata(pageable.getPageSize(), boardPage.getNumber(), boardPage.getTotalElements());
         boards = PagedModel.of(boardListResponseList, pageMetadata);
-        boards.add(linkTo(methodOn(BoardController.class).getBoards(pageable, searchOption, keyword)).withSelfRel());
+        boards.add(linkTo(methodOn(BoardController.class).getBoards(pageable, searchOption, keyword, boardType)).withSelfRel());
     }
 }

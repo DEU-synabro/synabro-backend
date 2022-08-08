@@ -259,13 +259,6 @@ public class WorkController {
         return new ResponseEntity<>(workPageResponse, HttpStatus.OK);
     }
 
-    /**
-     * 페이징 처리할 봉사 요청글을 추가해주는 메소드입니다.
-     *
-     * @param works 페이징 처리할 봉사 요청글을 입력받습니다.
-     * @param contentsResponseList 페이징 처리된 봉사 요청글을 추가할 리스트를 입력받습니다.
-     */
-
 
     /**
      * 봉사 요청글에 있는 사진을 다운로드 해주는 메소드입니다.
@@ -273,11 +266,10 @@ public class WorkController {
      * @param uuid 봉사 요청글의 uuid 값입니다,
      * @return 봉사 요청글의 사진을 반환합니다.
      */
-    @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
-    @Operation(tags = "Work", summary = "봉사 요청글에 있는 사진을 다운로드합니다..")
-    @GetMapping("/download/{work_id}")
+    @Operation(tags = "Work", summary = "봉사 요청글에 있는 사진을 다운로드합니다.")
+    @GetMapping("/download/{docs_id}")
     public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
-                                               @PathVariable(name = "work_id") UUID uuid)  {
+                                               @PathVariable(name = "docs_id") UUID uuid)  {
         return fileUtil.downDocs(uuid);
     }
 
