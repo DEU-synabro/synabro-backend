@@ -50,6 +50,8 @@ public class AuthController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, authentication.getAuthorities().toString());
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, String.valueOf(memberService.getMemberWithAuthorities(signInRequest.getEmail()).get().getIdx()));
+
         return new ResponseEntity<>(new TokenResponse(jwt), httpHeaders, HttpStatus.OK);
     }
 }
