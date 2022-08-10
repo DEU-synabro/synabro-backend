@@ -11,6 +11,7 @@ import com.deu.synabro.http.response.WorkResponse;
 import com.deu.synabro.http.response.member.WorkHistoryDetailResponse;
 import com.deu.synabro.http.response.member.WorkHistoryListResponse;
 import com.deu.synabro.http.response.member.WorkHistoryResponse;
+import com.deu.synabro.repository.DocsRepository;
 import com.deu.synabro.repository.WorkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,6 +43,9 @@ public class WorkService {
     @Autowired
     MemberService memberService;
 
+    @Autowired
+    DocsRepository docsRepository;
+
     public void setWork(WorkRequest workRequest){
         Work work = workRequest.toEntity(UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName()));
         workRepository.save(work);
@@ -50,17 +55,13 @@ public class WorkService {
      * 요청한 봉사 요청글 정보로 봉사 요청글을 생성해주는 메소드입니다.
      *
      * @param workRequest 봉사 요청 내용(제목, 내용, 봉사 시간, 마감일) 입니다.
-     * @param docs 저장할 사진입니다.
+     * @param docsList 저장할 사진입니다.
      */
-    public void setWorkDocs(WorkRequest workRequest, Docs docs){
+    public void setWorkDocs(WorkRequest workRequest, List<Docs> docsList){
         Work work = workRequest.toEntity(UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName()));
-        work.addDocs(docs);
-        workRepository.save(work);
-    }
-
-    public void setWorkVideo(WorkRequest workRequest, Video video){
-        Work work = workRequest.toEntity(UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName()));
-        work.addVideo(video);
+        for (Docs docs : docsList){
+            work.addDocs(docs);
+        }
         workRepository.save(work);
     }
 
@@ -71,9 +72,15 @@ public class WorkService {
      * @return 봉사 요청글 Response을 반환합니다.
      */
     public WorkResponse getContentsResponse(Work work){
+        List<Docs> docs = docsRepository.findByWork_Idx(work.getIdx());
+        ArrayList<UUID> uuids = new ArrayList<>();
+        for(int i=0; i<docs.size(); i++){
+            uuids.add(docs.get(i).getIdx());
+        }
         WorkResponse workResponse = WorkResponse.builder()
                 .id(work.getIdx())
                 .userId(work.getUserId().getIdx())
+                .docsId(uuids)
                 .title(work.getTitle())
                 .contents(work.getContents())
                 .volunteerTime(work.getVolunteerTime())

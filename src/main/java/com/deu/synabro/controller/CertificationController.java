@@ -88,14 +88,7 @@ public class CertificationController {
             @Parameter @RequestPart(name = "certificationRequest")CertificationRequest certificationRequest){
         try{
             if (files!=null) {
-                for(MultipartFile file : files){
-                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
-                        certificationService.setCertificationVideo(certificationRequest, tagName, fileUtil.saveVideo(file));
-                    }
-                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
-                        certificationService.setCertificationDocs(certificationRequest, tagName, fileUtil.saveDocs(file));
-                    }
-                }
+                certificationService.setCertificationDocs(certificationRequest, tagName, fileUtil.saveFiles(files));
             }else {
                 certificationService.setCertification(certificationRequest, tagName);
             }
@@ -245,9 +238,9 @@ public class CertificationController {
      */
     @CrossOrigin(origins = "*", exposedHeaders = {"Content-Disposition"}, maxAge = 3600)
     @Operation(tags = "Certification", summary = "봉사 인증글에 있는 사진을 다운로드합니다..")
-    @GetMapping("/download/{certification_id}")
+    @GetMapping("/download/{docs_id}")
     public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
-                                           @PathVariable(name = "certification_id") UUID uuid)  {
+                                           @PathVariable(name = "docs_id") UUID uuid)  {
         return fileUtil.downDocs(uuid);
     }
 }

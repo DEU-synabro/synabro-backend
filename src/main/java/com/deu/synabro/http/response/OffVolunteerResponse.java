@@ -9,6 +9,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -16,6 +18,9 @@ import java.time.LocalDateTime;
 public class OffVolunteerResponse {
     @Schema(description = "봉사 제목", example = "제목")
     private String title;
+
+    @Schema(description = "고유번호", example = "8857ba20-2cb7-407e-908c-b333cf1257c5")
+    private ArrayList<UUID> docsId;
 
     @Schema(description = "봉사 설명", example = "설명")
     private String contents;

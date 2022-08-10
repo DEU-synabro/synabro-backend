@@ -12,4 +12,7 @@ import java.util.UUID;
 @Repository
 public interface DocsRepository extends JpaRepository<Docs, UUID> {
     List<Docs> findByBoard_Idx(UUID uuid);
+    List<Docs> findByWork_Idx(UUID uuid);
+    List<Docs> findByOffVolunteer_Idx(UUID uuid);
+    List<Docs> findByCertification_Idx(UUID uuid);
 }

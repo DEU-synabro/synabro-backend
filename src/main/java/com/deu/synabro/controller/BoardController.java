@@ -256,6 +256,7 @@ public class BoardController {
                                            @PathVariable(name = "docs_id") UUID uuid)  {
         return fileUtil.downDocs(uuid);
     }
+
     /**
      * 페이징 처리할 게시글을 추가하는 메소드입니다.
      *

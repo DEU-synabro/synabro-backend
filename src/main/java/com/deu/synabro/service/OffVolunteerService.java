@@ -6,6 +6,7 @@ import com.deu.synabro.entity.Video;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
 import com.deu.synabro.http.request.offVolunteer.OffVolunteerRequest;
 import com.deu.synabro.http.response.OffVolunteerResponse;
+import com.deu.synabro.repository.DocsRepository;
 import com.deu.synabro.repository.OffVolunteerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,7 +27,10 @@ public class OffVolunteerService {
     @Autowired
     OffVolunteerRepository offVolunteerRepository;
 
-    public void setOffVolunteerDocs(OffVolunteerRequest offVolunteerRequest, Docs docs){
+    @Autowired
+    DocsRepository docsRepository;
+
+    public void setOffVolunteerDocs(OffVolunteerRequest offVolunteerRequest, List<Docs> docsList){
         OffVolunteer offVolunteers = OffVolunteer.builder()
                 .title(offVolunteerRequest.getTitle())
                 .contents(offVolunteerRequest.getContents())
@@ -33,7 +39,9 @@ public class OffVolunteerService {
                 .startDate(offVolunteerRequest.getStartDate())
                 .endDate(offVolunteerRequest.getEndDate())
                 .build();
-        offVolunteers.addDocs(docs);
+        for (Docs docs : docsList) {
+            offVolunteers.addDocs(docs);
+        }
         offVolunteerRepository.save(offVolunteers);
     }
 
@@ -73,7 +81,13 @@ public class OffVolunteerService {
     }
 
     public OffVolunteerResponse getOffVolunteerResponse(OffVolunteer offVolunteer){
+        List<Docs> docs = docsRepository.findByOffVolunteer_Idx(offVolunteer.getIdx());
+        ArrayList<UUID> uuids = new ArrayList<>();
+        for(int i=0; i<docs.size(); i++){
+            uuids.add(docs.get(i).getIdx());
+        }
         OffVolunteerResponse offVolunteerResponse = OffVolunteerResponse.builder()
+                .docsId(uuids)
                 .title(offVolunteer.getTitle())
                 .contents(offVolunteer.getContents())
                 .startPeriod(offVolunteer.getStartPeriod())
