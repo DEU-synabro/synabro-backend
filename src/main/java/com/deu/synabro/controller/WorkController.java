@@ -114,14 +114,7 @@ public class WorkController {
             @RequestPart(name = "contentsRequest") WorkRequest workRequest){
         try{
             if (files!=null) {
-                for(MultipartFile file : files){
-                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
-                        workService.setWorkVideo(workRequest, fileUtil.saveVideo(file));
-                    }
-                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
-                        workService.setWorkDocs(workRequest, fileUtil.saveDocs(file));
-                    }
-                }
+                workService.setWorkDocs(workRequest, fileUtil.saveFiles(files));
             }else {
                 workService.setWork(workRequest);
             }

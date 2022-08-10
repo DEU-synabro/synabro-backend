@@ -22,7 +22,6 @@ public class OffVolunteerApplicationService {
     OffVolunteerApplicationRepository offVolunteerApplicationRepository;
 
     public void applyOffVolunteer(UUID offVolunteerId){
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().isEmpty()){
             throw new RuntimeException("로그인하세요.");
         }

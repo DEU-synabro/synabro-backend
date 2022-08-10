@@ -98,14 +98,7 @@ public class OffVolunteerController {
         @RequestPart(name = "contentsRequest") OffVolunteerRequest offVolunteerRequest) {
         try{
             if (files!=null) {
-                for(MultipartFile file : files){
-                    if(file.getOriginalFilename().contains(".mp4") || file.getOriginalFilename().contains(".avi")){
-                        offVolunteerService.setOffVolunteerVideo(offVolunteerRequest, fileUtil.saveVideo(file));
-                    }
-                    if(file.getOriginalFilename().contains(".txt") || file.getOriginalFilename().contains(".png") || file.getOriginalFilename().contains(".jpg")){
-                        offVolunteerService.setOffVolunteerDocs(offVolunteerRequest, fileUtil.saveDocs(file));
-                    }
-                }
+                offVolunteerService.setOffVolunteerDocs(offVolunteerRequest, fileUtil.saveFiles(files));
             }else {
                 offVolunteerService.setOffVolunteer(offVolunteerRequest);
             }
@@ -214,7 +207,7 @@ public class OffVolunteerController {
         }
         return new ResponseEntity<>(offVolunteerPageResponse, HttpStatus.OK);
     }
-
+    
     private void addOffVolunteerListResponse(Page<OffVolunteer> offVolunteers, List<OffVolunteerListResponse> offVolunteerListResponseList){
         if(offVolunteers.getSize()>=offVolunteers.getTotalElements()){
             for(int i=0; i<offVolunteers.getTotalElements(); i++){
@@ -239,5 +232,12 @@ public class OffVolunteerController {
                 contentSize++;
             }
         }
+    }
+
+    @Operation(tags = "offVolunteer", summary = "오프라인 봉사 모집글에 있는 파일을 다운로드합니다.")
+    @GetMapping("/download/{docs_id}")
+    public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
+                                           @PathVariable(name = "docs_id") UUID uuid)  {
+        return fileUtil.downDocs(uuid);
     }
 }

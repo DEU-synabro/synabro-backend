@@ -111,12 +111,6 @@ public class BoardService {
         board.setContents(boardRequest.getContents());
     }
 
-    public void setBoardVideo(BoardRequest boardRequest, Video video) {
-        Board board = boardRequest.toEntity(boardRequest);
-        board.addVideo(video);
-        boardRepository.save(board);
-    }
-
     public void setBoardDocs(BoardRequest boardRequest, List<Docs> docsList) {
         Board board = boardRequest.toEntity(boardRequest);
         for (Docs docs : docsList){

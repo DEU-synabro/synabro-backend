@@ -8,6 +8,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -25,6 +26,9 @@ public class WorkResponse {
 
     @Schema(description = "아이디", example = "62ddd3ba-bbf0-469f-9c7d-f908df979c75")
     private UUID userId;
+
+    @Schema(description = "고유번호", example = "8857ba20-2cb7-407e-908c-b333cf1257c5")
+    private ArrayList<UUID> docsId;
 
     @Schema(description = "봉사 제목", example = "제목")
     private String title;

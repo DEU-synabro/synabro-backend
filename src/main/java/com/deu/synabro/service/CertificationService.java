@@ -4,6 +4,7 @@ import com.deu.synabro.entity.*;
 import com.deu.synabro.http.request.CertificationRequest;
 import com.deu.synabro.http.response.CertificationResponse;
 import com.deu.synabro.repository.CertificationRepository;
+import com.deu.synabro.repository.DocsRepository;
 import com.deu.synabro.repository.OffVolunteerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +28,9 @@ public class CertificationService {
 
     @Autowired
     OffVolunteerRepository offVolunteerRepository;
+
+    @Autowired
+    DocsRepository docsRepository;
 
     public void setCertification(CertificationRequest certificationRequest, String tagName){
         OffVolunteer offVolunteer = offVolunteerRepository.findByTagName(tagName);
@@ -37,7 +43,7 @@ public class CertificationService {
         certificationRepository.save(certification);
     }
 
-    public void setCertificationDocs(CertificationRequest certificationRequest, String tagName, Docs docs){
+    public void setCertificationDocs(CertificationRequest certificationRequest, String tagName, List<Docs> docsList){
         OffVolunteer offVolunteer = offVolunteerRepository.findByTagName(tagName);
         Certification certification = Certification.builder()
                 .offVolunteerId(offVolunteer)
@@ -45,7 +51,9 @@ public class CertificationService {
                 .title(certificationRequest.getTitle())
                 .contents(certificationRequest.getContents())
                 .build();
-        certification.addDocs(docs);
+        for (Docs docs : docsList) {
+            certification.addDocs(docs);
+        }
         certificationRepository.save(certification);
     }
 
@@ -111,10 +119,16 @@ public class CertificationService {
     }
 
     public CertificationResponse getCertification(Certification certification){
+        List<Docs> docs = docsRepository.findByOffVolunteer_Idx(certification.getIdx());
+        ArrayList<UUID> uuids = new ArrayList<>();
+        for(int i=0; i<docs.size(); i++){
+            uuids.add(docs.get(i).getIdx());
+        }
         CertificationResponse certificationResponse = CertificationResponse.builder()
                 .id(certification.getIdx())
                 .offVolunteerId(certification.getOffVolunteerId().getIdx())
                 .userId(certification.getUserId().getIdx())
+                .docsId(uuids)
                 .title(certification.getTitle())
                 .contents(certification.getContents())
                 .createdDate(certification.getCreatedDate())
