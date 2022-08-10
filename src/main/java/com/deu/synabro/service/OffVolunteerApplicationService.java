@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -59,4 +60,7 @@ public class OffVolunteerApplicationService {
     }
 
 
+    public List<OffVolunteerApplication> getOffVolunteerApplication(UUID uuid) {
+        return offVolunteerApplicationRepository.findByOffVolunteerId(uuid);
+    }
 }

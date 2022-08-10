@@ -119,7 +119,7 @@ public class CertificationService {
     }
 
     public CertificationResponse getCertification(Certification certification){
-        List<Docs> docs = docsRepository.findByOffVolunteer_Idx(certification.getIdx());
+        List<Docs> docs = docsRepository.findByCertification_Idx(certification.getIdx());
         ArrayList<UUID> uuids = new ArrayList<>();
         for(int i=0; i<docs.size(); i++){
             uuids.add(docs.get(i).getIdx());

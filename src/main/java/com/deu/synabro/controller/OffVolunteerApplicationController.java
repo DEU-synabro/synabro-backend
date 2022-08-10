@@ -1,8 +1,10 @@
 package com.deu.synabro.controller;
 
+import com.deu.synabro.entity.OffVolunteerApplication;
 import com.deu.synabro.entity.enums.ApplyOption;
 import com.deu.synabro.http.request.offVolunteer.ApplyBeneficiaryRequest;
 import com.deu.synabro.http.request.offVolunteer.BeneficiaryRequest;
+import com.deu.synabro.http.response.BoardResponse;
 import com.deu.synabro.http.response.GeneralResponse;
 import com.deu.synabro.service.OffVolunteerApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name="offVolunteerApplication", description = "오프라인 봉사 신청 API")
@@ -108,6 +111,22 @@ public class OffVolunteerApplicationController {
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK,"오프라인 봉사 신청이 취소되었습니다."), HttpStatus.OK);
         }  catch (Exception e){
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.NOT_FOUND,"취소할 봉사 신청이 없습니다."), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Operation(tags = "offVolunteerApplication", summary = "id 값으로 신청자들을 확인합니다.",
+            responses={
+                    @ApiResponse(responseCode = "200", description = "id 값으로 신청자들 정보 조회 성공",
+                            content = @Content(schema = @Schema(implementation = OffVolunteerApplication.class)))
+            })
+    @GetMapping("/{off_volunteer_id}")
+    public ResponseEntity<List<OffVolunteerApplication>> getOffVolunteerApplication(@PathVariable(name = "off_volunteer_id") UUID uuid) {
+        List<OffVolunteerApplication> offVolunteerApplications = null;
+        try{
+            offVolunteerApplications = offVolunteerApplicationService.getOffVolunteerApplication(uuid);
+            return new ResponseEntity<>(offVolunteerApplications, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(offVolunteerApplications, HttpStatus.BAD_REQUEST);
         }
     }
 }
