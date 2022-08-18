@@ -3,6 +3,7 @@ package com.deu.synabro.service;
 import com.deu.synabro.entity.Docs;
 import com.deu.synabro.entity.OffVolunteer;
 import com.deu.synabro.entity.Video;
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
 import com.deu.synabro.http.request.offVolunteer.OffVolunteerRequest;
 import com.deu.synabro.http.response.OffVolunteerResponse;
@@ -38,6 +39,8 @@ public class OffVolunteerService {
                 .endPeriod(offVolunteerRequest.getEndPeriod())
                 .startDate(offVolunteerRequest.getStartDate())
                 .endDate(offVolunteerRequest.getEndDate())
+                .tagName(offVolunteerRequest.getTagName())
+                .approvalType(ApprovalType.refuse)
                 .build();
         for (Docs docs : docsList) {
             offVolunteers.addDocs(docs);
@@ -66,8 +69,16 @@ public class OffVolunteerService {
                 .endPeriod(offVolunteerRequest.getEndPeriod())
                 .startDate(offVolunteerRequest.getStartDate())
                 .endDate(offVolunteerRequest.getEndDate())
+                .tagName(offVolunteerRequest.getTagName())
+                .approvalType(ApprovalType.refuse)
                 .build();
         offVolunteerRepository.save(offVolunteers);
+    }
+
+    @Transactional
+    public void setCertification(UUID uuid, ApprovalType approvalType){
+        OffVolunteer offVolunteer = findByIdx(uuid);
+        offVolunteer.setApprovalType(approvalType);
     }
 
     @Transactional

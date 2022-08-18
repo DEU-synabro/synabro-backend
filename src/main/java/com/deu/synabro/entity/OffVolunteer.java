@@ -1,5 +1,6 @@
 package com.deu.synabro.entity;
 
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,6 +43,11 @@ public class OffVolunteer extends BaseTime implements Serializable{
     @Schema(description = "봉사 태그", example = "봉사 태그")
     private String tagName;
 
+    @Enumerated(value=EnumType.STRING)
+    @Column
+    @Schema(description = "인증 글 허용", example = "true 일 경우 해당 인증글 작성 가능")
+    private ApprovalType approvalType;
+
     @Column(name = "start_period")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startPeriod;
@@ -66,7 +72,7 @@ public class OffVolunteer extends BaseTime implements Serializable{
         docs.setOffVolunteer(this);
     }
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "work")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "offVolunteer")
     private List<Video> videoList = new ArrayList<>();
 
     public void addVideo(Video video){
@@ -75,13 +81,15 @@ public class OffVolunteer extends BaseTime implements Serializable{
     }
 
     @Builder
-    public OffVolunteer(String title, String contents, LocalDateTime startPeriod, LocalDateTime endPeriod, LocalDateTime startDate, LocalDateTime endDate) {
+    public OffVolunteer(String title, String contents, LocalDateTime startPeriod, LocalDateTime endPeriod, LocalDateTime startDate, LocalDateTime endDate, String tagName, ApprovalType approvalType) {
         this.title = title;
         this.contents = contents;
         this.startPeriod = startPeriod;
         this.endPeriod = endPeriod;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.tagName = tagName;
+        this.approvalType = approvalType;
     }
 
     public OffVolunteer(UUID idx) {

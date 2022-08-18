@@ -11,5 +11,5 @@ import java.util.UUID;
 @Repository
 public interface OffVolunteerApplicationRepository extends JpaRepository<OffVolunteerApplication, UUID> {
     Optional<OffVolunteerApplication> findByNameAndPassword(String name, String password);
-    List<OffVolunteerApplication> findByOffVolunteerId(UUID uuid);
+    List<OffVolunteerApplication> findByOffVolunteerId_Idx(UUID uuid);
 }

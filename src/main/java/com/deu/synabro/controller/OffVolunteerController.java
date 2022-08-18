@@ -2,6 +2,7 @@ package com.deu.synabro.controller;
 
 
 import com.deu.synabro.entity.OffVolunteer;
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.deu.synabro.entity.enums.SearchOption;
 import com.deu.synabro.http.request.OffVolunteerUpdateRequest;
 import com.deu.synabro.http.request.offVolunteer.OffVolunteerRequest;
@@ -239,5 +240,12 @@ public class OffVolunteerController {
     public ResponseEntity<Object> download(@Parameter(description = "고유 아이디")
                                            @PathVariable(name = "docs_id") UUID uuid)  {
         return fileUtil.downDocs(uuid);
+    }
+
+    @Operation(tags = "offVolunteer", summary = "봉사 인증글을 작성할 수 있게 허용합니다.")
+    @PatchMapping("/certification/{off_volunteer_id}")
+    public void setCertification(@Parameter(description = "고유 아이디")
+                                                       @PathVariable(name = "off_volunteer_id") UUID uuid, @RequestParam(name = "approvalType") ApprovalType approvalType){
+        offVolunteerService.setCertification(uuid, approvalType);
     }
 }
