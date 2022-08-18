@@ -1,8 +1,8 @@
 package com.deu.synabro.entity.enums;
 
 public enum ApplyOption {
-    member("회원"),
-    non_member("수혜자");
+    user("회원"),
+    beneficiary("수혜자");
 
     private String applyOption;
 

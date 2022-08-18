@@ -44,13 +44,16 @@ public class OffVolunteerApplication extends BaseTime implements Serializable {
     private String phone;
 
     @Column(columnDefinition = "VARCHAR(255)")
+    private String address;
+
+    @Column(columnDefinition = "VARCHAR(255)")
     private String teamGroup;
 
     @Column(columnDefinition = "VARCHAR(255)")
     private ApplyOption applyOption;
 
     @Builder
-    public OffVolunteerApplication(OffVolunteer offVolunteerId, Member userId, String name, String password, String phone, String teamGroup, ApplyOption applyOption) {
+    public OffVolunteerApplication(OffVolunteer offVolunteerId, Member userId, String name, String password, String phone, String teamGroup, ApplyOption applyOption, String address) {
         this.offVolunteerId = offVolunteerId;
         this.userId = userId;
         this.name = name;
@@ -58,5 +61,6 @@ public class OffVolunteerApplication extends BaseTime implements Serializable {
         this.phone = phone;
         this.teamGroup = teamGroup;
         this.applyOption = applyOption;
+        this.address = address;
     }
 }

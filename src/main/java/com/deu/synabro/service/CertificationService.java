@@ -1,8 +1,10 @@
 package com.deu.synabro.service;
 
 import com.deu.synabro.entity.*;
+import com.deu.synabro.entity.enums.ApprovalType;
 import com.deu.synabro.http.request.CertificationRequest;
 import com.deu.synabro.http.response.CertificationResponse;
+import com.deu.synabro.http.response.TagNameResponse;
 import com.deu.synabro.repository.CertificationRepository;
 import com.deu.synabro.repository.DocsRepository;
 import com.deu.synabro.repository.OffVolunteerRepository;
@@ -135,5 +137,15 @@ public class CertificationService {
                 .updatedDate(certification.getUpdatedDate())
                 .build();
         return certificationResponse;
+    }
+
+    public List<TagNameResponse> getTagName(){
+        List<OffVolunteer> dataList = offVolunteerRepository.findByApprovalType(ApprovalType.permit);
+        List<TagNameResponse> tagNameResponses = new ArrayList<>();
+        for(int i=0; i<dataList.size(); i++){
+            TagNameResponse tagNameResponse = new TagNameResponse(dataList.get(i).getTagName());
+            tagNameResponses.add(tagNameResponse);
+        }
+        return  tagNameResponses;
     }
 }

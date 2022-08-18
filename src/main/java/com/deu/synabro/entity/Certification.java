@@ -16,13 +16,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name="off_volunteer_application")
+@Table(name="certification")
 @RequiredArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Certification extends BaseTime implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Certifiacation_id", columnDefinition = "BINARY(16)")
+    @Column(name = "certification_id", columnDefinition = "BINARY(16)")
     private UUID idx;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -6,6 +6,7 @@ import com.deu.synabro.http.request.offVolunteer.ApplyBeneficiaryRequest;
 import com.deu.synabro.http.request.offVolunteer.BeneficiaryRequest;
 import com.deu.synabro.http.response.BoardResponse;
 import com.deu.synabro.http.response.GeneralResponse;
+import com.deu.synabro.http.response.OffVolunteerApplicationResponse;
 import com.deu.synabro.service.OffVolunteerApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,7 +66,7 @@ public class OffVolunteerApplicationController {
                 offVolunteerApplicationService.applyOffVolunteer(uuid);
             }
             if (option=="수혜자"){
-                offVolunteerApplicationService.applyOffVolunteerBeneficiary(applyBeneficiaryRequest);
+                offVolunteerApplicationService.applyOffVolunteerBeneficiary(applyBeneficiaryRequest, uuid);
             }
 
             return new ResponseEntity<>(GeneralResponse.of(HttpStatus.OK, "오프라인 봉사 신청이 되었습니다."), HttpStatus.OK);
@@ -120,13 +122,13 @@ public class OffVolunteerApplicationController {
                             content = @Content(schema = @Schema(implementation = OffVolunteerApplication.class)))
             })
     @GetMapping("/{off_volunteer_id}")
-    public ResponseEntity<List<OffVolunteerApplication>> getOffVolunteerApplication(@PathVariable(name = "off_volunteer_id") UUID uuid) {
-        List<OffVolunteerApplication> offVolunteerApplications = null;
+    public ResponseEntity<List<OffVolunteerApplicationResponse>> getOffVolunteerApplication(@PathVariable(name = "off_volunteer_id") UUID uuid) {
+        List<OffVolunteerApplicationResponse> dataResponse = null;
         try{
-            offVolunteerApplications = offVolunteerApplicationService.getOffVolunteerApplication(uuid);
-            return new ResponseEntity<>(offVolunteerApplications, HttpStatus.OK);
+            dataResponse = offVolunteerApplicationService.getOffVolunteerApplication(uuid);
+            return new ResponseEntity<>(dataResponse, HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>(offVolunteerApplications, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(dataResponse, HttpStatus.BAD_REQUEST);
         }
     }
 }

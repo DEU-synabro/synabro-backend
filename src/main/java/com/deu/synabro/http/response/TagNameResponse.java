@@ -1,0 +1,16 @@
+package com.deu.synabro.http.response;
+
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class TagNameResponse {
+    private String tagName;
+
+    public TagNameResponse(String tagName) {
+        this.tagName = tagName;
+    }
+}

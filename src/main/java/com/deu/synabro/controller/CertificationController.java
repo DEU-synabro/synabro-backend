@@ -243,4 +243,18 @@ public class CertificationController {
                                            @PathVariable(name = "docs_id") UUID uuid)  {
         return fileUtil.downDocs(uuid);
     }
+
+    @Operation(tags = "Certification", summary = "태그명을 가져옵니다.",
+            responses={
+                    @ApiResponse(responseCode = "200", description = "태그명 조회 성공",
+                            content = @Content(schema = @Schema(implementation = TagNameResponse.class)))
+            })
+    @GetMapping("/tagName")
+    public ResponseEntity<List<TagNameResponse>> getTagName(){
+        try{
+            return new ResponseEntity<>(certificationService.getTagName(), HttpStatus.OK);
+        }catch ( NullPointerException e){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }
