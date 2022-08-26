@@ -57,7 +57,8 @@ public class VolunteerWorkService {
                 .userId(new Member(userId))
                 .workId(workId)
                 .contents("")
-                .performType(PerformType.PERFORMING)
+                .performType(PerformType.WAIT)
+                .approvalType(ApprovalType.wait)
                 .build();
         volunteerWorkRepository.save(volunteerWork);
     }
@@ -296,6 +297,7 @@ public class VolunteerWorkService {
 
     @Transactional
     public void permitVolunteerWork(VolunteerWork volunteerWork){
+        volunteerWork.setPerformType(PerformType.PERFORMING);
         volunteerWork.setApprovalType(ApprovalType.permit);
     }
 
